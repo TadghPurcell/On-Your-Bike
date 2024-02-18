@@ -10,7 +10,7 @@ import requests
 import time
 from IPython.display import display
 
-with open('./se-group27-project/data_collection/dbinfo.json') as f:
+with open('../data_collection/dbinfo.json') as f:
     db_info = json.load(f)
 USER = db_info['dbConnection']['USER']
 PASSWORD = db_info['dbConnection']['PASSWORD']
