@@ -39,6 +39,6 @@ try:
     connection = engine.connect()
     res = connection.execute("DROP TABLE IF EXISTS station")
     res = connection.execute(sql)
-    print(res.fetchall())
+    print(res)
 except SQLAlchemyError as e:
     print("Error: ", e.__cause__)
