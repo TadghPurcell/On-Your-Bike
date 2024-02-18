@@ -37,8 +37,8 @@ status VARCHAR(256)
 
 try:
     connection = engine.connect()
-    res = engine.execute("DROP TABLE IF EXISTS station")
-    res = engine.exeucte(sql)
+    res = connection.execute("DROP TABLE IF EXISTS station")
+    res = connection.execute(sql)
     print(res.fetchall())
 except SQLAlchemyError as e:
     print("Error: ", e.__cause__)
