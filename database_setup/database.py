@@ -20,8 +20,29 @@ DB = db_info['dbConnection']['DB']
 
 engine = create_engine('mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
 print(engine.url)
+
 try:
     connection = engine.connect()
     print("success")
-except SQLAlchemyError as err:
-    print("Error: ", err.__cause__)
+except SQLAlchemyError as e:
+    print("Error: ", e.__cause__)
+
+sql = """
+CREATE TABLE IF NOT EXISTS station (
+address VARCHAR(256),
+banking INTEGER,
+bike_stands INTEGER,
+bonus INTEGER,
+contract_name VARCHAR(256),
+name VARCHAR(256),
+number INTEGER,
+position_lat REAL,
+position_lng REAL,
+status VARCHAR(256)
+)"""
+try:
+    res = engine.execute("DROP TABLE IF EXISTS station")
+    res = engine.exeucte(sql)
+    print(res.fetchall())
+except SQLAlchemyError as e:
+    print(e)
