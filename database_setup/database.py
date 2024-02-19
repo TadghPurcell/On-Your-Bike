@@ -1,16 +1,33 @@
-from sqlalchemy import create_engine
-from sqlalchemy.exc import SQLAlchemyError
-import MySQLdb
-import traceback
-import glob
-import os
-import pprint
+import pandas as pd
 import json
-import requests
-import time
-from IPython.display import display
+from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR
+from sqlalchemy.orm import sessionmaker, declarative_base
+import SQLAlchemyError
 
-with open('../data_collection/dbinfo.json') as f:
+Base = declarative_base()
+
+# Class defines tables in DB
+class Station(Base):
+    __tablename__ = 'stations'
+    stationid = Column('stationid', Integer, primary_key=True)
+    name = Column('name', String)
+    address = Column('address', String)
+    latitude = Column('latitude', Integer)
+    longitude = Column('Longitude', Integer)
+
+    def __init__(self, stationid, name, address, latitude, longitude):
+        self.stationid = stationid
+        self.name = name
+        self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
+
+    def __repr__(self):
+        return f"{self.name}, {self.address}"
+
+    
+
+with open('../dbinfo.json') as f:
     db_info = json.load(f)
 USER = db_info['dbConnection']['USER']
 PASSWORD = db_info['dbConnection']['PASSWORD']
@@ -21,24 +38,23 @@ DB = db_info['dbConnection']['DB']
 engine = create_engine('mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
 print(engine.url)
 
-sql = """
-CREATE TABLE IF NOT EXISTS station (
-address VARCHAR(256),
-banking INTEGER,
-bike_stands INTEGER,
-bonus INTEGER,
-contract_name VARCHAR(256),
-name VARCHAR(256),
-number INTEGER,
-position_lat REAL,
-position_lng REAL,
-status VARCHAR(256)
-)"""
+# Takes all classes that extends from base and creates them in the 
+# database connects to engine and creates table for each class
+Base.metadata.create_all(bind=engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+df = pd.read_csv(f"../dublin_bikes_static_info.csv", keep_default_na=True, delimiter=',', skipinitialspace=True, encoding='Windows-1252')
+df.to_csv('dublin_bikes_static_info.csv', index=False)
 
 try:
-    connection = engine.connect()
-    res = connection.execute("DROP TABLE IF EXISTS station")
-    res = connection.execute(sql)
-    print(res)
+    for row in df.itertuples():
+        print(row)
+        existing_station = session.query(Station).filter_by(stationid=row[1]).first()
+        if existing_station is None:
+            station = Station(row[1], row[1], row[2], row[3], row[4], row[5])
+            session.add(station)
+    session.commit()
 except SQLAlchemyError as e:
-    print("Error: ", e.__cause__)
+    print('Error', e.__cause__)
