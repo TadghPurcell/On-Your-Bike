@@ -2,7 +2,6 @@ import pandas as pd
 import json
 from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR
 from sqlalchemy.orm import sessionmaker, declarative_base
-import SQLAlchemyError
 
 Base = declarative_base()
 
@@ -10,8 +9,8 @@ Base = declarative_base()
 class Station(Base):
     __tablename__ = 'stations'
     stationid = Column('stationid', Integer, primary_key=True)
-    name = Column('name', String)
-    address = Column('address', String)
+    name = Column('name', String(255))
+    address = Column('address', String(255))
     latitude = Column('latitude', Integer)
     longitude = Column('Longitude', Integer)
 
@@ -48,13 +47,11 @@ session = Session()
 df = pd.read_csv(f"../dublin_bikes_static_info.csv", keep_default_na=True, delimiter=',', skipinitialspace=True, encoding='Windows-1252')
 df.to_csv('dublin_bikes_static_info.csv', index=False)
 
-try:
-    for row in df.itertuples():
-        print(row)
-        existing_station = session.query(Station).filter_by(stationid=row[1]).first()
-        if existing_station is None:
-            station = Station(row[1], row[1], row[2], row[3], row[4], row[5])
-            session.add(station)
-    session.commit()
-except SQLAlchemyError as e:
-    print('Error', e.__cause__)
+
+for row in df.itertuples():
+    print(row)
+    existing_station = session.query(Station).filter_by(stationid=row[1]).first()
+    if existing_station is None:
+        station = Station(row[1], row[2], row[3], row[4], row[5])
+        session.add(station)
+session.commit()
