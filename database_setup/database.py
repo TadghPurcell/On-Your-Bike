@@ -11,8 +11,8 @@ class Station(Base):
     stationid = Column('stationid', Integer, primary_key=True)
     name = Column('name', String(255))
     address = Column('address', String(255))
-    latitude = Column('latitude', Integer)
-    longitude = Column('Longitude', Integer)
+    latitude = Column('latitude', String(255))
+    longitude = Column('longitude', String(255))
 
     def __init__(self, stationid, name, address, latitude, longitude):
         self.stationid = stationid
@@ -46,12 +46,13 @@ session = Session()
 
 df = pd.read_csv(f"../dublin_bikes_static_info.csv", keep_default_na=True, delimiter=',', skipinitialspace=True, encoding='Windows-1252')
 df.to_csv('dublin_bikes_static_info.csv', index=False)
+print(df)
 
 
 for row in df.itertuples():
     print(row)
     existing_station = session.query(Station).filter_by(stationid=row[1]).first()
     if existing_station is None:
-        station = Station(row[1], row[2], row[3], row[4], row[5])
+        station = Station(row[1], row[2], row[3], str(row[4]), str(row[5]))
         session.add(station)
 session.commit()
