@@ -29,7 +29,7 @@ df = pd.read_json(jcDecaux_data.text)
 class Availability(Base):
     __tablename__ = 'availability'
     station_id = Column('station_id', Integer, ForeignKey('stations.station_id'), primary_key=True)
-    timestamp = Column('timestamp', Integer)
+    timestamp = Column('timestamp', Integer, primary_key=True)
     bike_stands = Column('bike_stands', Integer)
     available_bikes = Column('available_bikes', Integer)
     available_bike_stands = Column('available_bike_stands', Integer)
