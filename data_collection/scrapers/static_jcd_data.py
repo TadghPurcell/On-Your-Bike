@@ -59,8 +59,6 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 for row in transposed_df.iterrows():
-    existing_station = session.query(Station).filter_by(station_id=row[1].name).first()
-    if existing_station is None:
-        station = Station(row[1]['number'], row[1]['name'], row[1]['address'], row[1]['position']['lat'], row[1]['position']['lng'], row[1]['banking'])
-        session.add(station)
+    station = Station(row[1]['number'], row[1]['name'], row[1]['address'], row[1]['position']['lat'], row[1]['position']['lng'], row[1]['banking'])
+    session.add(station)
 session.commit()
