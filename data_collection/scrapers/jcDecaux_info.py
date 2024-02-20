@@ -1,4 +1,4 @@
-from static_jcd_data import Station
+# from static_jcd_data import Station
 from db_config import Base
 import pandas as pd
 import requests
@@ -24,7 +24,8 @@ PORT = db_info['dbConnection']['PORT']
 DB = db_info['dbConnection']['DB']
 
 jcDecaux_data = requests.get(STATIONS_URI, params={'apiKey':BIKE_API_KEY, 'contract':NAME})
-df = pd.read_json(jcDecaux_data.text)
+jcDecaux_info = jcDecaux_data.json()
+df = pd.DataFrame(jcDecaux_info)
 
 class Availability(Base):
     __tablename__ = 'availability'
@@ -55,10 +56,10 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-for row in df.iterrows():
-    availabilityRow = Availability(row[1].name + 1, row[1].bike_stands, row[1].available_bike_stands, row[1].available_bikes, row[1].status)
+for row in df.itertuples():
+    availabilityRow = Availability(row.number, row.bike_stands, row.available_bike_stands, row.available_bikes, row.status, row.last_update)
     session.add(availabilityRow)
-    # print(row[1].number, row[1].bike_stands, row[1].available_bike_stands, row[1].available_bikes, row[1].status, row[1].last_update)
+    # print(row.number, row.bike_stands, row.available_bike_stands, row.available_bikes, row.status, row.last_update)
     # print('-----------')
 
 session.commit()
