@@ -46,7 +46,6 @@ session = Session()
 df = pd.read_csv(f"../dublin_bikes_static_info.csv", keep_default_na=True, delimiter=',', skipinitialspace=True, encoding='Windows-1252')
 print(df)
 
-
 for row in df.itertuples():
     print(row)
     existing_station = session.query(Station).filter_by(stationid=row[1]).first()
