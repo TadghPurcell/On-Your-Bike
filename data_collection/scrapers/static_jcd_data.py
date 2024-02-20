@@ -42,10 +42,11 @@ class Station(Base):
         self.address = address
         self.latitude = latitude
         self.longitude = longitude
-        self.payment_terminal = payment_terminal
-        self.bonus_station = bonus_station
-
-
+        if payment_terminal == 'True':
+            self.payment_terminal = True
+        else:
+            self.payment_terminal = False
+            
     def __repr__(self):
         return f"{self.name}, {self.address}"
 
@@ -61,6 +62,6 @@ session = Session()
 for row in df.iterrows():
     existing_station = session.query(Station).filter_by(stationid=row[1]).first()
     if existing_station is None:
-        station = Station(row[1].number, row[1].name, row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking, row[1].bonus)
+        station = Station(row[1].number, row[1].name, row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking)
         session.add(station)
 session.commit()
