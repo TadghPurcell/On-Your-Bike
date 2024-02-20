@@ -1,40 +1,55 @@
 from db_config import Base
 import pandas as pd
 import json
-from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR
-from sqlalchemy.orm import sessionmaker, declarative_base
+import requests
+from sqlalchemy import create_engine, Column, String, Integer
+from sqlalchemy.orm import sessionmaker
 
-# Class defines tables in DB
-class Station(Base):
-    __tablename__ = 'stations' 
-    stationid = Column('stationid', Integer, primary_key=True)
-    name = Column('name', String(255))
-    address = Column('address', String(255))
-    latitude = Column('latitude', String(255))
-    longitude = Column('longitude', String(255))
-
-    def __init__(self, stationid, name, address, latitude, longitude):
-        self.stationid = stationid
-        self.name = name
-        self.address = address
-        self.latitude = latitude
-        self.longitude = longitude
-
-    def __repr__(self):
-        return f"{self.name}, {self.address}"
-
-    
+#Sets options to read entire data frame
+pd.set_option("display.max_rows", None, "display.max_columns", None)
 
 with open('../dbinfo.json') as f:
     db_info = json.load(f)
+# URI and name
+BIKE_API_KEY = db_info['JCKey']
+STATIONS_URI = 'https://api.jcdecaux.com/vls/v1/stations'
+NAME = 'dublin'
+
 USER = db_info['dbConnection']['USER']
 PASSWORD = db_info['dbConnection']['PASSWORD']
 URI = db_info['dbConnection']['URI']
 PORT = db_info['dbConnection']['PORT']
 DB = db_info['dbConnection']['DB']
 
+jcDecaux_data = requests.get(STATIONS_URI, params={'apiKey':BIKE_API_KEY, 'contract':NAME})
+df = pd.read_json(jcDecaux_data.text)
+
+
+# Class defines tables in DB
+class Station(Base):
+    __tablename__ = 'stations' 
+    station_id = Column('station_id', Integer, primary_key=True)
+    name = Column('name', String(255))
+    address = Column('address', String(255))
+    latitude = Column('latitude', String(255))
+    longitude = Column('longitude', String(255))
+    payment_terminal = Column('payment_terminal', bool)
+    bonus_station = Column('bonus_station', bool)
+
+    def __init__(self, stationid, name, address, latitude, longitude, payment_terminal, bonus_station):
+        self.stationid = stationid
+        self.name = name
+        self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
+        self.payment_terminal = payment_terminal
+        self.bonus_station = bonus_station
+
+
+    def __repr__(self):
+        return f"{self.name}, {self.address}"
+
 engine = create_engine('mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
-print(engine.url)
 
 # Takes all classes that extends from base and creates them in the 
 # database connects to engine and creates table for each class
@@ -43,13 +58,9 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-df = pd.read_csv(f"../dublin_bikes_static_info.csv", keep_default_na=True, delimiter=',', skipinitialspace=True, encoding='Windows-1252')
-print(df)
-
-for row in df.itertuples():
-    print(row)
+for row in df.iterrows():
     existing_station = session.query(Station).filter_by(stationid=row[1]).first()
     if existing_station is None:
-        station = Station(row[1], row[2], row[3], str(row[4]), str(row[5]))
+        station = Station(row[1].number, row[1].name, row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking, row[1].bonus)
         session.add(station)
 session.commit()

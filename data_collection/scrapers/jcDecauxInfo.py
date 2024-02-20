@@ -3,10 +3,9 @@ from db_config import Base
 import pandas as pd
 import requests
 from datetime import datetime
-from pprint import pprint 
 import json
 from sqlalchemy import create_engine, Column, String, Integer, ForeignKey
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import sessionmaker
 
 #Sets options to read entire data frame
 pd.set_option("display.max_rows", None, "display.max_columns", None)
@@ -29,7 +28,7 @@ df = pd.read_json(jcDecaux_data.text)
 
 class Availability(Base):
     __tablename__ = 'availability'
-    station_id = Column('station_id', Integer, ForeignKey('stations.stationid'), primary_key=True)
+    station_id = Column('station_id', Integer, ForeignKey('stations.station_id'), primary_key=True)
     timestamp = Column('timestamp', Integer)
     bike_stands = Column('bike_stands', Integer)
     available_bikes = Column('available_bikes', Integer)
