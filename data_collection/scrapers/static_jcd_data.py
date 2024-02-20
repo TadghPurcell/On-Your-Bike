@@ -57,6 +57,6 @@ session = Session()
 for row in df.iterrows():
     existing_station = session.query(Station).filter_by(station_id=row[1].name).first()
     if existing_station is None:
-        station = Station(row[1].name, row[1]['name'], row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking)
+        station = Station(row[1].name + 1, row[1]['name'], row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking)
         session.add(station)
 session.commit()
