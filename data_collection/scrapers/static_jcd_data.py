@@ -25,8 +25,7 @@ jcDecaux_data = requests.get(STATIONS_URI, params={'apiKey':BIKE_API_KEY, 'contr
 jcDecaux_info = jcDecaux_data.json()
 
 #use pd.DataFrame because data is already an object 
-df = pd.DataFrame([jcDecaux_info])
-transposed_df = df.transpose()
+df = pd.DataFrame(jcDecaux_info)
 
 # Class defines tables in DB
 class Station(Base):
@@ -58,7 +57,7 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-for row in transposed_df.iterrows():
-    station = Station(row[1]['number'], row[1]['name'], row[1]['address'], row[1]['position']['lat'], row[1]['position']['lng'], row[1]['banking'])
+for row in df.itertuples():
+    station = Station(row.number, row.name, row.address, row.position['lat'], row.position['lng'], row.banking])
     session.add(station)
 session.commit()
