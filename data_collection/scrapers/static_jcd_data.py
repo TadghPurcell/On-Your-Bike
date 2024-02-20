@@ -35,8 +35,8 @@ class Station(Base):
     longitude = Column('longitude', String(255))
     payment_terminal = Column('payment_terminal', Boolean)
 
-    def __init__(self, stationid, name, address, latitude, longitude, payment_terminal):
-        self.stationid = stationid
+    def __init__(self, station_id, name, address, latitude, longitude, payment_terminal):
+        self.station_id = station_id
         self.name = name
         self.address = address
         self.latitude = latitude
