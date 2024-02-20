@@ -46,9 +46,9 @@ class Weather(Base):
     sunrise = Column('sunrise', String(255))
     sunset = Column('sunset', String(255))
     
-    def __init__(self):
+    def __init__(self, type):
           self.timestamp = str(datetime.now().timestamp())
-          self.type = df['weather'][0][0]['main']
+          self.type = type
           self.description = df['weather'][0][0]['description']
           self.temperature = df['main'][0]['temp']
           self.feels_like = df['main'][0]['feels_like']
@@ -76,6 +76,6 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 #Create new weather row
-updated_weather = Weather()
-session.add()
+updated_weather = Weather(df['weather'][0][0]['main'])
+session.add(updated_weather)
 session.commit
