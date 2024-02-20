@@ -1,4 +1,4 @@
-from db_config import Base
+from data_collection.scrapers.db_config import Base
 import pandas as pd
 import requests
 from datetime import datetime

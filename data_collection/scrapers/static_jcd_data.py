@@ -1,4 +1,4 @@
-from db_config import Base
+from data_collection.scrapers.db_config import Base
 import pandas as pd
 import json
 from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR
