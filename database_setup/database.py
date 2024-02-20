@@ -45,7 +45,6 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 df = pd.read_csv(f"../dublin_bikes_static_info.csv", keep_default_na=True, delimiter=',', skipinitialspace=True, encoding='Windows-1252')
-df.to_csv('dublin_bikes_static_info.csv', index=False)
 print(df)
 
 
