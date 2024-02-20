@@ -1,3 +1,4 @@
+from static_jcd_data import Station
 from db_config import Base
 import pandas as pd
 import requests
