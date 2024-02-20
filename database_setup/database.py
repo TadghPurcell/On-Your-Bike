@@ -1,13 +1,12 @@
+from db_config import Base
 import pandas as pd
 import json
 from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-Base = declarative_base()
-
 # Class defines tables in DB
 class Station(Base):
-    __tablename__ = 'stations'
+    __tablename__ = 'stations' 
     stationid = Column('stationid', Integer, primary_key=True)
     name = Column('name', String(255))
     address = Column('address', String(255))

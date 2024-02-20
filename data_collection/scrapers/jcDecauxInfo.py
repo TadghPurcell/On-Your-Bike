@@ -1,3 +1,4 @@
+from db_config import Base
 import pandas as pd
 import requests
 from datetime import datetime
@@ -22,8 +23,6 @@ URI = db_info['dbConnection']['URI']
 PORT = db_info['dbConnection']['PORT']
 DB = db_info['dbConnection']['DB']
 
-Base = declarative_base()
-
 jcDecaux_data = requests.get(STATIONS_URI, params={'apiKey':BIKE_API_KEY, 'contract':NAME})
 df = pd.read_json(jcDecaux_data.text)
 
@@ -36,7 +35,6 @@ class Availability(Base):
     available_bike_stands = Column('available_bike_stands', Integer)
     status = Column('status', String(32))
     
-
     def __init__(self, station_id, bike_stands, available_bikes, available_bike_stands, status):
         self.station_id = station_id
         self.timestamp = datetime.now().timestamp()
