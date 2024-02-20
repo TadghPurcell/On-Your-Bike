@@ -24,7 +24,6 @@ DB = db_info['dbConnection']['DB']
 jcDecaux_data = requests.get(STATIONS_URI, params={'apiKey':BIKE_API_KEY, 'contract':NAME})
 df = pd.read_json(jcDecaux_data.text)
 
-
 # Class defines tables in DB
 class Station(Base):
     __tablename__ = 'stations' 
@@ -58,6 +57,6 @@ session = Session()
 for row in df.iterrows():
     existing_station = session.query(Station).filter_by(station_id=row[1]).first()
     if existing_station is None:
-        station = Station(row[1].number, row[1].name, row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking)
+        station = Station(row[1].name, row[1]['name'], row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking)
         session.add(station)
 session.commit()

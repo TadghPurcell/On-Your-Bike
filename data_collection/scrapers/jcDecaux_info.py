@@ -56,7 +56,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 for row in df.iterrows():
-    availabilityRow = Availability(row[1].number, row[1].bike_stands, row[1].available_bike_stands, row[1].available_bikes, row[1].status)
+    availabilityRow = Availability(row[1].name, row[1].bike_stands, row[1].available_bike_stands, row[1].available_bikes, row[1].status)
     session.add(availabilityRow)
     # print(row[1].number, row[1].bike_stands, row[1].available_bike_stands, row[1].available_bikes, row[1].status, row[1].last_update)
     # print('-----------')
