@@ -79,4 +79,4 @@ session = Session()
 #Create new weather row
 updated_weather = Weather()
 session.add(updated_weather)
-session.commit
+session.commit()
