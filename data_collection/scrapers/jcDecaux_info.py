@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 from datetime import datetime
 import json
-from sqlalchemy import create_engine, Column, String, Integer, ForeignKey
+from sqlalchemy import create_engine, Column, String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import sessionmaker
 
 #Sets options to read entire data frame
@@ -30,7 +30,7 @@ df = pd.DataFrame(jcDecaux_info)
 class Availability(Base):
     __tablename__ = 'availability'
     station_id = Column('station_id', Integer, ForeignKey('stations.station_id'), primary_key=True)
-    timestamp = Column('timestamp', Integer, primary_key=True)
+    time_updated = Column('time_updated', DateTime, primary_key=True)
     bike_stands = Column('bike_stands', Integer)
     available_bikes = Column('available_bikes', Integer)
     available_bike_stands = Column('available_bike_stands', Integer)
@@ -38,7 +38,7 @@ class Availability(Base):
     
     def __init__(self, station_id, bike_stands, available_bikes, available_bike_stands, status):
         self.station_id = station_id
-        self.timestamp = datetime.now().timestamp()
+        self.time_updated = datetime.now()
         self.bike_stands = bike_stands
         self.available_bikes = available_bikes 
         self.available_bike_stands = available_bike_stands

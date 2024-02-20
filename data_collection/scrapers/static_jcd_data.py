@@ -2,7 +2,7 @@ from db_config import Base
 import pandas as pd
 import json
 import requests
-from sqlalchemy import create_engine, Column, String, Integer, Boolean
+from sqlalchemy import create_engine, Column, String, Integer, Double, Boolean
 from sqlalchemy.orm import sessionmaker
 
 #Sets options to read entire data frame
@@ -33,8 +33,8 @@ class Station(Base):
     station_id = Column('station_id', Integer, primary_key=True)
     name = Column('name', String(255))
     address = Column('address', String(255))
-    latitude = Column('latitude', String(255))
-    longitude = Column('longitude', String(255))
+    latitude = Column('latitude', Double)
+    longitude = Column('longitude', Double)
     payment_terminal = Column('payment_terminal', Boolean)
 
     def __init__(self, station_id, name, address, latitude, longitude, payment_terminal):

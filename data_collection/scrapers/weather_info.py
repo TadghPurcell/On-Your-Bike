@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 from datetime import datetime
 import json
-from sqlalchemy import create_engine, Column, String, Integer
+from sqlalchemy import create_engine, Column, String, Integer, Double, DateTime 
 from sqlalchemy.orm import sessionmaker
 
 #Sets options to read entire data frame
@@ -30,37 +30,37 @@ df = pd.DataFrame([weather_info])
 # Class defines tables in DB
 class Weather(Base):
     __tablename__ = 'weather'
-    timestamp = Column('timestamp', Integer, primary_key=True)
+    time_updated = Column('time_updated', DateTime, primary_key=True)
     type = Column('type', String(255))
     description = Column('description', String(255))
-    temperature = Column('temperature', String(255))
-    feels_like = Column('feels_like', String(255))
-    min_temp = Column('min_temp', String(255))
-    max_temp = Column('max_temp', String(255))
-    humidity = Column('humidity', String(255))
-    wind_speed = Column('wind_speed', String(255))
-    visibility = Column('visibility', String(255))
-    clouds = Column('clouds', String(255))
-    sunrise = Column('sunrise', String(255))
-    sunset = Column('sunset', String(255))
+    temperature = Column('temperature', Double)
+    feels_like = Column('feels_like', Double)
+    min_temp = Column('min_temp', Double)
+    max_temp = Column('max_temp', Double)
+    humidity = Column('humidity', Integer)
+    wind_speed = Column('wind_speed', Double)
+    visibility = Column('visibility', Integer)
+    clouds = Column('clouds', Integer)
+    sunrise = Column('sunrise', Integer)
+    sunset = Column('sunset', Integer)
     
     def __init__(self):
-          self.timestamp = datetime.now().timestamp()
+          self.time_updated = datetime.now()
           self.type = str(df['weather'][0][0]['main'])
           self.description = str(df['weather'][0][0]['description'])
-          self.temperature = str(df['main'][0]['temp'])
-          self.feels_like = str(df['main'][0]['feels_like'])
-          self.min_temp = str(df['main'][0]['temp_min'])
-          self.max_temp = str(df['main'][0]['temp_max'])
-          self.humidity = str(df['main'][0]['humidity'])
-          self.wind_speed = str(df['wind'][0]['speed'])
-          self.visibility = str(df['visibility'][0])
-          self.clouds = str(df['clouds'][0]['all'])
-          self.sunrise = str(df['sys'][0]['sunrise'])
-          self.sunset = str(df['sys'][0]['sunset'])
+          self.temperature = df['main'][0]['temp']
+          self.feels_like = df['main'][0]['feels_like']
+          self.min_temp = df['main'][0]['temp_min']
+          self.max_temp = df['main'][0]['temp_max']
+          self.humidity = df['main'][0]['humidity']
+          self.wind_speed = df['wind'][0]['speed']
+          self.visibility = df['visibility'][0]
+          self.clouds = df['clouds'][0]['all']
+          self.sunrise = df['sys'][0]['sunrise']
+          self.sunset = df['sys'][0]['sunset']
 
     def __repr__(self):
-        return f"{self.timestamp}, {self.description}, {self.temperature}"
+        return f"{self.time_updated}, {self.description}, {self.temperature}"
 
 engine = create_engine('mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
 
