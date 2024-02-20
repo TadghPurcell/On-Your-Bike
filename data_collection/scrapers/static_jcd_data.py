@@ -22,7 +22,11 @@ PORT = db_info['dbConnection']['PORT']
 DB = db_info['dbConnection']['DB']
 
 jcDecaux_data = requests.get(STATIONS_URI, params={'apiKey':BIKE_API_KEY, 'contract':NAME})
-df = pd.read_json(jcDecaux_data.text)
+jcDecaux_info = jcDecaux_data.json()
+
+#use pd.DataFrame because data is already an object 
+df = pd.DataFrame([jcDecaux_info])
+transposed_df = df.transpose()
 
 # Class defines tables in DB
 class Station(Base):
@@ -54,9 +58,9 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-for row in df.iterrows():
+for row in transposed_df.iterrows():
     existing_station = session.query(Station).filter_by(station_id=row[1].name).first()
     if existing_station is None:
-        station = Station(row[1].name + 1, row[1]['name'], row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking)
+        station = Station(row[1]['number'], row[1]['name'], row[1]['address'], row[1]['position']['lat'], row[1]['position']['lng'], row[1]['banking'])
         session.add(station)
 session.commit()
