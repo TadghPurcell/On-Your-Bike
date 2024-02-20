@@ -24,41 +24,39 @@ DB = db_info['dbConnection']['DB']
 jcDecaux_data = requests.get(STATIONS_URI, params={'apiKey':BIKE_API_KEY, 'contract':NAME})
 df = pd.read_json(jcDecaux_data.text)
 
-print(df)
+# Class defines tables in DB
+class Station(Base):
+    __tablename__ = 'stations' 
+    station_id = Column('station_id', Integer, primary_key=True)
+    name = Column('name', String(255))
+    address = Column('address', String(255))
+    latitude = Column('latitude', String(255))
+    longitude = Column('longitude', String(255))
+    payment_terminal = Column('payment_terminal', Boolean)
 
-# # Class defines tables in DB
-# class Station(Base):
-#     __tablename__ = 'stations' 
-#     station_id = Column('station_id', Integer, primary_key=True)
-#     name = Column('name', String(255))
-#     address = Column('address', String(255))
-#     latitude = Column('latitude', String(255))
-#     longitude = Column('longitude', String(255))
-#     payment_terminal = Column('payment_terminal', Boolean)
+    def __init__(self, station_id, name, address, latitude, longitude, payment_terminal):
+        self.station_id = station_id
+        self.name = name
+        self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
+        self.payment_terminal = payment_terminal
 
-#     def __init__(self, station_id, name, address, latitude, longitude, payment_terminal):
-#         self.station_id = station_id
-#         self.name = name
-#         self.address = address
-#         self.latitude = latitude
-#         self.longitude = longitude
-#         self.payment_terminal = payment_terminal
+    def __repr__(self):
+        return f"{self.name}, {self.address}"
 
-#     def __repr__(self):
-#         return f"{self.name}, {self.address}"
+engine = create_engine('mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
 
-# engine = create_engine('mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
+# Takes all classes that extends from base and creates them in the 
+# database connects to engine and creates table for each class
+Base.metadata.create_all(bind=engine)
 
-# # Takes all classes that extends from base and creates them in the 
-# # database connects to engine and creates table for each class
-# Base.metadata.create_all(bind=engine)
+Session = sessionmaker(bind=engine)
+session = Session()
 
-# Session = sessionmaker(bind=engine)
-# session = Session()
-
-# for row in df.iterrows():
-#     existing_station = session.query(Station).filter_by(station_id=row[1].name).first()
-#     if existing_station is None:
-#         station = Station(row[1].name, row[1]['name'], row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking)
-#         session.add(station)
-# session.commit()
+for row in df.iterrows():
+    existing_station = session.query(Station).filter_by(station_id=row[1].name).first()
+    if existing_station is None:
+        station = Station(row[1].name, row[1]['name'], row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking)
+        session.add(station)
+session.commit()
