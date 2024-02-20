@@ -56,7 +56,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 for row in df.iterrows():
-    existing_station = session.query(Station).filter_by(stationid=row[1]).first()
+    existing_station = session.query(Station).filter_by(station_id=row[1]).first()
     if existing_station is None:
         station = Station(row[1].number, row[1].name, row[1].address, row[1].position['lat'], row[1].position['lng'], row[1].banking)
         session.add(station)
