@@ -58,6 +58,8 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 for row in df.itertuples():
-    station = Station(row.number, row.name, row.address, row.position['lat'], row.position['lng'], row.banking])
-    session.add(station)
+    existing_station = session.query(Station).filter_by(station_id=row.number).first()
+    if existing_station is None:
+        station = Station(row.number, row.name, row.address, row.position['lat'], row.position['lng'], row.banking)
+        session.add(station)
 session.commit()
