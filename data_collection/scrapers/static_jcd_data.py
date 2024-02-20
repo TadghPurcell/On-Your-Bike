@@ -2,7 +2,7 @@ from db_config import Base
 import pandas as pd
 import json
 import requests
-from sqlalchemy import create_engine, Column, String, Integer
+from sqlalchemy import create_engine, Column, String, Integer, Boolean
 from sqlalchemy.orm import sessionmaker
 
 #Sets options to read entire data frame
@@ -33,20 +33,16 @@ class Station(Base):
     address = Column('address', String(255))
     latitude = Column('latitude', String(255))
     longitude = Column('longitude', String(255))
-    payment_terminal = Column('payment_terminal', bool)
-    bonus_station = Column('bonus_station', bool)
+    payment_terminal = Column('payment_terminal', Boolean)
 
-    def __init__(self, stationid, name, address, latitude, longitude, payment_terminal, bonus_station):
+    def __init__(self, stationid, name, address, latitude, longitude, payment_terminal):
         self.stationid = stationid
         self.name = name
         self.address = address
         self.latitude = latitude
         self.longitude = longitude
-        if payment_terminal == 'True':
-            self.payment_terminal = True
-        else:
-            self.payment_terminal = False
-            
+        self.payment_terminal = payment_terminal
+
     def __repr__(self):
         return f"{self.name}, {self.address}"
 
