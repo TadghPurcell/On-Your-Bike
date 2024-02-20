@@ -22,9 +22,10 @@ DB = db_info['dbConnection']['DB']
 #Weather URI 
 WEATHER_URI = 'https://api.openweathermap.org/data/2.5/weather'
 weather_data = requests.get(WEATHER_URI, params={"units": "metric", "lat": 53.344, "lon": -6.2672, "appid": WEATHER_API_KEY})
+weather_info = weather_data.json()
 
 #use pd.DataFrame because data is already an object 
-df = pd.read_json(weather_data.text)
+df = pd.DataFrame([weather_info])
 
 # Class defines tables in DB
 class Weather(Base):
@@ -61,9 +62,7 @@ class Weather(Base):
     def __repr__(self):
         return f"{self.timestamp}, {self.description}, {self.temperature}"
 
-
 engine = create_engine('mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
-print(engine.url)
 
 # Takes all classes that extends from base and creates them in the 
 # database connects to engine and creates table for each class
