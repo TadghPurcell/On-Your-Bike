@@ -21,11 +21,10 @@ DB = db_info['dbConnection']['DB']
 #Weather 
 #Weather URI 
 WEATHER_URI = 'https://api.openweathermap.org/data/2.5/weather'
-weather_request = requests.get(WEATHER_URI, params={"units": "metric", "lat": 53.344, "lon": -6.2672, "appid": WEATHER_API_KEY})
-weather_data = weather_request.json()
+weather_data = requests.get(WEATHER_URI, params={"units": "metric", "lat": 53.344, "lon": -6.2672, "appid": WEATHER_API_KEY})
 
 #use pd.DataFrame because data is already an object 
-df = pd.DataFrame([weather_data])
+df = pd.read_json(weather_data.text)
 
 # print(type(df['weather'][0][0]['main']))
 Base = declarative_base()
@@ -33,7 +32,7 @@ Base = declarative_base()
 # Class defines tables in DB
 class Weather(Base):
     __tablename__ = 'weather'
-    timestamp = Column('timestamp', String(255), primary_key=True)
+    timestamp = Column('timestamp', Integer, primary_key=True)
     type = Column('type', String(255))
     description = Column('description', String(255))
     temperature = Column('temperature', String(255))
@@ -48,7 +47,7 @@ class Weather(Base):
     sunset = Column('sunset', String(255))
     
     def __init__(self):
-          self.timestamp = str(datetime.now().timestamp())
+          self.timestamp = datetime.now().timestamp()
           self.type = str(df['weather'][0][0]['main'])
           self.description = str(df['weather'][0][0]['description'])
           self.temperature = str(df['main'][0]['temp'])
