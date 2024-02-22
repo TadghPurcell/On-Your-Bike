@@ -27,11 +27,11 @@ def close_connection(exception):
 
 
 @app.route("/available/<int:station_id>")
-def get_stations():
+def get_stations(station_id):
     engine = get_db()
     data = []
     rows = engine.execute(
-        "SELECT available_bikes from  where number = {};".format(station_id))
+        "SELECT available_bikes from availability where station_id = {};".format(station_id))
     for row in rows:
         data.append(dict(row))
     return jsonify(available=data)
