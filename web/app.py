@@ -1,14 +1,24 @@
 from flask import Flask, g, jsonify
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import json
 
 app = Flask(__name__, static_url_path='')
 
+# Get the db_info
+with open('./dbinfo.json') as f:
+    db_info = json.load(f)
+
+USER = db_info['dbConnection']['USER']
+PASSWORD = db_info['dbConnection']['PASSWORD']
+URI = db_info['dbConnection']['URI']
+PORT = db_info['dbConnection']['PORT']
+DB = db_info['dbConnection']['DB']
+
 
 def connect_to_database():
-    engine = create_engine("mysql://{}:{}@{}:{}/{}".format(config.USER,
-                                                           config.PASSWORD,
-                                                           config.URI,
-                                                           config.PORT,
-                                                           config.DB), echo=True)
+    engine = engine = create_engine(
+        'mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
     return engine
 
 
@@ -49,3 +59,4 @@ def station(station_id):
 
 if __name__ == "__main__":
     app.run(debug=True)
+    connect_to_database()
