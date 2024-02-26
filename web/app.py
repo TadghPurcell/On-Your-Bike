@@ -18,7 +18,7 @@ DB = db_info['dbConnection']['DB']
 
 def connect_to_database():
     engine = engine = create_engine(
-        'mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
+        'mysql+pymysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
     return engine
 
 

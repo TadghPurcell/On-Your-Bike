@@ -52,7 +52,7 @@ class Availability(Base):
 
 
 engine = create_engine(
-    'mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
+    'mysql+pymysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
 
 # # Takes all classes that extends from base and creates them in the
 # # database connects to engine and creates table for each class
