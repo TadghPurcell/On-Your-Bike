@@ -4,12 +4,13 @@
  */
 #map {
   height: 100%;
+  width: 100%;
 }
 
 /* 
    * Optional: Makes the sample page fill the window. 
    */
-html,
+html, 
 body {
   height: 100%;
   margin: 0;
