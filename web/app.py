@@ -1,5 +1,5 @@
 from flask import Flask, g, jsonify
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, String, Integer, Double, Boolean
 from sqlalchemy.orm import sessionmaker
 import json
 import sys
@@ -21,12 +21,38 @@ PORT = db_info['dbConnection']['PORT']
 DB = db_info['dbConnection']['DB']
 
 
+class Station(Base):
+    __tablename__ = 'stations'
+    station_id = Column('station_id', Integer, primary_key=True)
+    name = Column('name', String(255))
+    address = Column('address', String(255))
+    latitude = Column('latitude', Double)
+    longitude = Column('longitude', Double)
+    payment_terminal = Column('payment_terminal', Boolean)
+
+    def __init__(self, station_id, name, address, latitude, longitude, payment_terminal):
+        self.station_id = station_id
+        self.name = name
+        self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
+        self.payment_terminal = payment_terminal
+
+    def __repr__(self):
+        return f"{self.name}, {self.address}"
+
+
 def connect_to_database():
-    print("connected")
+    # print(engine.url)
+    print('mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER,
+          PASSWORD, PORT, DB), file=sys.stdout)
     engine = create_engine(
-        'mysql+pymysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
-    Base.metadata.create_call(bind=engine)
-    return engine
+        'mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DB), echo=True)
+    Base.metadata.create_all(bind=engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    print("connected")
+    return session
 
 
 def get_db():
@@ -56,12 +82,12 @@ def get_stations(station_id):
 
 @app.route('/')
 def root():
-    engine = get_db()
+    session = connect_to_database()
     data = []
-    rows = engine.execute(
-        "SELECT available_bikes from availability;")
+    rows = session.query(Base).all()
+    print(rows, file=sys.stdout)
     for row in rows:
-        data.append(dict(row))
+        data.append(row.station_id)
     print(data, file=sys.stdout)
     return app.send_static_file('./templates/index.html')
 
