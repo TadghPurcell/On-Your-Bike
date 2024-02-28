@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 # Sets options to read entire data frame
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 
-with open('./data_collection/dbinfo.json') as f:
+with open('./dbinfo.json') as f:
     db_info = json.load(f)
 # URI and name
 BIKE_API_KEY = db_info['JCKey']
@@ -53,7 +53,7 @@ class Station(Base):
 
 
 engine = create_engine(
-    'mysql+pymysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
+    'mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
 
 # Takes all classes that extends from base and creates them in the
 # database connects to engine and creates table for each class
