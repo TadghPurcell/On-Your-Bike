@@ -11,7 +11,7 @@ Base = declarative_base()
 app = Flask(__name__, static_url_path='')
 
 # Get the db_info
-with open('./dbinfo.json') as f:
+with open('../dbinfo.json') as f:
     db_info = json.load(f)
 
 USER = db_info['dbConnection']['USER']
