@@ -31,32 +31,21 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 print("connected")
-# return session
 
 
-# def get_db():
-#     db = getattr(g, '_database', None)
-#     if db is None:
-#         db = g._database = connect_to_database()
-#     return db
-
-
-# @app.teardown_appcontext
-# def close_connection(exception):
-#     db = getattr(g, '_database', None)
-#     if db is not None:
-#         db.close()
+@app.route("/home/")
+def get_all_stations():
+    # Station ID, Name, longitude, latitude
+    # Weather data
+    # Station availability
+    row = session.query(Station).all()
+    return jsonify(row)
 
 
 @app.route("/available/<int:station_id>")
 def get_stations(station_id):
     row = session.query(Availability).filter_by(station_id=station_id)
     return jsonify(row)
-    # rows = engine.execute(
-    #     "SELECT available_bikes from availability where station_id = {};".format(station_id))
-    # for row in rows:
-    #     data.append(dict(row))
-    # return jsonify(available=data)
 
 
 @app.route('/')
@@ -68,11 +57,6 @@ def root():
         data.append(row.station_id)
     print(data, file=sys.stdout)
     return app.send_static_file('./templates/index.html')
-
-
-@app.route('/stations/<int:station_id>')
-def station(station_id):
-    return f'Retrieving data for station {station_id}'
 
 
 if __name__ == "__main__":
