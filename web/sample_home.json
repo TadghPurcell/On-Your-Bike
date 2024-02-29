@@ -1,0 +1,24 @@
+{
+  "stations": {
+    "01": {
+      "name": "DAME STREET",
+      "latitude": 53.344321,
+      "longitude": -6.113324,
+      "available_bikes": 10,
+      "available_bike_stands": 29
+    },
+    "02": {
+      "name": "DAME STREET",
+      "latitude": 53.344321,
+      "longitude": -6.113324,
+      "available_bikes": 10,
+      "available_bike_stands": 29
+    }
+  },
+  "weather": {
+    "type": "moderate rain",
+    "temperature": 10.01,
+    "humidity": 80,
+    "wind speed": 5.11
+  }
+}
