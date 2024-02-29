@@ -42,17 +42,18 @@ def get_all_stations():
         Availability.time_updated == func.max(Availability.time_updated).select())
     for row in rows:
         print(type(row.station_id), file=sys.stdout)
-        data["stations"][row.station_id] = "1"
-        data2.append(row.available_bikes)
-        print(row.station_id)
-        print(row.available_bikes)
-        print(row.available_bike_stands)
-        print(row.time_updated)
+        data["stations"][row.station_id] = {
+            "name": "DAME STREET",
+            "latitude": 53.344321,
+            "longitude": -6.113324,
+            "available_bikes": row.available_bikes,
+            "available_bike_stands": row.available_bike_stands
+        }
+
     print(data, file=sys.stdout)
-    print(data2, file=sys.stdout)
     row = session.query(Station).all()
 
-    return jsonify(rows)
+    return jsonify(data)
 
 
 @app.route("/available/<int:station_id>")
