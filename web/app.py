@@ -23,7 +23,7 @@ DB = db_info['dbConnection']['DB']
 # def connect_to_database():
 #     # print(engine.url)
 print('mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER,
-        PASSWORD, PORT, DB), file=sys.stdout)
+                                                     PASSWORD, PORT, DB), file=sys.stdout)
 engine = create_engine(
     'mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DB), echo=True)
 
@@ -31,7 +31,7 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 print("connected")
-    # return session
+# return session
 
 
 # def get_db():
@@ -62,7 +62,7 @@ def get_stations(station_id):
 @app.route('/')
 def root():
     data = []
-    rows = session.query(Base).all()
+    rows = session.query(Station).all()
     print(rows, file=sys.stdout)
     for row in rows:
         data.append(row.station_id)
