@@ -17,15 +17,19 @@ BIKE_API_KEY = db_info['JCKey']
 STATIONS_URI = 'https://api.jcdecaux.com/vls/v1/stations'
 NAME = 'dublin'
 
+#Details for connecting to database from dbinfo
 USER = db_info['dbConnection']['USER']
 PASSWORD = db_info['dbConnection']['PASSWORD']
 URI = db_info['dbConnection']['URI']
 PORT = db_info['dbConnection']['PORT']
 DB = db_info['dbConnection']['DB']
 
+#Request data from API
 jcDecaux_data = requests.get(
     STATIONS_URI, params={'apiKey': BIKE_API_KEY, 'contract': NAME})
 jcDecaux_info = jcDecaux_data.json()
+
+#Creates a data frame to organise data from API
 df = pd.DataFrame(jcDecaux_info)
 
 
@@ -61,6 +65,7 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+#Loop through data frame and add row to table
 for row in df.itertuples():
     availabilityRow = Availability(
         row.number, row.bike_stands, row.available_bikes, row.available_bike_stands, row.status)
