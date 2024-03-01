@@ -2,10 +2,10 @@ from static_jcd_data import Station
 from db_config import Base
 import pandas as pd
 import requests
-from datetime import datetime
 import json
-from sqlalchemy import create_engine, Column, String, Integer, DateTime, ForeignKey
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from Database import Availability
 
 # Sets options to read entire data frame
 pd.set_option("display.max_rows", None, "display.max_columns", None)
@@ -27,29 +27,6 @@ jcDecaux_data = requests.get(
     STATIONS_URI, params={'apiKey': BIKE_API_KEY, 'contract': NAME})
 jcDecaux_info = jcDecaux_data.json()
 df = pd.DataFrame(jcDecaux_info)
-
-
-class Availability(Base):
-    __tablename__ = 'availability'
-    station_id = Column('station_id', Integer, ForeignKey(
-        'stations.station_id'), primary_key=True)
-    time_updated = Column('time_updated', DateTime, primary_key=True)
-    bike_stands = Column('bike_stands', Integer)
-    available_bikes = Column('available_bikes', Integer)
-    available_bike_stands = Column('available_bike_stands', Integer)
-    status = Column('status', String(32))
-
-    def __init__(self, station_id, bike_stands, available_bikes, available_bike_stands, status):
-        self.station_id = station_id
-        self.time_updated = datetime.now()
-        self.bike_stands = bike_stands
-        self.available_bikes = available_bikes
-        self.available_bike_stands = available_bike_stands
-        self.status = status
-
-    def __repr__(self):
-        return f"{self.station_id}"
-
 
 engine = create_engine(
     'mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DB), echo=True)

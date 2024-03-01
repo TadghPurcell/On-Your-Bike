@@ -2,8 +2,9 @@ from db_config import Base
 import pandas as pd
 import json
 import requests
-from sqlalchemy import create_engine, Column, String, Integer, Double, Boolean
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from Database import Station
 
 # Sets options to read entire data frame
 pd.set_option("display.max_rows", None, "display.max_columns", None)
@@ -27,29 +28,6 @@ jcDecaux_info = jcDecaux_data.json()
 
 # use pd.DataFrame because data is already an object
 df = pd.DataFrame(jcDecaux_info)
-
-# Class defines tables in DB
-
-
-class Station(Base):
-    __tablename__ = 'stations'
-    station_id = Column('station_id', Integer, primary_key=True)
-    name = Column('name', String(255))
-    address = Column('address', String(255))
-    latitude = Column('latitude', Double)
-    longitude = Column('longitude', Double)
-    payment_terminal = Column('payment_terminal', Boolean)
-
-    def __init__(self, station_id, name, address, latitude, longitude, payment_terminal):
-        self.station_id = station_id
-        self.name = name
-        self.address = address
-        self.latitude = latitude
-        self.longitude = longitude
-        self.payment_terminal = payment_terminal
-
-    def __repr__(self):
-        return f"{self.name}, {self.address}"
 
 
 engine = create_engine(
