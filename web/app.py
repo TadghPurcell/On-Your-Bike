@@ -38,17 +38,21 @@ def get_all_stations():
     # Station availability
     data = {"stations": {},
             "weather": {}}
-    rows = session.query(Availability).filter(
+    bike_stations = session.query(Station).all()
+    bike_availability = session.query(Availability).filter(
         Availability.time_updated == func.max(Availability.time_updated).select())
-    for row in rows:
+
+    for row in bike_availability:
         print(type(row.station_id), file=sys.stdout)
         data["stations"][row.station_id] = {
-            "name": "DAME STREET",
-            "latitude": 53.344321,
-            "longitude": -6.113324,
             "available_bikes": row.available_bikes,
             "available_bike_stands": row.available_bike_stands
         }
+
+    for row in bike_stations:
+        data["stations"][row.station_id]["name"] = row.name
+        data["stations"][row.station_id]["latitude"] = row.latitude
+        data["stations"][row.station_id]["longitude"] = row.longitude
 
     print(data, file=sys.stdout)
     row = session.query(Station).all()
