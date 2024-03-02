@@ -2,7 +2,7 @@ from db_config import Base
 from static_jcd_data import Station
 from jcDecaux_info import Availability
 from weather_info import Weather
-from flask import Flask, g, jsonify
+from flask import Flask, g, jsonify, render_template
 from sqlalchemy import create_engine, func, Column, String, Integer, Double, Boolean
 from sqlalchemy.orm import sessionmaker
 import json
@@ -11,7 +11,7 @@ import sys
 app = Flask(__name__, static_url_path='')
 
 # Get the db_info
-with open('../dbinfo.json') as f:
+with open('./static/dbinfo.json') as f:
     db_info = json.load(f)
 
 USER = db_info['dbConnection']['USER']
@@ -29,7 +29,6 @@ session = Session()
 print("connected")
 
 # Gives all of the data needed for the home page
-
 
 @app.route("/home/")
 def get_all_stations():
@@ -54,6 +53,18 @@ def get_all_stations():
 
     return jsonify(rows)
 
+@app.route("/stations/")
+def get_locations():
+    rows = session.query(Station).all()
+    data = []
+    for row in rows:
+        station_data = {           
+            'station_id': row.station_id,
+            'latitude': row.latitude,
+            'longitude': row.longitude
+            }
+        data.append(station_data)
+    return jsonify(data)
 
 @app.route("/available/<int:station_id>")
 def get_stations(station_id):
@@ -67,8 +78,8 @@ def root():
     rows = session.query(Station).all()
     for row in rows:
         data.append(row.station_id)
-    return app.send_static_file('./templates/index.html')
-
+    #Changed to render_template as we will be importing data and I was getting errors.
+    return render_template('index.html', data=data)
 
 if __name__ == "__main__":
     app.run(debug=True)
