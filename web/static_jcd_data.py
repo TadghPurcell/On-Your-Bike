@@ -3,7 +3,7 @@ import pandas as pd
 import json
 import requests
 from sqlalchemy import create_engine, Column, String, Integer, Double, Boolean
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 
 # Sets options to read entire data frame
 pd.set_option("display.max_rows", None, "display.max_columns", None)
@@ -30,7 +30,6 @@ df = pd.DataFrame(jcDecaux_info)
 
 # Class defines tables in DB
 
-
 class Station(Base):
     __tablename__ = 'stations'
     station_id = Column('station_id', Integer, primary_key=True)
@@ -39,6 +38,7 @@ class Station(Base):
     latitude = Column('latitude', Double)
     longitude = Column('longitude', Double)
     payment_terminal = Column('payment_terminal', Boolean)
+    availabilities = relationship("Availability", back_populates="station")
 
     def __init__(self, station_id, name, address, latitude, longitude, payment_terminal):
         self.station_id = station_id

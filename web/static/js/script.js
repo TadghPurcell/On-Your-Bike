@@ -53,13 +53,37 @@ async function initMap() {
 
 const res = await fetch('/stations/')
 const data = await res.json()
-    
+
+console.log(data[0])
+// data.forEach(e => {
+//   console.log(e.station_id)
+// });
+
+
   // The markers for each station
-  const markers = data.map(({latitude: lat, longitude: lng, station_id: id}) => {
+  const markers = data.map(({name: sName, latitude: lat, longitude: lng, station_id: id,
+  total_bike_stands: totalBikesStands, available_bikes: availableBikes,
+  available_bike_stands: availableBikeStands, payment_terminal: paymentTerminal,
+  time_updated: latestTimeUpdate}) => {
     // const pinSvg = parser.parseFromString(
-    //   pinSvgString,
-    //   "image/svg+xml",
-    //   ).documentElement;
+      //   pinSvgString,
+      //   "image/svg+xml",
+      //   ).documentElement;
+
+      // fixes issues with names
+      let modifiedName = sName.split(' ').map(e => {
+        let newName = e.toLowerCase()
+        if (newName == "(o'connell's)") {
+          return "(O'Connell's)"
+        }
+        if (newName == "o'connell") {
+          return "O'Connell"
+        }
+        if (newName[0] == '(') {
+          return newName[0] + newName[1].toUpperCase() + newName.slice(2)
+        } 
+        return newName[0].toUpperCase() + newName.slice(1)
+      }).join(' ')
       
     const pinGlyph = new google.maps.marker.PinElement({
       glyph: id.toString(),
@@ -82,17 +106,39 @@ const data = await res.json()
       // content: pinSvg,
     });
 
-    function getStationInfo(name, lat, lng) {
+    function getStationInfo(name, totalBikesStands, 
+      availableBikes,
+      availableBikeStands, paymentTerminal,
+      latestTimeUpdate) {
       const stationInfoWindow = document.createElement('div');
+      stationInfoWindow.classList.add('station-window')
 
-      const stationTitle = document.createElement('h1');
-      stationTitle.textContent = name
+      //total, bikes, stands, pay, update
 
-      const stationLocation = document.createElement('p')
-      stationLocation.textContent = `${lat}, ${lng}`
+      const stationName = document.createElement('h1');
+      stationName.textContent = name
 
-      stationInfoWindow.appendChild(stationTitle)
-      stationInfoWindow.appendChild(stationLocation)
+      const stationTotalBikeStands = document.createElement('p')
+      stationTotalBikeStands.textContent = `Total Bike Stands: ${totalBikesStands}`
+
+      const stationAvailableBikes = document.createElement('p')
+      stationAvailableBikes.textContent = `Available Bikes: ${availableBikes}`
+
+      const stationAvailableBikeStands = document.createElement('p')
+      stationAvailableBikeStands.textContent = `Available Bike Stands: ${availableBikeStands}`
+
+      const stationPaymentTerminal = document.createElement('p')
+      stationPaymentTerminal.textContent = `Payment Terminal: ${paymentTerminal ? 'Yes' : 'No'}`
+
+      const stationLastUpdate = document.createElement('p')
+      stationLastUpdate.textContent = `Latest Update Time: ${latestTimeUpdate.slice(17, 26)}`
+
+      stationInfoWindow.appendChild(stationName)
+      stationInfoWindow.appendChild(stationTotalBikeStands)
+      stationInfoWindow.appendChild(stationAvailableBikes)
+      stationInfoWindow.appendChild(stationAvailableBikeStands)
+      stationInfoWindow.appendChild(stationPaymentTerminal)
+      stationInfoWindow.appendChild(stationLastUpdate)
 
       return stationInfoWindow
     }
@@ -100,7 +146,10 @@ const data = await res.json()
     // markers can only be keyboard focusable when they have click listeners
     // open info window when marker is clicked
     marker.addListener("click", () => {
-      const stationInfo = getStationInfo(id, lat, lng)
+      const stationInfo = getStationInfo(modifiedName, totalBikesStands, 
+        availableBikes,
+        availableBikeStands, paymentTerminal,
+        latestTimeUpdate)
       infoWindow.setContent(stationInfo.innerHTML);
       infoWindow.open(map, marker);
     });

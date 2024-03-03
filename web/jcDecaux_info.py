@@ -1,11 +1,10 @@
-from static_jcd_data import Station
 from db_config import Base
 import pandas as pd
 import requests
 from datetime import datetime
 import json
-from sqlalchemy import create_engine, Column, String, Integer, DateTime, ForeignKey
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, Column, String, Integer, Double, Boolean, DateTime, ForeignKey
+from sqlalchemy.orm import sessionmaker, relationship
 
 # Sets options to read entire data frame
 pd.set_option("display.max_rows", None, "display.max_columns", None)
@@ -32,7 +31,29 @@ jcDecaux_info = jcDecaux_data.json()
 #Creates a data frame to organise data from API
 df = pd.DataFrame(jcDecaux_info)
 
+#Static data
+class Station(Base):
+    __tablename__ = 'stations'
+    station_id = Column('station_id', Integer, primary_key=True)
+    name = Column('name', String(255))
+    address = Column('address', String(255))
+    latitude = Column('latitude', Double)
+    longitude = Column('longitude', Double)
+    payment_terminal = Column('payment_terminal', Boolean)
+    availabilities = relationship("Availability", back_populates="station")
 
+    def __init__(self, station_id, name, address, latitude, longitude, payment_terminal):
+        self.station_id = station_id
+        self.name = name
+        self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
+        self.payment_terminal = payment_terminal
+
+    def __repr__(self):
+        return f"{self.name}, {self.address}"
+
+#Dynamic Data
 class Availability(Base):
     __tablename__ = 'availability'
     station_id = Column('station_id', Integer, ForeignKey(
@@ -42,6 +63,7 @@ class Availability(Base):
     available_bikes = Column('available_bikes', Integer)
     available_bike_stands = Column('available_bike_stands', Integer)
     status = Column('status', String(32))
+    station = relationship("Station", back_populates="availabilities")
 
     def __init__(self, station_id, bike_stands, available_bikes, available_bike_stands, status):
         self.station_id = station_id
@@ -50,6 +72,7 @@ class Availability(Base):
         self.available_bikes = available_bikes
         self.available_bike_stands = available_bike_stands
         self.status = status
+        
 
     def __repr__(self):
         return f"{self.station_id}"
@@ -64,6 +87,16 @@ Base.metadata.create_all(bind=engine)
 
 Session = sessionmaker(bind=engine)
 session = Session()
+
+#Loop through df and add all static info for stations
+for row in df.itertuples():
+    existing_station = session.query(Station).filter_by(
+        station_id=row.number).first()
+    if existing_station is None:
+        station = Station(row.number, row.name, row.address,
+                          row.position['lat'], row.position['lng'], row.banking)
+        session.add(station)
+session.commit()
 
 #Loop through data frame and add row to table
 for row in df.itertuples():
