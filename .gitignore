@@ -4,3 +4,4 @@ svg
 .DS_Store
 maps_api.json
 dublinbike-historical-all.csv
+bike_weather_joined.csv
