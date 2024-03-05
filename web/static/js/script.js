@@ -1,39 +1,29 @@
 let map;
 
 async function initMap() {
-  let mapKey;
   let mapStyleId;
   
   try {
     const res = await fetch('/dbinfo.json')
     if (!res.ok) {
-      throw new Error("Couldn't find API key or Map ID")
+      throw new Error("Couldn't find Map ID")
     }
     const data = await res.json()
-
-    mapKey = data.mapsAPIKey
     mapStyleId = data.mapStyleID
 
   } catch (e) {
     console.error('Error loading dbinfo.json:', e)
   }
 
-  //Google Maps Code
-  (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
-        ({key: mapKey, v: "weekly"});
-
-  //Google maps own code
-
   // The location of Dublin
   const position = { lat: 53.344, lng: -6.2672 };
   // Request needed libraries.
-  //@ts-ignore
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
 
   // The map, centered at Dublin
   map = new Map(document.getElementById("map"), {
-    zoom: 13,
+    zoom: 13.5,
     center: position,
     mapId: mapStyleId,
   });
@@ -48,20 +38,11 @@ async function initMap() {
 // const parser = new DOMParser();
 // A marker with a custom inline SVG.
 
-
-// hard coded for now but will create function to get locations from db and populat the screen
-
 const res = await fetch('/stations/')
 const data = await res.json()
 
-console.log(data[0])
-// data.forEach(e => {
-//   console.log(e.station_id)
-// });
-
-
   // The markers for each station
-  const markers = data.map(({name: sName, latitude: lat, longitude: lng, station_id: id,
+const markers = data.map(({name: sName, latitude: lat, longitude: lng, station_id: id,
   total_bike_stands: totalBikesStands, available_bikes: availableBikes,
   available_bike_stands: availableBikeStands, payment_terminal: paymentTerminal,
   time_updated: latestTimeUpdate}) => {
@@ -157,7 +138,7 @@ console.log(data[0])
     return marker;
   })
 
-  // const markerCluster = new MarkerClusterer({ markers, map });
+  const markerCluster = new markerClusterer.MarkerClusterer({ markers, map });
 }
 
 initMap();

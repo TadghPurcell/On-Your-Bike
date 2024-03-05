@@ -93,7 +93,7 @@ def root():
     for row in rows:
         data.append(row.station_id)
     #Changed to render_template as we will be importing data and I was getting errors.
-    return render_template('index.html', data=data)
+    return render_template('index.html', data=data, mapsAPIKey=db_info['mapsAPIKey'])
 
 if __name__ == "__main__":
     app.run(debug=True)
