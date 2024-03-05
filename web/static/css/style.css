@@ -22,3 +22,19 @@ body {
 .gm-style-iw-d {
   color: gray
 }
+
+/* Style the zoom control */
+/* .gm-bundled-control .gm-bundled-control-on-bottom  */
+.gm-bundled-control, .gm-bundled-control-on-bottom, .gmnoprint, .gm-control-active {
+  display: flex;
+  align-items: flex-end; /* Align as needed */
+  background-color: #eaf2f0; /* Change background color */
+}
+
+.gm-bundled-control, .gm-bundled-control-on-bottom, .gmnoprint, .gm-control-active {
+  background-color: #eaf2f0; /* Change background color */
+  border: none; /* Remove border */
+  border-radius: 20px; /* Optional: if you want rounded corners */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* Optional: if you want shadow */
+  /* Add other styles as needed */
+}

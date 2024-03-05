@@ -17,6 +17,7 @@ async function initMap() {
 
   // The location of Dublin
   const position = { lat: 53.344, lng: -6.2672 };
+  
   // Request needed libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
@@ -25,7 +26,16 @@ async function initMap() {
   map = new Map(document.getElementById("map"), {
     zoom: 13.5,
     center: position,
+    fullscreenControl: false,
+    mapTypeControl: false,
+    streetViewControl: false,
     mapId: mapStyleId,
+    zoomControl: true, // add the zoom control back
+    zoomControlOptions: {
+      style: google.maps.ZoomControlStyle.DEFAULT, // or LARGE/SMALL
+      position: google.maps.ControlPosition.RIGHT_BOTTOM // position of the zoom control
+    },
+    disableDefaultUI: true 
   });
 
   const infoWindow = new google.maps.InfoWindow({
@@ -40,6 +50,8 @@ async function initMap() {
 
 const res = await fetch('/stations/')
 const data = await res.json()
+
+console.log(data[0])
 
   // The markers for each station
 const markers = data.map(({name: sName, latitude: lat, longitude: lng, station_id: id,
@@ -70,23 +82,26 @@ const markers = data.map(({name: sName, latitude: lat, longitude: lng, station_i
       glyph: id.toString(),
       glyphColor: "White",
     })
+    
     const pinBackground = new google.maps.marker.PinElement({
-      background: "#FBBC04",
+      background: "#03a981",
     });
     const pinScaled = new google.maps.marker.PinElement({
       scale: 0.5,
     })
+
     const marker = new AdvancedMarkerElement({
       position: {lat, lng},
       map: map,
       title: `Station ${id}`,
-      // content: pinBackground.element,
+      content: pinBackground.element,
       content: pinScaled.element,
       content: pinGlyph.element,
       //issue with trying to use custom SVG probably in the way its parsed
       // content: pinSvg,
     });
 
+    //Create Pop up Window
     function getStationInfo(name, totalBikesStands, 
       availableBikes,
       availableBikeStands, paymentTerminal,
@@ -124,8 +139,6 @@ const markers = data.map(({name: sName, latitude: lat, longitude: lng, station_i
       return stationInfoWindow
     }
 
-    // markers can only be keyboard focusable when they have click listeners
-    // open info window when marker is clicked
     marker.addListener("click", () => {
       const stationInfo = getStationInfo(modifiedName, totalBikesStands, 
         availableBikes,
