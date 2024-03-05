@@ -13,10 +13,9 @@ body {
 #wrapper-div {
     display: flex;
     flex-direction: column;
-    width: 60%;
+    width: 100%;
     min-height: 100px;
-    background-color: rgb(19, 184, 184);
-    margin: auto;
+    background-color: rgb(162, 189, 189);
 }
 
 #logo-div {
@@ -70,17 +69,17 @@ body {
     display: flex;
     flex-direction: row;
     width: 100%;
-    min-height: 400px;
+    height: 100%
     background-color: rgba(185, 198, 202, 0.306);
     margin-top: 10px;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     
 }
 
 #sidebar-div {
     display: flex;
     flex-direction: row;
-    flex-basis: 20%;
+    flex-basis: 25%;
     background-color: lightgray;
     justify-content: center;
     align-items: center;
@@ -93,6 +92,10 @@ body {
     flex-direction: row;
     flex-basis: 75%;
     background-color: lightgray;
+}
+
+#map {
+    width: 100%;
 }
 
 #footer-div {
