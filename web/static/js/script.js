@@ -24,18 +24,12 @@ async function initMap() {
 
   // The map, centered at Dublin
   map = new Map(document.getElementById("map"), {
-    zoom: 13.5,
+    zoom: 13,
     center: position,
     fullscreenControl: false,
     mapTypeControl: false,
     streetViewControl: false,
     mapId: mapStyleId,
-    zoomControl: true, // add the zoom control back
-    zoomControlOptions: {
-      style: google.maps.ZoomControlStyle.DEFAULT, // or LARGE/SMALL
-      position: google.maps.ControlPosition.RIGHT_BOTTOM // position of the zoom control
-    },
-    disableDefaultUI: true 
   });
 
   const infoWindow = new google.maps.InfoWindow({
@@ -50,8 +44,6 @@ async function initMap() {
 
 const res = await fetch('/stations/')
 const data = await res.json()
-
-console.log(data[0])
 
   // The markers for each station
 const markers = data.map(({name: sName, latitude: lat, longitude: lng, station_id: id,
@@ -78,27 +70,22 @@ const markers = data.map(({name: sName, latitude: lat, longitude: lng, station_i
         return newName[0].toUpperCase() + newName.slice(1)
       }).join(' ')
       
-    const pinGlyph = new google.maps.marker.PinElement({
-      glyph: id.toString(),
-      glyphColor: "White",
-    })
-    
-    const pinBackground = new google.maps.marker.PinElement({
+    const glyphImg = document.createElement('img')
+    glyphImg.classList.add('bike-logo')
+    glyphImg.src = '/img/bike.svg'
+    glyphImg.alt = 'marker logo'
+    const pinElement= new google.maps.marker.PinElement({
       background: "#03a981",
+      borderColor: "#266052",
+      glyph: glyphImg,
+      scale: 1,
     });
-    const pinScaled = new google.maps.marker.PinElement({
-      scale: 0.5,
-    })
 
     const marker = new AdvancedMarkerElement({
       position: {lat, lng},
       map: map,
       title: `Station ${id}`,
-      content: pinBackground.element,
-      content: pinScaled.element,
-      content: pinGlyph.element,
-      //issue with trying to use custom SVG probably in the way its parsed
-      // content: pinSvg,
+      content: pinElement.element,
     });
 
     //Create Pop up Window

@@ -1,4 +1,10 @@
-/* Import Fonts */
+/* Variables */
+:root {
+  --box-shadow: 0px 1px 4px -1px rgba(0, 0, 0, 0.3);
+  --dark-green: #266052;
+  --light-green: #03a981;
+}
+/* Import Font */
 .open-sans-standard {
   font-family: "Open Sans", sans-serif;
   font-optical-sizing: auto;
@@ -17,7 +23,6 @@ body {
   margin: 0;
   padding: 0;
   font-family:"Open Sans", sans-serif;
-  font-weight: 400;
   font-size: 16px;
 }
 
@@ -30,19 +35,19 @@ header {
   justify-content: space-between;
   padding: 0 10rem;
   /* background-color: hsl(61, 56%, 41%); */
-  background-color: #266052;
+  background-color: var(--dark-green);
   /* background-color: hsl(0, 43%, 26%); */
   height: 3.5rem;
   color: #fff;
-  box-shadow:  0 2px 5px 1px rgba(0, 0, 0, 0.2);
+  /* box-shadow:  0 2px 5px 1px rgba(0, 0, 0, 0.2); */
+  box-shadow: var(--box-shadow);
 }
 
 header > p {
   font-size: 2rem;
-  /* color: #eaf2f0; */
-  /* color: red */
 }
 
+/* Styling dynamic section for current weather */
 .weather-info {
   font-size: 1rem;
   display: flex;
@@ -52,28 +57,92 @@ header > p {
 }
 
 /* Map section */
-
 #map {
- height: calc(100vh - 3.5rem);
- width: 100%;
+  height: calc(100vh - 3.5rem);
+  width: 100%;
+}
+
+/* General style of markers including window */
+.gm-style {
+  font-family: inherit;
 }
 /* style info window */
 .gm-style-iw-d {
-  color: gray
+  font-size: inherit;
+  color: var(--dark-green);
 }
 
-/* Style the zoom control */
-/* .gm-bundled-control .gm-bundled-control-on-bottom  */
-.gm-bundled-control, .gm-bundled-control-on-bottom, .gmnoprint, .gm-control-active {
+/* Placed map, buttons and sidebar in main*/
+main {
+  position: relative;
+}
+
+.buttons {
+  margin: 2rem;
+  position: absolute;
+  z-index: 2;
+  left: 0px;
+  top: 0px;
   display: flex;
-  align-items: flex-end; /* Align as needed */
-  background-color: #eaf2f0; /* Change background color */
+  gap: 1rem;
 }
 
-.gm-bundled-control, .gm-bundled-control-on-bottom, .gmnoprint, .gm-control-active {
-  background-color: #eaf2f0; /* Change background color */
-  border: none; /* Remove border */
-  border-radius: 20px; /* Optional: if you want rounded corners */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* Optional: if you want shadow */
-  /* Add other styles as needed */
+button {
+  background-color: var(--light-green);
+  color: white;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 500;
+  padding: 10px 15px;
+  box-shadow: var(--box-shadow);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Sidebar Section */
+aside {
+  border-radius: 4px;
+  margin: 2rem;
+  position: absolute;
+  background-color: white;
+  box-shadow: var(--box-shadow);
+  color: var(--dark-green);
+  height: 75%;
+  max-width: 25%;
+  z-index: 4;
+  right: 0px;
+  top: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 3rem;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+.station-data-piece {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+  padding: 3rem 2rem;
+  margin-bottom: 4rem;
+  height: 20%;
+}
+
+.example-barchart {
+  display: inline-block;
+  min-height: 150px;
+  max-width: 100%;
+}
+
+/* Custom scrollbar for sidebar */ 
+aside::-webkit-scrollbar {
+  width: 12px;               
+}
+
+aside::-webkit-scrollbar-thumb {
+  background-color: var(--light-green);    
+  border-radius: 20px;       
+  border: 3px solid white;  
 }
