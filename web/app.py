@@ -62,7 +62,7 @@ def get_stations():
     station_data = session.query(Station, Availability).\
         join(Availability, Station.station_id == Availability.station_id).\
         filter(Availability.time_updated == latest_dynamic_data).all()
-    
+
     data = []
 
     for station, availability in station_data:
@@ -93,7 +93,7 @@ def root():
     for row in rows:
         data.append(row.station_id)
     #Changed to render_template as we will be importing data and I was getting errors.
-    return render_template('index.html', data=data, mapsAPIKey=db_info['mapsAPIKey'])
+    return render_template('index.html', data=data, mapsAPIKey=db_info['mapsAPIKey']) 
 
 if __name__ == "__main__":
     app.run(debug=True)
