@@ -1,17 +1,16 @@
 from db_config import Base
-from static_jcd_data import Station
-from jcDecaux_info import Availability
+from jcDecaux_info import Station, Availability
 from weather_info import Weather
-from flask import Flask, g, jsonify
+from flask import Flask, g, jsonify, render_template
 from sqlalchemy import create_engine, func, Column, String, Integer, Double, Boolean
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, joinedload
 import json
 import sys
 
 app = Flask(__name__, static_url_path='')
 
 # Get the db_info
-with open('../dbinfo.json') as f:
+with open('./static/dbinfo.json') as f:
     db_info = json.load(f)
 
 USER = db_info['dbConnection']['USER']
@@ -29,7 +28,6 @@ session = Session()
 print("connected")
 
 # Gives all of the data needed for the home page
-
 
 @app.route("/home/")
 def get_all_stations():
@@ -55,10 +53,37 @@ def get_all_stations():
     return jsonify(rows)
 
 
-@app.route("/available/<int:station_id>")
-def get_stations(station_id):
-    row = session.query(Availability).filter_by(station_id=station_id)
-    return jsonify(row)
+#Joins stations tables to give static data and latest dynamic data
+@app.route("/stations/")
+def get_stations():
+    #subquery to find latest data in availability
+    latest_dynamic_data = session.query(func.max(Availability.time_updated)).scalar_subquery()
+
+    station_data = session.query(Station, Availability).\
+        join(Availability, Station.station_id == Availability.station_id).\
+        filter(Availability.time_updated == latest_dynamic_data).all()
+
+    data = []
+
+    for station, availability in station_data:
+        station_data = {
+            'station_id': station.station_id,
+            'name': station.name,
+            'latitude': station.latitude,
+            'longitude': station.longitude,
+            'payment_terminal': station.payment_terminal,
+            'total_bike_stands': availability.bike_stands,
+            'available_bikes': availability.available_bikes,
+            'available_bike_stands': availability.available_bike_stands,
+            'time_updated': availability.time_updated
+        }
+        data.append(station_data)
+    return jsonify(data)
+
+# @app.route("/available/<int:station_id>")
+# def get_stations(station_id):
+#     row = session.query(Availability).filter_by(station_id=station_id)
+#     return jsonify(row)
 
 
 @app.route('/')
@@ -67,9 +92,10 @@ def root():
     rows = session.query(Station).all()
     for row in rows:
         data.append(row.station_id)
-    return app.send_static_file('./templates/index.html')
-
+    #Changed to render_template as we will be importing data and I was getting errors.
+    return render_template('index.html', data=data, mapsAPIKey=db_info['mapsAPIKey']) 
 
 if __name__ == "__main__":
     app.run(debug=True)
     print("Done", file=sys.stdout)
+
