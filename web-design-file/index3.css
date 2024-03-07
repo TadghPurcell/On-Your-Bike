@@ -23,7 +23,7 @@ body {
     flex-direction: row;
     width: 100%;
     min-height: 50px;
-    background-color: lightcyan;
+    background-color: #266052;
     justify-content: center;
     align-items: center;
     padding-left: 2%;
@@ -34,7 +34,7 @@ body {
     flex-direction: row;
     width: 100%;
     min-height: 30px;
-    background-color: lightgray;
+    background-color: #03a981;
     margin-top: 10px;
     justify-content: center;
     align-items: center;
@@ -69,8 +69,8 @@ body {
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: 100%
-    background-color: rgba(185, 198, 202, 0.306);
+    height: 100vh;
+    background-color: rgba(234,242,240,255);
     margin-top: 10px;
     /* justify-content: space-between; */
     
@@ -103,7 +103,7 @@ body {
     flex-direction: row;
     width: 100%;
     min-height: 25px;
-    background-color: lightgray;
+    background-color: #03a981;
     margin-top: 10px;
     justify-content: center;
     align-items: center;
