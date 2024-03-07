@@ -3,12 +3,12 @@ import pandas as pd
 import json
 import requests
 from sqlalchemy import create_engine, Column, String, Integer, Double, Boolean
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 
-#Sets options to read entire data frame
+# Sets options to read entire data frame
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 
-with open('./se-group27-project/dbinfo.json') as f:
+with open('./static/dbinfo.json') as f:
     db_info = json.load(f)
 # URI and name
 BIKE_API_KEY = db_info['JCKey']
@@ -21,21 +21,24 @@ URI = db_info['dbConnection']['URI']
 PORT = db_info['dbConnection']['PORT']
 DB = db_info['dbConnection']['DB']
 
-jcDecaux_data = requests.get(STATIONS_URI, params={'apiKey':BIKE_API_KEY, 'contract':NAME})
+jcDecaux_data = requests.get(
+    STATIONS_URI, params={'apiKey': BIKE_API_KEY, 'contract': NAME})
 jcDecaux_info = jcDecaux_data.json()
 
-#use pd.DataFrame because data is already an object 
+# use pd.DataFrame because data is already an object
 df = pd.DataFrame(jcDecaux_info)
 
 # Class defines tables in DB
+
 class Station(Base):
-    __tablename__ = 'stations' 
+    __tablename__ = 'stations'
     station_id = Column('station_id', Integer, primary_key=True)
     name = Column('name', String(255))
     address = Column('address', String(255))
     latitude = Column('latitude', Double)
     longitude = Column('longitude', Double)
     payment_terminal = Column('payment_terminal', Boolean)
+    availabilities = relationship("Availability", back_populates="station")
 
     def __init__(self, station_id, name, address, latitude, longitude, payment_terminal):
         self.station_id = station_id
@@ -48,9 +51,11 @@ class Station(Base):
     def __repr__(self):
         return f"{self.name}, {self.address}"
 
-engine = create_engine('mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
 
-# Takes all classes that extends from base and creates them in the 
+engine = create_engine(
+    'mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DB), echo=True)
+
+# Takes all classes that extends from base and creates them in the
 # database connects to engine and creates table for each class
 Base.metadata.create_all(bind=engine)
 
@@ -58,8 +63,10 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 for row in df.itertuples():
-    existing_station = session.query(Station).filter_by(station_id=row.number).first()
+    existing_station = session.query(Station).filter_by(
+        station_id=row.number).first()
     if existing_station is None:
-        station = Station(row.number, row.name, row.address, row.position['lat'], row.position['lng'], row.banking)
+        station = Station(row.number, row.name, row.address,
+                          row.position['lat'], row.position['lng'], row.banking)
         session.add(station)
 session.commit()
