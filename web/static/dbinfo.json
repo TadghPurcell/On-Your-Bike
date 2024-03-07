@@ -1,0 +1,11 @@
+{ "dbConnection": { "USER": "admin", 
+                    "PASSWORD": "onyourbikeddt!", 
+                    "URI": "db-on-your-bike.cfcwwwioiyxi.eu-west-1.rds.amazonaws.com", 
+                    "PORT": 3306, 
+                    "DB": "db_on_your_bike"    
+                },
+    "JCKey": "67581b3ada5305c487ad825e560e841b9175fe8c",
+    "weatherKey":  "6175ea356d9a1f9288fa45cb85657c19",
+    "mapsAPIKey": "AIzaSyAfHtLjNb8YIOqagCSctxEHJQuE3Ti92Zo",
+    "mapStyleID": "fcbb1ad91e585fd8"
+}
