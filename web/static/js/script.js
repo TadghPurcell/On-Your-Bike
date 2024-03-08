@@ -20,6 +20,7 @@ async function initMap() {
   
   // Request needed libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+  const { Place } = await google.maps.importLibrary("places");
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
 
   // The map, centered at Dublin
@@ -29,6 +30,10 @@ async function initMap() {
     fullscreenControl: false,
     mapTypeControl: false,
     streetViewControl: false,
+    zoomControl: true,
+    zoomControlOptions: {
+      position: google.maps.ControlPosition.LEFT_CENTER,
+    },
     mapId: mapStyleId,
   });
 
