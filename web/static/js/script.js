@@ -22,6 +22,8 @@ async function initMap() {
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
   const { Place } = await google.maps.importLibrary("places");
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+  const { DistanceMatrixService } = await google.maps.importLibrary("routes")
+  const { geometry } = await google.maps.importLibrary("geometry")
 
   // The map, centered at Dublin
   map = new Map(document.getElementById("map"), {
@@ -142,6 +144,60 @@ const markers = data.map(({name: sName, latitude: lat, longitude: lng, station_i
 
     return marker;
   })
+
+  //get nearest stations
+  const nearestStationsBtn = document.querySelector('.btn-stations');
+
+  nearestStationsBtn.addEventListener("click", async () => {
+    const distanceService = new DistanceMatrixService()
+
+    
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+    
+          const stationDistances = await Promise.all(data.map(({name: sName, latitude: lat, longitude: lng, 
+            station_id: id, total_bike_stands: totalBikesStands, available_bikes: availableBikes, available_bike_stands: availableBikeStands}) => {
+            return new Promise((resolve, reject) => {
+              distanceService.getDistanceMatrix({
+                origins: [pos],
+                destinations: [{lat, lng}],
+                travelMode: 'WALKING',
+              }, (response, status) => {
+                if (status == 'OK') {
+                  resolve({
+                    sName,
+                    distanceVal: response.rows[0].elements[0].distance.value,
+                    distanceText: response.rows[0].elements[0].distance.text,
+                    walkTime: response.rows[0].elements[0].duration.text
+                  });
+                } else {
+                  reject(status);
+                }
+              });
+            });
+          }));
+          const closestStations = stationDistances.sort((a, b) => a.distanceVal - b.distanceVal).slice(0, 5)
+        }, (error) => {
+          console.error("Geolocation error:", error);
+        });
+      }
+      else {
+        handleLocationError(false, infoWindow, map.getCenter());
+      }
+});
+}
+
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+  infoWindow.setPosition(pos);
+  infoWindow.setContent(
+    browserHasGeolocation
+      ? "Error: The Geolocation service failed."
+      : "Error: Your browser doesn't support geolocation.",
+  );
 
   const markerCluster = new markerClusterer.MarkerClusterer({ markers, map });
 }

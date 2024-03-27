@@ -79,17 +79,8 @@ main {
 
 /* Buttons Section */
 
-.buttons {
-  margin: 2rem;
-  position: absolute;
-  z-index: 2;
-  left: 0px;
-  top: 0px;
-  display: flex;
-  gap: 1rem;
-}
 
-button {
+button, .custom-map-control-button   {
   background-color: var(--light-green);
   color: white;
   font-family: inherit;
@@ -100,6 +91,16 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.buttons, .custom-map-control-button {
+  margin: 2rem;
+  position: absolute;
+  z-index: 2;
+  left: 0px;
+  top: 0px;
+  display: flex;
+  gap: 1rem;
 }
 
 /* Maps Zoom Buttons*/
