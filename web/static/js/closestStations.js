@@ -38,11 +38,16 @@ export async function getClosestStations(data) {
             });
           }));
           
+          const otherAside = document.querySelector('.journey_planner_sidebar')
+          otherAside.style.display = 'none'
+          otherAside.classList.remove('drop-down')
+          
           const aside = document.querySelector('.nearest_stations_sidebar')
           aside.style.display = 'flex'
           // remove original aside html
           aside.innerHTML = ""
           aside.classList.add('drop-down')
+
 
           const asideTitle = document.createElement('h2')
           asideTitle.classList.add('closest_station_head')
