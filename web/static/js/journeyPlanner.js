@@ -1,5 +1,5 @@
 export async function initJourneyPlanner(map) {
-    const { Place } = await google.maps.importLibrary("places");
+    const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary("places");
     const { DirectionsService, DirectionsRenderer } = await google.maps.importLibrary("routes")
 
     const directionsService = new DirectionsService()
@@ -51,16 +51,37 @@ export async function initJourneyPlanner(map) {
         destinationInput.setAttribute('id', 'destination')
         destinationInput.setAttribute('class', 'controls')
         destinationInput.setAttribute('placeholder', 'Choose a destination..')
-
+        
         destination.appendChild(destinationLabel)
         destination.appendChild(destinationInput)
-
+        
         journeyForm.appendChild(destination)
+        
+        // create search boxes
+        const center = { lat: 53.344, lng: -6.2672 };
+        // Create a bounding box with sides ~10km away from the center point
+        const defaultBounds = {
+        north: center.lat + 0.1,
+        south: center.lat - 0.1,
+        east: center.lng + 0.1,
+        west: center.lng - 0.1,
+        };
+        console.log(map)
+        const options = {
+            bounds: defaultBounds,
+            componentRestrictions: { country: "ie" },
+            fields: ["address_components", "geometry", "icon", "name"],
+            strictBounds: false,
+          };
+        const startingPointSearchBox = new SearchBox(startingPointInput);
+        const destinationSearchBox = new SearchBox(destinationInput);
+        const startingPointAutocomplete = new Autocomplete(startingPointInput, options)
+        const destinationAutocomplete = new Autocomplete(destinationInput, options)
 
         const submitBtn = document.createElement('button')
         submitBtn.setAttribute('type', 'submit')
         submitBtn.textContent = 'Submit'
-
+        
         submitBtn.addEventListener('click', (e) => {
             e.preventDefault()
             let request = {
@@ -98,8 +119,5 @@ export async function initJourneyPlanner(map) {
 
         aside.appendChild(journeyForm)
 
-        // create search boxes
-        const startingPointSearchBox = new google.maps.places.SearchBox(startingPointInput);
-        const destinationSearchBox = new google.maps.places.SearchBox(destinationInput);
     })
 }
