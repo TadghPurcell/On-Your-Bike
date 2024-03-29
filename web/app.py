@@ -7,6 +7,10 @@ from sqlalchemy import create_engine, func, Column, String, Integer, Double, Boo
 from sqlalchemy.orm import sessionmaker, joinedload
 import json
 import sys
+import pickle
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.model_selection import train_test_split
 
 app = Flask(__name__, static_url_path='')
 
@@ -95,10 +99,17 @@ def get_stations():
         data.append(station_data)
     return jsonify(data)
 
-# @app.route("/available/<int:station_id>")
-# def get_stations(station_id):
-#     row = session.query(Availability).filter_by(station_id=station_id)
-#     return jsonify(row)
+
+@app.route("/availabile/<int:station_id>")
+def get_stations(station_id):
+    poly = PolynomialFeatures(degree=3, include_bias=False)
+    with open(f'station_{station_id}.pkl', 'rb') as file:
+        # Load the model from the file
+        poly_reg_model = pickle.load(file)
+
+    poly_reg_model.predict(poly_features)
+    # row = session.query(Availability).filter_by(station_id=station_id)
+    return jsonify(row)
 
 
 @app.route('/')
