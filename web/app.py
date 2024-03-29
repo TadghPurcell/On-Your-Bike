@@ -2,6 +2,7 @@ from db_config import Base
 from jcDecaux_info import Station, Availability
 from weather_info import Weather
 from flask import Flask, g, jsonify, render_template
+from Database import Station, Availability, Weather
 from sqlalchemy import create_engine, func, Column, String, Integer, Double, Boolean
 from sqlalchemy.orm import sessionmaker, joinedload
 import json
@@ -29,6 +30,7 @@ print("connected")
 
 # Gives all of the data needed for the home page
 
+
 @app.route("/home/")
 def get_all_stations():
     # Station ID, Name, longitude, latitude
@@ -36,28 +38,41 @@ def get_all_stations():
     # Station availability
     data = {"stations": {},
             "weather": {}}
-    rows = session.query(Availability).filter(
-        Availability.time_updated == func.max(Availability.time_updated).select())
-    for row in rows:
-        print(type(row.station_id), file=sys.stdout)
-        data["stations"][row.station_id] = "1"
-        data2.append(row.available_bikes)
-        print(row.station_id)
-        print(row.available_bikes)
-        print(row.available_bike_stands)
-        print(row.time_updated)
+    bike_stations = session.query(Station).all()
+    bike_availability = session.query(Availability).filter(
+        Availability.time_updated == func.max(Availability.time_updated).select()).all()
+    weather = session.query(Weather).filter(
+        Weather.time_updated == func.max(Weather.time_updated).select()).first()
+
+    for row in bike_availability:
+        data["stations"][row.station_id] = {
+            "available_bikes": row.available_bikes,
+            "available_bike_stands": row.available_bike_stands
+        }
+
+    for row in bike_stations:
+        data["stations"][row.station_id]["name"] = row.name
+        data["stations"][row.station_id]["latitude"] = row.latitude
+        data["stations"][row.station_id]["longitude"] = row.longitude
+    data["weather"] = {
+        "type": weather.type,
+        "temperature": weather.temperature,
+        "humidity": weather.humidity,
+        "wind speed": weather.wind_speed
+
+    }
     print(data, file=sys.stdout)
-    print(data2, file=sys.stdout)
     row = session.query(Station).all()
 
-    return jsonify(rows)
+    return jsonify(data)
 
 
-#Joins stations tables to give static data and latest dynamic data
+# Joins stations tables to give static data and latest dynamic data
 @app.route("/stations/")
 def get_stations():
-    #subquery to find latest data in availability
-    latest_dynamic_data = session.query(func.max(Availability.time_updated)).scalar_subquery()
+    # subquery to find latest data in availability
+    latest_dynamic_data = session.query(
+        func.max(Availability.time_updated)).scalar_subquery()
 
     station_data = session.query(Station, Availability).\
         join(Availability, Station.station_id == Availability.station_id).\
@@ -92,10 +107,10 @@ def root():
     rows = session.query(Station).all()
     for row in rows:
         data.append(row.station_id)
-    #Changed to render_template as we will be importing data and I was getting errors.
-    return render_template('index.html', data=data, mapsAPIKey=db_info['mapsAPIKey']) 
+    # Changed to render_template as we will be importing data and I was getting errors.
+    return render_template('index.html', data=data, mapsAPIKey=db_info['mapsAPIKey'])
+
 
 if __name__ == "__main__":
     app.run(debug=True)
     print("Done", file=sys.stdout)
-
