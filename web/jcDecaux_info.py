@@ -4,7 +4,7 @@ import requests
 import json
 from sqlalchemy import create_engine, Column, String, Integer, Double, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
-from Database import Availability
+from Database import Availability, Station
 
 # Sets options to read entire data frame
 pd.set_option("display.max_rows", None, "display.max_columns", None)
