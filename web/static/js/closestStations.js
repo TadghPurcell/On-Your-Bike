@@ -41,7 +41,7 @@ export async function getClosestStations(data) {
           const otherAside = document.querySelector('.journey_planner_sidebar')
           otherAside.style.display = 'none'
           otherAside.classList.remove('drop-down')
-          
+
           const aside = document.querySelector('.nearest_stations_sidebar')
           aside.style.display = 'flex'
           // remove original aside html
@@ -54,7 +54,6 @@ export async function getClosestStations(data) {
           asideTitle.textContent = "Nearest Stations"
           aside.appendChild(asideTitle)
           const closestStations = stationDistances.sort((a, b) => a.distanceVal - b.distanceVal).slice(0, 5)
-          console.log(closestStations[0])
           closestStations.forEach( station => {
             const stationDiv = document.createElement('div')
             stationDiv.classList.add('closest_station')

@@ -85,7 +85,6 @@ def get_stations():
 #     row = session.query(Availability).filter_by(station_id=station_id)
 #     return jsonify(row)
 
-
 @app.route('/')
 def root():
     data = []

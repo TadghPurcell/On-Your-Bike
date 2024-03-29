@@ -1,16 +1,16 @@
-export async function findPlaces() {
+export async function createSearchBox(map) {
     const { Place } = await google.maps.importLibrary("places");
     //@ts-ignore
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     const request = {
-      textQuery: "Tacos in Mountain View",
+      textQuery: "UCD",
       fields: ["displayName", "location", "businessStatus"],
-      includedType: "restaurant",
-      isOpenNow: true,
-      language: "en-US",
-      maxResultCount: 7,
-      minRating: 3.2,
-      region: "us",
+      // includedType: "restaurant",
+      // isOpenNow: true,
+      // language: "en-US",
+      // maxResultCount: 7,
+      // minRating: 3.2,
+      // region: "us",
       useStrictTypeFiltering: false,
     };
     //@ts-ignore
@@ -21,6 +21,7 @@ export async function findPlaces() {
   
       const { LatLngBounds } = await google.maps.importLibrary("core");
       const bounds = new LatLngBounds();
+      console.log(bounds)
   
       // Loop through and get all the results.
       places.forEach((place) => {
@@ -33,7 +34,7 @@ export async function findPlaces() {
         bounds.extend(place.location);
         console.log(place);
       });
-      map.setCenter(bounds.getCenter());
+      // map.setCenter(bounds.getCenter());
     } else {
       console.log("No results");
     }

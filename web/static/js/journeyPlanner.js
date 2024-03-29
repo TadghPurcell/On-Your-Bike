@@ -1,5 +1,10 @@
 export async function initJourneyPlanner(map) {
     const { Place } = await google.maps.importLibrary("places");
+    const { DirectionsService, DirectionsRenderer } = await google.maps.importLibrary("routes")
+
+    const directionsService = new DirectionsService()
+    const directionsRenderer = new DirectionsRenderer()
+    directionsRenderer.setMap(map)
 
     const journeyPlannerBtn = document.querySelector('.btn-journey-planner')
 
@@ -58,7 +63,18 @@ export async function initJourneyPlanner(map) {
 
         submitBtn.addEventListener('click', (e) => {
             e.preventDefault()
-            console.log(e)
+            let request = {
+                origin: startingPointInput.value,
+                destination: destinationInput.value,
+                travelMode: 'WALKING'
+            }
+
+            directionsService.route(request, (result, status) => {
+                if (status == 'OK') {
+                    console.log(result)
+                    directionsRenderer.setDirections(result)
+                }
+            })
         })
 
         const resetBtn = document.createElement('button')
@@ -69,6 +85,7 @@ export async function initJourneyPlanner(map) {
             e.preventDefault()
             startingPointInput.value = ''
             destinationInput.value = ''
+        
         })
 
         journeyForm.appendChild(submitBtn)
@@ -76,80 +93,8 @@ export async function initJourneyPlanner(map) {
 
         aside.appendChild(journeyForm)
 
-        //create search boxes
+        // create search boxes
         const startingPointSearchBox = new google.maps.places.SearchBox(startingPointInput);
         const destinationSearchBox = new google.maps.places.SearchBox(destinationInput);
-
-        map.addEventListener("bounds_changed", () => {
-            startingPointSearchBox.setBounds(map.getBounds());
-            destinationSearchBox.setBounds(map.getBounds());
-          });
-
-        
-  let markers = [];
-
-  // Listen for the event fired when the user selects a prediction and retrieve
-  // more details for that place.
-  const listener = (e) => {
-    console.log(e)
-  }
-
-//   startingPointSearchBox.addListener("places_changed", listener)
-  destinationSearchBox.addListener("places_changed", () => {
-    const places = destinationSearchBox.getPlaces();
-
-    if (places.length == 0) {
-      return;
-    }
-
-    // Clear out the old markers.
-    markers.forEach((marker) => {
-      marker.setMap(null);
-    });
-    markers = [];
-
-    // For each place, get the icon, name and location.
-    const bounds = new google.maps.LatLngBounds();
-
-    places.forEach((place) => {
-      if (!place.geometry || !place.geometry.location) {
-        console.log("Returned place contains no geometry");
-        return;
-      }
-
-      const icon = {
-        url: place.icon,
-        size: new google.maps.Size(71, 71),
-        origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(17, 34),
-        scaledSize: new google.maps.Size(25, 25),
-      };
-
-      // Create a marker for each place.
-      markers.push(
-        new google.maps.Marker({
-          map,
-          icon,
-          title: place.name,
-          position: place.geometry.location,
-        }),
-      );
-      if (place.geometry.viewport) {
-        // Only geocodes have viewport.
-        bounds.union(place.geometry.viewport);
-      } else {
-        bounds.extend(place.geometry.location);
-      }
-    });
-    map.fitBounds(bounds);
-  });
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async position => {
-                const pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                }
-            })
-        }
     })
 }
