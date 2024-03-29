@@ -4,7 +4,7 @@ export async function initJourneyPlanner(map) {
 
     const directionsService = new DirectionsService()
     const directionsRenderer = new DirectionsRenderer()
-    directionsRenderer.setMap(map)
+    // directionsRenderer.setMap(map)
 
     const journeyPlannerBtn = document.querySelector('.btn-journey-planner')
 
@@ -66,26 +66,31 @@ export async function initJourneyPlanner(map) {
             let request = {
                 origin: startingPointInput.value,
                 destination: destinationInput.value,
-                travelMode: 'WALKING'
+                travelMode: 'BICYCLING',
+                region: 'ie'
             }
-
+            
             directionsService.route(request, (result, status) => {
                 if (status == 'OK') {
                     console.log(result)
+                    directionsRenderer.setMap(map)
                     directionsRenderer.setDirections(result)
+                    directionsRenderer.setPanel(aside);
                 }
             })
         })
-
+        
         const resetBtn = document.createElement('button')
         resetBtn.setAttribute('type', 'reset')
         resetBtn.textContent = 'Reset'
-
+        
         resetBtn.addEventListener('click', (e) => {
             e.preventDefault()
             startingPointInput.value = ''
             destinationInput.value = ''
-        
+            directionsRenderer.setPanel(null);
+            directionsRenderer.setDirections(null)
+            directionsRenderer.setMap(null)
         })
 
         journeyForm.appendChild(submitBtn)
