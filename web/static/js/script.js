@@ -169,36 +169,51 @@ async function initMap() {
         // Close the info window, this allows the user to know that the marker was clicked
         infoWindow.close(map, marker);
 
-        // Get the data
+        // Create predicted availability chart
+        // Get the predicted availability for the station
+        let json;
         try {
           const res = await fetch(`/available/${id}`);
           if (!res.ok) {
             throw new Error("Couldn't find station ID");
           }
-          const data = await res.json();
-          console.log(data);
+          json = await res.json();
         } catch (e) {
           console.error("Error connecting to DB: ", e);
         }
 
+        // Iterate over the hours and add to data
+        var availability_data = [];
+        for (var idx in json.hour) {
+          availability_data.push([
+            json.hour[idx].toString(),
+            json.predicted_available[idx],
+          ]);
+        }
+        console.log(availability_data);
+
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
-          // Define the chart to be drawn.
           var data = new google.visualization.DataTable();
-          data.addColumn("string", "Element");
-          data.addColumn("number", "Percentage");
-          data.addRows([
-            ["Nitrogen", 0.78],
-            ["Oxygen", 0.21],
-            ["Other", 0.01],
-          ]);
+          data.addColumn("string", "Hour");
+          data.addColumn("number", "Busyness Level");
+          data.addRows(availability_data);
 
-          // Instantiate and draw the chart.
-          var chart = new google.visualization.PieChart(
-            document.getElementById("myPieChart")
+          var options = {
+            legend: "none",
+            colors: ["#4286f4"],
+            opacity: 0.3,
+            vAxis: {
+              minValue: 0,
+            },
+            bar: { groupWidth: "100%" },
+            borderRadius: 4,
+          };
+          var chart = new google.visualization.LineChart(
+            document.getElementById("busyness-chart")
           );
-          chart.draw(data, null);
+          chart.draw(data, options);
         }
       });
 
