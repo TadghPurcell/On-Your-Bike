@@ -1,6 +1,4 @@
 from db_config import Base
-from jcDecaux_info import Station, Availability
-from weather_info import Weather
 from flask import Flask, g, jsonify, render_template
 from Database import Station, Availability, Weather
 from sqlalchemy import create_engine, func, Column, String, Integer, Double, Boolean
@@ -101,7 +99,7 @@ def get_stations():
 
 
 @app.route("/availabile/<int:station_id>")
-def get_stations(station_id):
+def get_station(station_id):
     poly = PolynomialFeatures(degree=3, include_bias=False)
     with open(f'station_{station_id}.pkl', 'rb') as file:
         # Load the model from the file
