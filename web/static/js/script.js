@@ -190,7 +190,6 @@ async function initMap() {
             json.predicted_available[idx],
           ]);
         }
-        console.log(availability_data);
 
         google.charts.setOnLoadCallback(drawChart);
 
@@ -206,12 +205,12 @@ async function initMap() {
             opacity: 0.3,
             vAxis: {
               minValue: 0,
+              viewWindow: { min: 0 },
             },
-            bar: { groupWidth: "100%" },
-            borderRadius: 4,
+            curveType: "function",
           };
           var chart = new google.visualization.LineChart(
-            document.getElementById("busyness-chart")
+            document.getElementById("availability-chart")
           );
           chart.draw(data, options);
         }

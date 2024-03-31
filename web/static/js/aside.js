@@ -6,10 +6,10 @@ async function initAside() {
   stationDataPiece.classList.add(`station-data-piece`);
 
   const busynessChart = document.createElement("div");
-  busynessChart.id = "busyness-chart";
+  busynessChart.id = "availability-chart";
 
   const stationDataPieceTitle = document.createElement("h2");
-  stationDataPieceTitle.textContent = `Example of analysis data ${1}`;
+  stationDataPieceTitle.textContent = `Predicted Station Availability`;
 
   stationDataPiece;
   stationDataPiece.appendChild(stationDataPieceTitle);
