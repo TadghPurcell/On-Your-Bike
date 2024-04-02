@@ -182,25 +182,33 @@ async function initMap() {
         aside.style.display = "flex";
         aside.innerHTML = "";
 
+        const topDiv = document.createElement("div");
+
         const asideTitle = document.createElement("h2");
         asideTitle.classList.add("closest_station_head");
         asideTitle.textContent = `${modifiedName}`;
-        aside.appendChild(asideTitle);
+        topDiv.appendChild(asideTitle);
+
+        const quickInfo = document.createElement("div");
+        quickInfo.classList.add("station_information");
 
         const stationBikes = document.createElement("p");
         stationBikes.classList.add("station_information_bikes");
         stationBikes.textContent = availableBikes;
-        aside.appendChild(stationBikes);
+        quickInfo.appendChild(stationBikes);
 
         const stationDistance = document.createElement("p");
-        stationDistance.classList.add("closest_station_distance");
+        stationDistance.classList.add("station_information_distance");
         stationDistance.textContent = "10km";
-        aside.appendChild(stationDistance);
+        quickInfo.appendChild(stationDistance);
 
         const stationWalkTime = document.createElement("p");
-        stationWalkTime.classList.add("closest_station_walk_time");
+        stationWalkTime.classList.add("station_information_walk_time");
         stationWalkTime.textContent = "20min";
-        aside.appendChild(stationWalkTime);
+        quickInfo.appendChild(stationWalkTime);
+
+        topDiv.appendChild(quickInfo);
+        aside.appendChild(topDiv);
 
         const availability_title = document.createElement("h2");
         availability_title.classList.add("closest_station_head");

@@ -10,7 +10,6 @@ async function initAside() {
 
   stationDataPiece;
   stationDataPiece.appendChild(stationDataPieceTitle);
-  stationDataPiece.appendChild(busynessChart);
 
   aside.appendChild(stationDataPiece);
 }
