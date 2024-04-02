@@ -22,8 +22,10 @@ async function initMap() {
   // Request needed libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
   const { Place } = await google.maps.importLibrary("places");
-  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
-  const { DistanceMatrixService } = await google.maps.importLibrary("routes")
+  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
+    "marker"
+  );
+  const { DistanceMatrixService } = await google.maps.importLibrary("routes");
 
   // The map, centered at Dublin
   let map = new Map(document.getElementById("map"), {
@@ -64,7 +66,6 @@ async function initMap() {
       payment_terminal: paymentTerminal,
       time_updated: latestTimeUpdate,
     }) => {
-
       let modifiedName = sName
         .split(" ")
         .map((e) => {
@@ -165,8 +166,50 @@ async function initMap() {
       });
 
       marker.content.addEventListener("click", async () => {
+        const stationInfo = getStationInfo(
+          modifiedName,
+          totalBikesStands,
+          availableBikes,
+          availableBikeStands,
+          paymentTerminal,
+          latestTimeUpdate
+        );
+
         // Close the info window, this allows the user to know that the marker was clicked
         infoWindow.close(map, marker);
+
+        const aside = document.querySelector(".station_information_sidebar");
+        aside.style.display = "flex";
+        aside.innerHTML = "";
+
+        const asideTitle = document.createElement("h2");
+        asideTitle.classList.add("closest_station_head");
+        asideTitle.textContent = `${modifiedName}`;
+        aside.appendChild(asideTitle);
+
+        const stationBikes = document.createElement("p");
+        stationBikes.classList.add("station_information_bikes");
+        stationBikes.textContent = availableBikes;
+        aside.appendChild(stationBikes);
+
+        const stationDistance = document.createElement("p");
+        stationDistance.classList.add("closest_station_distance");
+        stationDistance.textContent = "10km";
+        aside.appendChild(stationDistance);
+
+        const stationWalkTime = document.createElement("p");
+        stationWalkTime.classList.add("closest_station_walk_time");
+        stationWalkTime.textContent = "20min";
+        aside.appendChild(stationWalkTime);
+
+        const availability_title = document.createElement("h2");
+        availability_title.classList.add("closest_station_head");
+        availability_title.textContent = "Available Stations";
+        aside.appendChild(availability_title);
+
+        const availability_chart = document.createElement("div");
+        availability_chart.id = "availability-chart";
+        aside.appendChild(availability_chart);
 
         // Create predicted availability chart
         // Get the predicted availability for the station
@@ -189,7 +232,6 @@ async function initMap() {
             json.predicted_available[idx],
           ]);
         }
-
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
@@ -204,11 +246,12 @@ async function initMap() {
             opacity: 0.3,
             vAxis: {
               minValue: 0,
-              viewWindow: { min: 0 },
+              maxValue: totalBikesStands,
+              viewWindow: { min: 0, max: totalBikesStands },
             },
             curveType: "function",
           };
-          var chart = new google.visualization.LineChart(
+          var chart = new google.visualization.AreaChart(
             document.getElementById("availability-chart")
           );
           chart.draw(data, options);
@@ -219,9 +262,9 @@ async function initMap() {
     }
   );
 
-getClosestStations(data)
-initJourneyPlanner(map)
-const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
+  getClosestStations(data);
+  initJourneyPlanner(map);
+  const markerCluster = new markerClusterer.MarkerClusterer({ markers, map });
 }
 
 initMap();
