@@ -1,7 +1,10 @@
 import { getStationInfo } from "./getStationInfo.js";
 
+// Make the station information sidebar
 export async function stationInformationSidebar(
   id,
+  lat,
+  lng,
   modifiedName,
   totalBikesStands,
   availableBikes,
@@ -9,6 +12,17 @@ export async function stationInformationSidebar(
   paymentTerminal,
   latestTimeUpdate
 ) {
+  console.log({
+    id,
+    lat,
+    lng,
+    modifiedName,
+    totalBikesStands,
+    availableBikes,
+    availableBikeStands,
+    paymentTerminal,
+    latestTimeUpdate,
+  });
   const stationInfo = getStationInfo(
     modifiedName,
     totalBikesStands,
@@ -17,6 +31,10 @@ export async function stationInformationSidebar(
     paymentTerminal,
     latestTimeUpdate
   );
+
+  // For getting distance/time to station
+  const { DistanceMatrixService } = await google.maps.importLibrary("routes");
+  const distanceService = new DistanceMatrixService();
 
   const aside = document.querySelector(".station_information_sidebar");
   aside.style.display = "block";
@@ -33,22 +51,65 @@ export async function stationInformationSidebar(
   quickInfo.classList.add("station_information");
 
   const stationBikes = document.createElement("p");
+  stationBikes.classList.add("station_information_data");
   stationBikes.classList.add("station_information_bikes");
   stationBikes.textContent = availableBikes;
   quickInfo.appendChild(stationBikes);
 
   const stationDistance = document.createElement("p");
+  stationDistance.classList.add("station_information_data");
   stationDistance.classList.add("station_information_distance");
-  stationDistance.textContent = "10km";
-  quickInfo.appendChild(stationDistance);
+  stationDistance.textContent = "...";
 
   const stationWalkTime = document.createElement("p");
+  stationWalkTime.classList.add("station_information_data");
   stationWalkTime.classList.add("station_information_walk_time");
-  stationWalkTime.textContent = "20min";
-  quickInfo.appendChild(stationWalkTime);
+  stationWalkTime.textContent = "...";
 
+  // Get the current location if available
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const pos = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+
+      const stationDistInfo = await new Promise((resolve, reject) => {
+        distanceService.getDistanceMatrix(
+          {
+            origins: [pos],
+            destinations: [{ lat, lng }],
+            travelMode: "WALKING",
+          },
+          (response, status) => {
+            if (status == "OK") {
+              resolve({
+                modifiedName,
+                availableBikes,
+                distanceVal: response.rows[0].elements[0].distance.value,
+                distanceText: response.rows[0].elements[0].distance.text,
+                walkTime: response.rows[0].elements[0].duration.text,
+              });
+            } else {
+              reject(status);
+            }
+          }
+        );
+      });
+      stationDistance.innerText = stationDistInfo.distanceText;
+      stationWalkTime.innerText = stationDistInfo.walkTime;
+    });
+  }
+
+  quickInfo.appendChild(stationDistance);
+  quickInfo.appendChild(stationWalkTime);
   topDiv.appendChild(quickInfo);
   aside.appendChild(topDiv);
+
+  const directions = document.createElement("button");
+  directions.classList.add("directions-button");
+  directions.textContent = "Directions";
+  aside.appendChild(directions);
 
   const availability_title = document.createElement("h2");
   availability_title.classList.add("closest_station_head");

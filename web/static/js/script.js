@@ -124,8 +124,21 @@ async function initMap() {
 
       marker.content.addEventListener("click", async () => {
         infoWindow.close(map, marker);
+        console.log({
+          id,
+          lat,
+          lng,
+          modifiedName,
+          totalBikesStands,
+          availableBikes,
+          availableBikeStands,
+          paymentTerminal,
+          latestTimeUpdate,
+        });
         stationInformationSidebar(
           id,
+          lat,
+          lng,
           modifiedName,
           totalBikesStands,
           availableBikes,
