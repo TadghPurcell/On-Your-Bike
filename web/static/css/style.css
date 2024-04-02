@@ -13,7 +13,9 @@
   font-variation-settings: "wdth" 100;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -22,7 +24,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family:"Open Sans", sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-size: 16px;
 }
 
@@ -115,7 +117,6 @@ aside {
   top: 0px;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
   gap: 3rem;
   overflow: scroll;
   overflow-x: hidden;
@@ -125,7 +126,7 @@ aside {
   display: flex;
   flex-direction: column;
   font-size: 0.75rem;
-  padding: 3rem 2rem;
+  padding: 1rem 2rem;
   margin-bottom: 4rem;
   height: 20%;
 }
@@ -136,13 +137,13 @@ aside {
   max-width: 100%;
 }
 
-/* Custom scrollbar for sidebar */ 
+/* Custom scrollbar for sidebar */
 aside::-webkit-scrollbar {
-  width: 12px;               
+  width: 12px;
 }
 
 aside::-webkit-scrollbar-thumb {
-  background-color: var(--light-green);    
-  border-radius: 20px;       
-  border: 3px solid white;  
+  background-color: var(--light-green);
+  border-radius: 20px;
+  border: 3px solid white;
 }
