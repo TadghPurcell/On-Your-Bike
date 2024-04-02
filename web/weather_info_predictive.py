@@ -1,14 +1,11 @@
 from db_config import Base
-import pandas as pd
 import requests
-from datetime import datetime
 import json
-from sqlalchemy import create_engine, Column, String, Integer, Double, DateTime
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from Database import Weather
+from Database import WeatherPredictive
 
 # Sets options to read entire data frame
-pd.set_option("display.max_rows", None, "display.max_columns", None)
 
 with open('./static/dbinfo.json') as f:
     db_info = json.load(f)
@@ -21,12 +18,10 @@ DB = db_info['dbConnection']['DB']
 
 # Weather
 # Weather URI
-WEATHER_URI = 'https://api.openweathermap.org/data/2.5/weather'
+WEATHER_URI = 'https://api.openweathermap.org/data/2.5/forecast'
 weather_data = requests.get(WEATHER_URI, params={
                             "units": "metric", "lat": 53.344, "lon": -6.2672, "appid": WEATHER_API_KEY})
 weather_info = weather_data.json()
-# use pd.DataFrame because data is already an object
-df = pd.DataFrame([weather_info])
 
 engine = create_engine(
     'mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DB), echo=True)
@@ -39,6 +34,16 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # Create new weather row
-updated_weather = Weather(df)
-session.add(updated_weather)
+updated_predictive_weather = WeatherPredictive(
+weather_info['list'][0]['weather'][0]['main'], 
+weather_info['list'][0]['weather'][0]['description'],
+weather_info['list'][0]['main']['temp'],
+weather_info['list'][0]['main']['feels_like'],
+weather_info['list'][0]['main']['temp_min'],
+weather_info['list'][0]['main']['temp_max'],
+weather_info['list'][0].get('rain'),
+weather_info['list'][0]['main']['humidity'],
+weather_info['list'][0]['wind']['speed'],
+weather_info['list'][0]['clouds']['all'])
+session.add(updated_predictive_weather)
 session.commit()

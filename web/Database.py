@@ -3,7 +3,6 @@ from sqlalchemy import Column, DateTime, ForeignKey, String, Integer, Double, Bo
 from datetime import datetime
 import pandas as pd
 
-
 # Class defines tables in DB
 class Station(Base):
     __tablename__ = 'stations'
@@ -78,6 +77,37 @@ class Weather(Base):
         self.clouds = df['clouds'][0]['all']
         self.sunrise = df['sys'][0]['sunrise']
         self.sunset = df['sys'][0]['sunset']
+
+    def __repr__(self):
+        return f"{self.time_updated}, {self.description}, {self.temperature}"
+
+class WeatherPredictive(Base):
+    __tablename__ = 'weather_predictive'
+    time_updated = Column('time_updated', DateTime, primary_key=True)
+    type = Column('type', String(255))
+    description = Column('description', String(255))
+    temperature = Column('temperature', Double)
+    feels_like = Column('feels_like', Double)
+    min_temp = Column('min_temp', Double)
+    max_temp = Column('max_temp', Double)
+    rain_3h = Column('rain_3h', String(255))
+    humidity = Column('humidity', Integer)
+    wind_speed = Column('wind_speed', Double)
+    clouds = Column('clouds', Integer)
+
+    def __init__(self, type, description, temperature, feels_like, min_temp, max_temp, rain_3h,
+                 humidity, wind_speed, clouds):
+        self.time_updated = datetime.now()
+        self.type = type
+        self.description = str(description)
+        self.temperature = temperature
+        self.feels_like = feels_like
+        self.min_temp = min_temp
+        self.max_temp = max_temp
+        self.rain_3h = str(rain_3h)
+        self.humidity = humidity
+        self.wind_speed = wind_speed
+        self.clouds = clouds
 
     def __repr__(self):
         return f"{self.time_updated}, {self.description}, {self.temperature}"
