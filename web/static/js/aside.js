@@ -16,7 +16,7 @@ for (let i = 1; i < 4; i++) {
     stationDataPieceImg.alt = 'example barchart'
 
     stationDataPiece.appendChild(stationDataPieceTitle)
-    stationDataPiece.   appendChild(stationDataPieceImg)
+    stationDataPiece.appendChild(stationDataPieceImg)
 
     aside.appendChild(stationDataPiece)
 }

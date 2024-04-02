@@ -52,11 +52,7 @@ async function initMap() {
   total_bike_stands: totalBikesStands, available_bikes: availableBikes,
   available_bike_stands: availableBikeStands, payment_terminal: paymentTerminal,
   time_updated: latestTimeUpdate}) => {
-    // const pinSvg = parser.parseFromString(
-      //   pinSvgString,
-      //   "image/svg+xml",
-      //   ).documentElement;
-
+    
       // fixes issues with names
       let modifiedName = sName.split(' ').map(e => {
         let newName = e.toLowerCase()
@@ -142,6 +138,7 @@ async function initMap() {
 
 getClosestStations(data)
 initJourneyPlanner(map)
+const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
 }
 
 initMap();

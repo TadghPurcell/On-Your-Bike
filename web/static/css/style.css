@@ -116,7 +116,7 @@ aside {
   background-color: white;
   box-shadow: var(--box-shadow);
   color: var(--dark-green);
-  height: 90%;
+  /* height: 90%; */
   max-width: 30%;
   z-index: 4;
   right: 0px;
