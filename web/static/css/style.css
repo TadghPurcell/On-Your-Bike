@@ -241,6 +241,12 @@ aside::-webkit-scrollbar-thumb {
   height: 10px;
 }
 
+/* journey planner */
+
+.journey_planner_sidebar {
+  display: none;
+}
+
 /* Station information */
 
 .station_information {
@@ -248,6 +254,10 @@ aside::-webkit-scrollbar-thumb {
   flex-direction: row;
   justify-content: space-evenly;
   align-items: flex-end;
+}
+
+.station_information_sidebar {
+  display: none;
 }
 
 .station_information_bikes::before {

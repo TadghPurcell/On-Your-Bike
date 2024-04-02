@@ -179,7 +179,7 @@ async function initMap() {
         infoWindow.close(map, marker);
 
         const aside = document.querySelector(".station_information_sidebar");
-        aside.style.display = "flex";
+        aside.style.display = "block";
         aside.innerHTML = "";
 
         const topDiv = document.createElement("div");
