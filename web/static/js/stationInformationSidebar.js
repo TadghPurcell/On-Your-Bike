@@ -12,17 +12,6 @@ export async function stationInformationSidebar(
   paymentTerminal,
   latestTimeUpdate
 ) {
-  console.log({
-    id,
-    lat,
-    lng,
-    modifiedName,
-    totalBikesStands,
-    availableBikes,
-    availableBikeStands,
-    paymentTerminal,
-    latestTimeUpdate,
-  });
   const stationInfo = getStationInfo(
     modifiedName,
     totalBikesStands,
@@ -59,14 +48,14 @@ export async function stationInformationSidebar(
   const stationDistance = document.createElement("p");
   stationDistance.classList.add("station_information_data");
   stationDistance.classList.add("station_information_distance");
-  stationDistance.textContent = "...";
+  stationDistance.textContent = "..."; // Leave as 3 dots while distance loads
 
   const stationWalkTime = document.createElement("p");
   stationWalkTime.classList.add("station_information_data");
   stationWalkTime.classList.add("station_information_walk_time");
-  stationWalkTime.textContent = "...";
+  stationWalkTime.textContent = "..."; // Leave as 3 dots while walk time loads
 
-  // Get the current location if available
+  // Get the current location if available and add distance and walk times to sidebar
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(async (position) => {
       const pos = {
@@ -113,7 +102,7 @@ export async function stationInformationSidebar(
 
   const availability_title = document.createElement("h2");
   availability_title.classList.add("closest_station_head");
-  availability_title.textContent = "Available Bikes";
+  availability_title.textContent = "Predicted Bike Availability";
   aside.appendChild(availability_title);
 
   const availability_chart = document.createElement("div");
@@ -122,7 +111,7 @@ export async function stationInformationSidebar(
 
   const avail_station_title = document.createElement("h2");
   avail_station_title.classList.add("closest_station_head");
-  avail_station_title.textContent = "Available Stations";
+  avail_station_title.textContent = "Predicted Station Availability";
   aside.appendChild(avail_station_title);
 
   const station_chart = document.createElement("div");
