@@ -4,7 +4,7 @@
       "name": "DAME STREET",
       "latitude": 53.344321,
       "longitude": -6.113324,
-      "bike_stands": 31,
+      "total_bike_stands": 31,
       "available_bikes": 10,
       "available_bike_stands": 29
     },
