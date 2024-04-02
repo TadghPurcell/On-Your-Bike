@@ -173,7 +173,6 @@ def get_station(station_id):
     # row = session.query(Availability).filter_by(station_id=station_id)
     return df[['hour', 'predicted_available']].to_json()
 
-
 @app.route('/')
 def root():
     data = []

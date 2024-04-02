@@ -1,5 +1,5 @@
-let map;
-
+import { getClosestStations } from "./closestStations.js";
+import { initJourneyPlanner } from "./journeyPlanner.js";
 async function initMap() {
   let mapStyleId;
 
@@ -21,17 +21,21 @@ async function initMap() {
 
   // Request needed libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
-    "marker"
-  );
+  const { Place } = await google.maps.importLibrary("places");
+  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+  const { DistanceMatrixService } = await google.maps.importLibrary("routes")
 
   // The map, centered at Dublin
-  map = new Map(document.getElementById("map"), {
+  let map = new Map(document.getElementById("map"), {
     zoom: 13,
     center: position,
     fullscreenControl: false,
     mapTypeControl: false,
     streetViewControl: false,
+    zoomControl: true,
+    zoomControlOptions: {
+      position: google.maps.ControlPosition.LEFT_CENTER,
+    },
     mapId: mapStyleId,
   });
 
@@ -60,12 +64,7 @@ async function initMap() {
       payment_terminal: paymentTerminal,
       time_updated: latestTimeUpdate,
     }) => {
-      // const pinSvg = parser.parseFromString(
-      //   pinSvgString,
-      //   "image/svg+xml",
-      //   ).documentElement;
 
-      // fixes issues with names
       let modifiedName = sName
         .split(" ")
         .map((e) => {
@@ -220,7 +219,9 @@ async function initMap() {
     }
   );
 
-  const markerCluster = new markerClusterer.MarkerClusterer({ markers, map });
+getClosestStations(data)
+initJourneyPlanner(map)
+const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
 }
 
 initMap();
