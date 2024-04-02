@@ -212,12 +212,21 @@ async function initMap() {
 
         const availability_title = document.createElement("h2");
         availability_title.classList.add("closest_station_head");
-        availability_title.textContent = "Available Stations";
+        availability_title.textContent = "Available Bikes";
         aside.appendChild(availability_title);
 
         const availability_chart = document.createElement("div");
         availability_chart.id = "availability-chart";
         aside.appendChild(availability_chart);
+
+        const avail_station_title = document.createElement("h2");
+        avail_station_title.classList.add("closest_station_head");
+        avail_station_title.textContent = "Available Stations";
+        aside.appendChild(avail_station_title);
+
+        const station_chart = document.createElement("div");
+        station_chart.id = "avail-station-chart";
+        aside.appendChild(station_chart);
 
         // Create predicted availability chart
         // Get the predicted availability for the station
@@ -240,6 +249,15 @@ async function initMap() {
             json.predicted_available[idx],
           ]);
         }
+
+        var avail_station_data = [];
+        for (var idx in json.hour) {
+          avail_station_data.push([
+            json.hour[idx].toString(),
+            totalBikesStands - json.predicted_available[idx],
+          ]);
+        }
+
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
@@ -247,6 +265,11 @@ async function initMap() {
           data.addColumn("string", "Hour");
           data.addColumn("number", "Busyness Level");
           data.addRows(availability_data);
+
+          var station_data = new google.visualization.DataTable();
+          station_data.addColumn("string", "Hour");
+          station_data.addColumn("number", "Busyness Level");
+          station_data.addRows(avail_station_data);
 
           var options = {
             legend: "none",
@@ -262,7 +285,12 @@ async function initMap() {
           var chart = new google.visualization.AreaChart(
             document.getElementById("availability-chart")
           );
+          var station_chart = new google.visualization.AreaChart(
+            document.getElementById("avail-station-chart")
+          );
+
           chart.draw(data, options);
+          station_chart.draw(station_data, options);
         }
       });
 
