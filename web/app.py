@@ -160,15 +160,16 @@ def get_station(station_id):
     for day in days:
         df[day] = df['weekday'] == day
 
-    weather_types = ['Clear', 'Clouds', 'Drizzle', 'Mist', 'Rain']
-
-    for weather_type in weather_types:
-        df[weather_type] = df['type'] == weather_type
+    df['rain'] = df['type'] == 'Rain'
 
     df.drop('time_updated', axis=1, inplace=True)
     df.drop('weekday', axis=1, inplace=True)
     df.drop('type', axis=1, inplace=True)
-    print(df, file=sys.stdout)
+
+    # Get the columns in the right order
+    df = df[['temperature', 'wind_speed', 'humidity', 'hour', 'rain', 'Friday',
+             'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday', 'Wednesday']]
+
     with open(f'../ML_models/station_{station_id}.pkl', 'rb') as file:
         # Load the model from the file
         poly_reg_model = pickle.load(file)
@@ -177,7 +178,6 @@ def get_station(station_id):
     poly_features = poly.fit_transform(df)
 
     df['predicted_available'] = poly_reg_model.predict(poly_features)
-    print(df['predicted_available'], file=sys.stdout)
     # row = session.query(Availability).filter_by(station_id=station_id)
     return df[['hour', 'predicted_available']].to_json()
 
