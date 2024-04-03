@@ -128,6 +128,8 @@ def get_station(station_id):
                                           for row in weather_info['list']]
     predicted_weather_df['time_updated'] = pd.to_datetime(
         predicted_weather_df['dt_txt'])
+    predicted_weather_df['type'] = [row['weather'][0]['main']
+                                    for row in weather_info['list']]
 
     predicted_weather_df['humidity'] = predicted_weather_df['humidity'].astype(
         'int64')
@@ -166,6 +168,7 @@ def get_station(station_id):
     df.drop('time_updated', axis=1, inplace=True)
     df.drop('weekday', axis=1, inplace=True)
     df.drop('type', axis=1, inplace=True)
+    print(df, file=sys.stdout)
     with open(f'../ML_models/station_{station_id}.pkl', 'rb') as file:
         # Load the model from the file
         poly_reg_model = pickle.load(file)
@@ -174,7 +177,7 @@ def get_station(station_id):
     poly_features = poly.fit_transform(df)
 
     df['predicted_available'] = poly_reg_model.predict(poly_features)
-
+    print(df['predicted_available'], file=sys.stdout)
     # row = session.query(Availability).filter_by(station_id=station_id)
     return df[['hour', 'predicted_available']].to_json()
 
