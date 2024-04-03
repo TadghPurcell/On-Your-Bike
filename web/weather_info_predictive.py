@@ -34,16 +34,19 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # Create new weather row
-updated_predictive_weather = WeatherPredictive(
-weather_info['list'][0]['weather'][0]['main'], 
-weather_info['list'][0]['weather'][0]['description'],
-weather_info['list'][0]['main']['temp'],
-weather_info['list'][0]['main']['feels_like'],
-weather_info['list'][0]['main']['temp_min'],
-weather_info['list'][0]['main']['temp_max'],
-weather_info['list'][0].get('rain'),
-weather_info['list'][0]['main']['humidity'],
-weather_info['list'][0]['wind']['speed'],
-weather_info['list'][0]['clouds']['all'])
-session.add(updated_predictive_weather)
+for i in range(len(weather_info['list'])):
+    updated_predictive_weather = WeatherPredictive(
+    weather_info['list'][i]['dt'],
+    weather_info['list'][i]['weather'][0]['main'], 
+    weather_info['list'][i]['weather'][0]['description'],
+    weather_info['list'][i]['main']['temp'],
+    weather_info['list'][i]['main']['feels_like'],
+    weather_info['list'][i]['main']['temp_min'],
+    weather_info['list'][i]['main']['temp_max'],
+    weather_info['list'][i].get('rain'),
+    weather_info['list'][i]['main']['humidity'],
+    weather_info['list'][i]['wind']['speed'],
+    weather_info['list'][i]['clouds']['all'])
+    session.add(updated_predictive_weather)
 session.commit()
+

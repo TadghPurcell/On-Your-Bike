@@ -83,7 +83,7 @@ class Weather(Base):
 
 class WeatherPredictive(Base):
     __tablename__ = 'weather_predictive'
-    time_updated = Column('time_updated', DateTime, primary_key=True)
+    forecast_time = Column('forecast_time', DateTime, primary_key=True)
     type = Column('type', String(255))
     description = Column('description', String(255))
     temperature = Column('temperature', Double)
@@ -95,9 +95,9 @@ class WeatherPredictive(Base):
     wind_speed = Column('wind_speed', Double)
     clouds = Column('clouds', Integer)
 
-    def __init__(self, type, description, temperature, feels_like, min_temp, max_temp, rain_3h,
+    def __init__(self, forecast_time, type, description, temperature, feels_like, min_temp, max_temp, rain_3h,
                  humidity, wind_speed, clouds):
-        self.time_updated = datetime.now()
+        self.forecast_time = datetime.fromtimestamp(forecast_time)
         self.type = type
         self.description = str(description)
         self.temperature = temperature
