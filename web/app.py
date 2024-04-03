@@ -1,6 +1,6 @@
 from db_config import Base
 from flask import Flask, g, jsonify, render_template
-from Database import Station, Availability, Weather
+from Database import Station, Availability, Weather, WeatherPredictive
 from sqlalchemy import create_engine, func, Column, String, Integer, Double, Boolean
 from sqlalchemy.orm import sessionmaker, joinedload
 import pandas as pd
@@ -115,32 +115,15 @@ def get_station(station_id):
     weather_historical_df = weather_historical_df[[
         'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
 
-    weather_data = requests.get(FORECAST_URI, params={
-                                "units": "metric", "lat": 53.344, "lon": -6.2672, "appid": db_info["weatherKey"]})
-    weather_info = weather_data.json()
+    weather_predictive = session.query(WeatherPredictive).all()
+    weather_predictive_df = pd.DataFrame(
+        [row.__dict__ for row in weather_predictive])
+    weather_predictive_df['type'] = weather_predictive_df['weather_type']
+    weather_predictive_df = weather_predictive_df[[
+        'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
 
-    predicted_weather_df = pd.DataFrame(weather_info['list'])
-    predicted_weather_df['temperature'] = [row['main']['temp']
-                                           for row in weather_info['list']]
-    predicted_weather_df['humidity'] = [row['main']['humidity']
-                                        for row in weather_info['list']]
-    predicted_weather_df['wind_speed'] = [row['wind']['speed']
-                                          for row in weather_info['list']]
-    predicted_weather_df['time_updated'] = pd.to_datetime(
-        predicted_weather_df['dt_txt'])
-    predicted_weather_df['type'] = [row['weather'][0]['main']
-                                    for row in weather_info['list']]
-
-    predicted_weather_df['humidity'] = predicted_weather_df['humidity'].astype(
-        'int64')
-    predicted_weather_df['temperature'] = predicted_weather_df['temperature'].astype(
-        'float64')
-    predicted_weather_df['wind_speed'] = predicted_weather_df['wind_speed'].astype(
-        'float64')
-    predicted_weather_df = predicted_weather_df[[
-        'time_updated', 'temperature', 'wind_speed', 'humidity']]
-
-    weather_combined = pd.concat([weather_historical_df, predicted_weather_df])
+    weather_combined = pd.concat(
+        [weather_historical_df, weather_predictive_df])
 
     current_date = datetime.now()
 
