@@ -1,5 +1,7 @@
+import { getClosestStations } from "./closestStations.js";
+
 //This is a placeholder function that will populate the side bar with machine learning predictions in time
-async function initAside() {
+export async function initAside(map, data) {
 
   //Create sample loop to show how data will be loaded
   const aside = document.querySelector("aside");
@@ -12,6 +14,23 @@ async function initAside() {
   const stationDataPieceTitle = document.createElement("h2");
   stationDataPieceTitle.textContent = `Predicted Station Availability`;
 
+  const btnsAside = document.querySelectorAll('.btn-aside')
+  const btnNearestStations = document.querySelector('.btn-stations')
+  
+  btnsAside.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      btnsAside.forEach(btn => {
+        btn.classList.remove('btn-aside-active')
+      })
+      e.target.classList.add('btn-aside-active')
+      if (e.target.textContent == 'Nearest Stations') {
+      }
+    })
+  })
+  
+  btnNearestStations.addEventListener('click', () => {
+    getClosestStations(map, data)
+  })
   stationDataPiece;
   stationDataPiece.appendChild(stationDataPieceTitle);
   stationDataPiece.appendChild(busynessChart);
@@ -19,4 +38,3 @@ async function initAside() {
   aside.appendChild(stationDataPiece);
 }
 
-initAside();

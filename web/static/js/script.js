@@ -1,4 +1,4 @@
-import { getClosestStations } from "./closestStations.js";
+import { initAside } from "./aside.js";
 import { initJourneyPlanner } from "./journeyPlanner.js";
 async function initMap() {
   let mapStyleId;
@@ -232,7 +232,7 @@ async function initMap() {
     }
   );
 
-getClosestStations(data)
+initAside(map, data)
 initJourneyPlanner(map)
 const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
 }
