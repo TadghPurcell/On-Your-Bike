@@ -81,7 +81,8 @@ main {
 
 /* Buttons Section */
 
-button, .custom-map-control-button   {
+button,
+.custom-map-control-button {
   background-color: var(--light-green);
   color: white;
   font-family: inherit;
@@ -94,7 +95,8 @@ button, .custom-map-control-button   {
   cursor: pointer;
 }
 
-.buttons, .custom-map-control-button {
+.buttons,
+.custom-map-control-button {
   margin: 2rem;
   position: absolute;
   z-index: 2;
@@ -118,7 +120,7 @@ aside {
   background-color: white;
   box-shadow: var(--box-shadow);
   color: var(--dark-green);
-  /* height: 90%; */
+  height: 90vh;
   max-width: 30%;
   z-index: 4;
   right: 0px;
@@ -172,7 +174,6 @@ aside::-webkit-scrollbar-thumb {
   border: 3px solid white;
 }
 
-
 /* Nearest Stations Sidebar */
 .nearest_stations_sidebar {
   display: none;
@@ -193,7 +194,6 @@ aside::-webkit-scrollbar-thumb {
     transform: scale(1.05);
     border: 1px solid var(--light-green);
   }
-  
 }
 
 .closest_station {
@@ -224,20 +224,67 @@ aside::-webkit-scrollbar-thumb {
 }
 
 .closest_station_bikes::before {
-  content: url('/img/bike.svg');
+  content: url("/img/bike.svg");
   width: 10px;
   height: 10px;
 }
 
 .closest_station_distance::before {
-  content: url('/img/distance.svg');
-  
+  content: url("/img/distance.svg");
+
   width: 10px;
   height: 10px;
 }
 .closest_station_walk_time::before {
-  content: url('/img/walking.svg');
+  content: url("/img/walking.svg");
   width: 10px;
   height: 10px;
 }
 
+/* journey planner */
+
+.journey_planner_sidebar {
+  display: none;
+}
+
+/* Station information */
+
+.station_information {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: flex-end;
+}
+
+.station_information_data {
+  margin: 0;
+  padding-top: 5px;
+}
+
+.directions-button {
+  content: url("/img/bike.svg");
+  margin: 10px;
+}
+
+.station_information_sidebar {
+  display: none;
+}
+
+.station_information_bikes::before {
+  content: url("/img/bike.svg");
+  width: 10px;
+  height: 10px;
+}
+
+.station_information_distance::before {
+  content: url("/img/distance.svg");
+
+  width: 10px;
+  height: 10px;
+}
+.station_information_walk_time::before {
+  content: url("/img/walking.svg");
+  width: 10px;
+  height: 10px;
+}
