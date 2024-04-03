@@ -4,6 +4,7 @@ from Database import Station, Availability, Weather, WeatherPredictive
 from sqlalchemy import create_engine, func, Column, String, Integer, Double, Boolean
 from sqlalchemy.orm import sessionmaker, joinedload
 import pandas as pd
+import numpy as np
 import json
 import sys
 import pickle
@@ -105,13 +106,23 @@ def get_stations():
 
 @app.route("/available/<int:station_id>")
 def get_station(station_id):
+
     midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    station_information = session.query(Availability).filter(
+        Availability.time_updated > midnight, Availability.station_id == station_id).all()
+
+    station_data = pd.DataFrame([row.__dict__ for row in station_information])
+
+    station_data['hour'] = station_data['time_updated'].dt.hour
+    station_data = station_data[['hour', 'available_bikes', 'bike_stands']]
 
     weather_historical = session.query(Weather).filter(
         Weather.time_updated > midnight).all()
 
     weather_historical_df = pd.DataFrame(
         [row.__dict__ for row in weather_historical])
+
     weather_historical_df = weather_historical_df[[
         'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
 
@@ -161,8 +172,20 @@ def get_station(station_id):
     poly_features = poly.fit_transform(df)
 
     df['predicted_available'] = poly_reg_model.predict(poly_features)
-    # row = session.query(Availability).filter_by(station_id=station_id)
-    return df[['hour', 'predicted_available']].to_json()
+    df['predicted_available'] = np.clip(
+        df['predicted_available'], 0, station_data['bike_stands'])
+
+    data = {'predicted': [],
+            'historical': []
+            }
+    for iter, row in df.iterrows():
+        data['predicted'].append([row.hour, row.predicted_available])
+
+    for iter, row in station_data.iterrows():
+        data['historical'].append([row.hour, row.available_bikes])
+
+    print(data, file=sys.stdout)
+    return jsonify(data)
 
 
 @app.route('/')
