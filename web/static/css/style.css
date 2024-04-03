@@ -118,7 +118,7 @@ aside {
   background-color: white;
   box-shadow: var(--box-shadow);
   color: var(--dark-green);
-  /* height: 90%; */
+  height: 90%;
   max-width: 30%;
   z-index: 4;
   right: 0px;
@@ -199,6 +199,7 @@ aside::-webkit-scrollbar-thumb {
 .closest_station {
   background-color: rgb(238, 238, 238);
   gap: 0.5rem;
+  /* margin-bottom: 5.5rem; */
   padding: 10px;
   display: flex;
   /* flex-direction: column; */
@@ -206,7 +207,7 @@ aside::-webkit-scrollbar-thumb {
   /* justify-items: center; */
   grid-template-columns: 2fr 1fr;
   grid-template-rows: 1fr 1fr;
-  margin: 0 20px 0 20px;
+  margin: 0 20px 10px 20px;
 }
 
 .closest_station:hover {
@@ -246,3 +247,24 @@ aside::-webkit-scrollbar-thumb {
   height: 10px;
 }
 
+/* Journey Planner Sidebar */
+.journey_planner_head {
+  text-align: center;
+  margin-bottom: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 2rem;
+}
+
+.form-buttons-box {
+  display: flex;
+  gap: 16px;
+}
+
+.form-btn {
+  padding: 8px 18px;
+}
