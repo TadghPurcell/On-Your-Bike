@@ -113,7 +113,7 @@ def get_station(station_id):
     weather_historical_df = pd.DataFrame(
         [row.__dict__ for row in weather_historical])
     weather_historical_df = weather_historical_df[[
-        'time_updated', 'temperature', 'wind_speed', 'humidity']]
+        'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
 
     weather_data = requests.get(FORECAST_URI, params={
                                 "units": "metric", "lat": 53.344, "lon": -6.2672, "appid": db_info["weatherKey"]})
@@ -128,6 +128,8 @@ def get_station(station_id):
                                           for row in weather_info['list']]
     predicted_weather_df['time_updated'] = pd.to_datetime(
         predicted_weather_df['dt_txt'])
+    predicted_weather_df['type'] = [row['weather'][0]['main']
+                                    for row in weather_info['list']]
 
     predicted_weather_df['humidity'] = predicted_weather_df['humidity'].astype(
         'int64')
@@ -158,8 +160,15 @@ def get_station(station_id):
     for day in days:
         df[day] = df['weekday'] == day
 
+    df['rain'] = df['type'] == 'Rain'
+
     df.drop('time_updated', axis=1, inplace=True)
     df.drop('weekday', axis=1, inplace=True)
+    df.drop('type', axis=1, inplace=True)
+
+    # Get the columns in the right order
+    df = df[['temperature', 'wind_speed', 'humidity', 'hour', 'rain', 'Friday',
+             'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday', 'Wednesday']]
 
     with open(f'../ML_models/station_{station_id}.pkl', 'rb') as file:
         # Load the model from the file
@@ -169,9 +178,9 @@ def get_station(station_id):
     poly_features = poly.fit_transform(df)
 
     df['predicted_available'] = poly_reg_model.predict(poly_features)
-
     # row = session.query(Availability).filter_by(station_id=station_id)
     return df[['hour', 'predicted_available']].to_json()
+
 
 @app.route('/')
 def root():
