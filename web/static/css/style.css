@@ -228,6 +228,11 @@ aside::-webkit-scrollbar-thumb {
   width: 10px;
   height: 10px;
 }
+.closest-station-parking::before {
+  content: url('/img/available_spaces.svg');
+  width: 10px;
+  height: 10px;
+}
 
 .closest_station_distance::before {
   content: url('/img/distance.svg');

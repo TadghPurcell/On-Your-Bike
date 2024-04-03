@@ -81,17 +81,30 @@ async function initMap() {
           return newName[0].toUpperCase() + newName.slice(1);
         })
         .join(" ");
-
+      
       const glyphImg = document.createElement("img");
       glyphImg.classList.add("bike-logo");
-      glyphImg.src = "/img/bike.svg";
       glyphImg.alt = "marker logo";
-      const pinElement = new google.maps.marker.PinElement({
-        background: "#03a981",
-        borderColor: "#266052",
-        glyph: glyphImg,
-        scale: 1,
-      });
+      glyphImg.classList.add("bike-logo");
+      let pinElement
+      if (availableBikes != 0) {
+        glyphImg.src = "/img/bike.svg"
+        pinElement = new google.maps.marker.PinElement({
+          background: "#03a981",
+          borderColor: "#266052",
+          glyph: glyphImg,
+          scale: 1,
+        })
+      }
+      else {
+        glyphImg.src = "/img/bike_unavailable.svg";
+        pinElement = new google.maps.marker.PinElement({
+          background: "#f21800",
+          borderColor: "#603126",
+          glyph: glyphImg,
+          scale: 1,
+        });
+      }
 
       const marker = new AdvancedMarkerElement({
         position: { lat, lng },

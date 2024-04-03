@@ -16,7 +16,7 @@ export async function getClosestStations(data) {
           };
           
           const stationDistances = await Promise.all(data.map(({name: sName, latitude: lat, longitude: lng, 
-            available_bikes: availableBikes}) => {
+            available_bikes: availableBikes, available_bike_stands: availableBikeStands}) => {
               return new Promise((resolve, reject) => {
                 distanceService.getDistanceMatrix({
                   origins: [pos],
@@ -27,6 +27,7 @@ export async function getClosestStations(data) {
                   resolve({
                     sName,
                     availableBikes,
+                    availableBikeStands,
                     distanceVal: response.rows[0].elements[0].distance.value,
                     distanceText: response.rows[0].elements[0].distance.text,
                     walkTime: response.rows[0].elements[0].duration.text
@@ -65,6 +66,10 @@ export async function getClosestStations(data) {
             const stationBikes = document.createElement('p')
             stationBikes.classList.add('closest_station_bikes')
             stationBikes.textContent = station.availableBikes
+
+            const stationParking = document.createElement('p')
+            stationParking.classList.add('closest-station-parking')
+            stationParking.textContent = station.availableBikeStands
             
             const stationDistance = document.createElement('p')
             stationDistance.classList.add('closest_station_distance')
@@ -76,6 +81,7 @@ export async function getClosestStations(data) {
 
             stationDiv.appendChild(stationTitle)
             stationDiv.appendChild(stationBikes)
+            stationDiv.appendChild(stationParking)
             stationDiv.appendChild(stationDistance)
             stationDiv.appendChild(stationWalkTime)
 
