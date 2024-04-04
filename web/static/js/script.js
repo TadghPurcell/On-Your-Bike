@@ -85,22 +85,21 @@ async function initMap() {
           return newName[0].toUpperCase() + newName.slice(1);
         })
         .join(" ");
-      
+
       const glyphImg = document.createElement("img");
       glyphImg.classList.add("bike-logo");
       glyphImg.alt = "marker logo";
       glyphImg.classList.add("bike-logo");
-      let pinElement
+      let pinElement;
       if (availableBikes != 0) {
-        glyphImg.src = "/img/bike.svg"
+        glyphImg.src = "/img/bike.svg";
         pinElement = new google.maps.marker.PinElement({
           background: "#03a981",
           borderColor: "#266052",
           glyph: glyphImg,
           scale: 1,
-        })
-      }
-      else {
+        });
+      } else {
         glyphImg.src = "/img/bike_unavailable.svg";
         pinElement = new google.maps.marker.PinElement({
           background: "#f21800",
@@ -138,17 +137,12 @@ async function initMap() {
 
       marker.content.addEventListener("click", async () => {
         infoWindow.close(map, marker);
-        console.log({
-          id,
-          lat,
-          lng,
-          modifiedName,
-          totalBikesStands,
-          availableBikes,
-          availableBikeStands,
-          paymentTerminal,
-          latestTimeUpdate,
-        });
+        // Define the new position
+        let newPosition = new google.maps.LatLng(lat, lng + 0.002); // add 0.002 to offset sidebar
+        // Set the new position
+        map.setCenter(newPosition);
+        map.setZoom(16);
+
         stationInformationSidebar(
           id,
           lat,
@@ -166,8 +160,8 @@ async function initMap() {
     }
   );
 
-initAside(map, data)
-const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
+  initAside(map, data);
+  const markerCluster = new markerClusterer.MarkerClusterer({ markers, map });
 }
 
 initMap();
