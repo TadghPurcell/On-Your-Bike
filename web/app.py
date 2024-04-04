@@ -185,7 +185,7 @@ def get_station(station_id):
     data = {'data': []
             }
     for hour, avail_bikes, pred_avail in zip(combined_df['hour'].values.tolist(), combined_df['available_bikes'].values.tolist(), combined_df['predicted_available'].values.tolist()):
-        data['data'].append([str(hour), avail_bikes, pred_avail])
+        data['data'].append([str(hour) + ":00", avail_bikes, pred_avail])
 
     print(data, file=sys.stdout)
 
