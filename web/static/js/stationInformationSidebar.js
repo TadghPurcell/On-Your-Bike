@@ -155,14 +155,14 @@ export async function stationInformationSidebar(
   function drawChart() {
     var data = new google.visualization.DataTable();
     data.addColumn("string", "Hour");
-    data.addColumn("number", "Historical Available Bikes");
-    data.addColumn("number", "Predicted Avaiable Bikes");
+    data.addColumn("number", "Available Bikes");
+    data.addColumn("number", "Predicted Bikes");
     data.addRows(availability_data);
 
     var station_data = new google.visualization.DataTable();
     station_data.addColumn("string", "Hour");
-    station_data.addColumn("number", "Historical Available Stations");
-    station_data.addColumn("number", "Predicted Avaiable Stations");
+    station_data.addColumn("number", "Available Stations");
+    station_data.addColumn("number", "Predicted Stations");
     station_data.addRows(avail_station_data);
 
     var options = {
