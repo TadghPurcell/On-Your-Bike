@@ -1,6 +1,6 @@
-import { getStationInfo } from "./getStationInfo.js";
-import { getClosestStations } from "./closestStations.js";
+import { initAside } from "./aside.js";
 import { initJourneyPlanner } from "./journeyPlanner.js";
+import { getStationInfo } from "./getStationInfo.js";
 import { stationInformationSidebar } from "./stationInformationSidebar.js";
 async function initMap() {
   let mapStyleId;
@@ -19,7 +19,8 @@ async function initMap() {
   }
 
   // The location of Dublin
-  const position = { lat: 53.344, lng: -6.2672 };
+  const position = { lat: 53.346, lng: -6.25 };
+  // 53.34611327830516, -6.264972599005677
 
   // Request needed libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
@@ -31,14 +32,14 @@ async function initMap() {
 
   // The map, centered at Dublin
   let map = new Map(document.getElementById("map"), {
-    zoom: 13,
+    zoom: 14,
     center: position,
     fullscreenControl: false,
     mapTypeControl: false,
     streetViewControl: false,
     zoomControl: true,
     zoomControlOptions: {
-      position: google.maps.ControlPosition.LEFT_CENTER,
+      position: google.maps.ControlPosition.LEFT_BOTTOM,
     },
     mapId: mapStyleId,
   });
@@ -84,17 +85,30 @@ async function initMap() {
           return newName[0].toUpperCase() + newName.slice(1);
         })
         .join(" ");
-
+      
       const glyphImg = document.createElement("img");
       glyphImg.classList.add("bike-logo");
-      glyphImg.src = "/img/bike.svg";
       glyphImg.alt = "marker logo";
-      const pinElement = new google.maps.marker.PinElement({
-        background: "#03a981",
-        borderColor: "#266052",
-        glyph: glyphImg,
-        scale: 1,
-      });
+      glyphImg.classList.add("bike-logo");
+      let pinElement
+      if (availableBikes != 0) {
+        glyphImg.src = "/img/bike.svg"
+        pinElement = new google.maps.marker.PinElement({
+          background: "#03a981",
+          borderColor: "#266052",
+          glyph: glyphImg,
+          scale: 1,
+        })
+      }
+      else {
+        glyphImg.src = "/img/bike_unavailable.svg";
+        pinElement = new google.maps.marker.PinElement({
+          background: "#f21800",
+          borderColor: "#603126",
+          glyph: glyphImg,
+          scale: 1,
+        });
+      }
 
       const marker = new AdvancedMarkerElement({
         position: { lat, lng },
@@ -152,9 +166,8 @@ async function initMap() {
     }
   );
 
-  getClosestStations(data);
-  initJourneyPlanner(map);
-  const markerCluster = new markerClusterer.MarkerClusterer({ markers, map });
+initAside(map, data)
+const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
 }
 
 initMap();
