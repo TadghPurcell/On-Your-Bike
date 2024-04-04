@@ -114,7 +114,7 @@ button,
 /* Maps Zoom Buttons*/
 
 .gmnoprint {
-  margin-left: calc(2rem - 10px);
+  margin-left: 2rem;
 }
 /* Sidebar Section */
 aside {
@@ -125,7 +125,7 @@ aside {
   background-color: white;
   box-shadow: var(--box-shadow);
   color: var(--dark-green);
-  height: 90vh;
+  height: 90%;
   max-width: 30%;
   z-index: 4;
   right: 0px;
@@ -285,7 +285,6 @@ aside::-webkit-scrollbar-thumb {
 }
 
 /* Station information */
-
 .station_information {
   display: flex;
   flex-direction: row;

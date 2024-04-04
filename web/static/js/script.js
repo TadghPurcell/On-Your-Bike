@@ -18,7 +18,8 @@ async function initMap() {
   }
 
   // The location of Dublin
-  const position = { lat: 53.344, lng: -6.2672 };
+  const position = { lat: 53.346, lng: -6.25 };
+  // 53.34611327830516, -6.264972599005677
 
   // Request needed libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
@@ -30,14 +31,14 @@ async function initMap() {
 
   // The map, centered at Dublin
   let map = new Map(document.getElementById("map"), {
-    zoom: 13,
+    zoom: 14,
     center: position,
     fullscreenControl: false,
     mapTypeControl: false,
     streetViewControl: false,
     zoomControl: true,
     zoomControlOptions: {
-      position: google.maps.ControlPosition.LEFT_CENTER,
+      position: google.maps.ControlPosition.LEFT_BOTTOM,
     },
     mapId: mapStyleId,
   });
@@ -165,7 +166,6 @@ async function initMap() {
   );
 
 initAside(map, data)
-initJourneyPlanner(map)
 const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
 }
 

@@ -7,14 +7,12 @@ export async function initAside(map, data) {
   //Create sample loop to show how data will be loaded
   const aside = document.querySelector("aside");
   const stationDataPiece = document.createElement("div");
-  stationDataPiece.classList.add(`station-data-piece`);
-
-  const stationDataPieceTitle = document.createElement("h2");
-  stationDataPieceTitle.textContent = `Predicted Station Availability`;
-
+   
   const btnsAside = document.querySelectorAll('.btn-aside')
   const btnJourneyPlanner = document.querySelector('.btn-journey-planner')
   const btnNearestStations = document.querySelector('.btn-stations')
+  
+  initJourneyPlanner(map)
   
   btnsAside.forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -34,9 +32,6 @@ export async function initAside(map, data) {
       initJourneyPlanner(map)
   })
   
-  stationDataPiece;
-  stationDataPiece.appendChild(stationDataPieceTitle);
-
   aside.appendChild(stationDataPiece);
 }
 
