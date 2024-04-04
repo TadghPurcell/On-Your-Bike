@@ -102,7 +102,7 @@ export async function stationInformationSidebar(
 
   const availability_title = document.createElement("h2");
   availability_title.classList.add("closest_station_head");
-  availability_title.textContent = "Predicted Bike Availability";
+  availability_title.textContent = "Bike Availability";
   aside.appendChild(availability_title);
 
   const availability_chart = document.createElement("div");
@@ -111,7 +111,7 @@ export async function stationInformationSidebar(
 
   const avail_station_title = document.createElement("h2");
   avail_station_title.classList.add("closest_station_head");
-  avail_station_title.textContent = "Predicted Station Availability";
+  avail_station_title.textContent = "Station Availability";
   aside.appendChild(avail_station_title);
 
   const station_chart = document.createElement("div");
@@ -167,7 +167,7 @@ export async function stationInformationSidebar(
 
     var options = {
       legend: "none",
-      colors: ["#ff0000", "#4286f4"],
+      colors: ["#4286f4", "#03a981"],
       opacity: 0.3,
       vAxis: {
         minValue: 0,
