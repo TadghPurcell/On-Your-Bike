@@ -132,20 +132,11 @@ export async function stationInformationSidebar(
   }
 
   // Iterate over the hours and add to data
-  var availability_data = [];
-  for (var idx in json.hour) {
-    availability_data.push([
-      json.hour[idx].toString(),
-      json.predicted_available[idx],
-    ]);
-  }
+  var availability_data = json.predicted;
 
   var avail_station_data = [];
-  for (var idx in json.hour) {
-    avail_station_data.push([
-      json.hour[idx].toString(),
-      totalBikesStands - json.predicted_available[idx],
-    ]);
+  for (var row of availability_data) {
+    avail_station_data.push([row[0], totalBikesStands - row[1]]);
   }
 
   google.charts.setOnLoadCallback(drawChart);
