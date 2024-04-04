@@ -133,14 +133,21 @@ export async function stationInformationSidebar(
 
   // Iterate over the hours and add to data
   var availability_data = json.data;
-  console.log(availability_data);
   var avail_station_data = [];
   for (var row of availability_data) {
-    avail_station_data.push([
-      row[0],
-      totalBikesStands - row[1],
-      totalBikesStands - row[2],
-    ]);
+    let new_row = [row[0]];
+    if (row[1] !== null) {
+      new_row.push(totalBikesStands - row[1]);
+    } else {
+      new_row.push(null);
+    }
+
+    if (row[2] !== null) {
+      new_row.push(totalBikesStands - row[2]);
+    } else {
+      new_row.push(null);
+    }
+    avail_station_data.push(new_row);
   }
 
   google.charts.setOnLoadCallback(drawChart);
