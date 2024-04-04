@@ -9,9 +9,6 @@ export async function initAside(map, data) {
   const stationDataPiece = document.createElement("div");
   stationDataPiece.classList.add(`station-data-piece`);
 
-  const busynessChart = document.createElement("div");
-  busynessChart.id = "availability-chart";
-
   const stationDataPieceTitle = document.createElement("h2");
   stationDataPieceTitle.textContent = `Predicted Station Availability`;
 
@@ -39,7 +36,6 @@ export async function initAside(map, data) {
   
   stationDataPiece;
   stationDataPiece.appendChild(stationDataPieceTitle);
-  stationDataPiece.appendChild(busynessChart);
 
   aside.appendChild(stationDataPiece);
 }

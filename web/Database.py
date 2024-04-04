@@ -4,6 +4,8 @@ from datetime import datetime
 import pandas as pd
 
 # Class defines tables in DB
+
+
 class Station(Base):
     __tablename__ = 'stations'
     station_id = Column('station_id', Integer, primary_key=True)
@@ -81,10 +83,11 @@ class Weather(Base):
     def __repr__(self):
         return f"{self.time_updated}, {self.description}, {self.temperature}"
 
+
 class WeatherPredictive(Base):
     __tablename__ = 'weather_predictive'
-    time_updated = Column('time_updated', DateTime, primary_key=True)
-    type = Column('type', String(255))
+    time_updated = Column('forecast_time', DateTime, primary_key=True)
+    weather_type = Column('type', String(255))
     description = Column('description', String(255))
     temperature = Column('temperature', Double)
     feels_like = Column('feels_like', Double)
@@ -95,10 +98,10 @@ class WeatherPredictive(Base):
     wind_speed = Column('wind_speed', Double)
     clouds = Column('clouds', Integer)
 
-    def __init__(self, type, description, temperature, feels_like, min_temp, max_temp, rain_3h,
+    def __init__(self, weather_type, description, temperature, feels_like, min_temp, max_temp, rain_3h,
                  humidity, wind_speed, clouds):
         self.time_updated = datetime.now()
-        self.type = type
+        self.weather_type = weather_type
         self.description = str(description)
         self.temperature = temperature
         self.feels_like = feels_like

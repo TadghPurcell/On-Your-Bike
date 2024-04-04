@@ -1,9 +1,10 @@
 from db_config import Base
 from flask import Flask, g, jsonify, render_template
-from Database import Station, Availability, Weather
+from Database import Station, Availability, Weather, WeatherPredictive
 from sqlalchemy import create_engine, func, Column, String, Integer, Double, Boolean
 from sqlalchemy.orm import sessionmaker, joinedload
 import pandas as pd
+import numpy as np
 import json
 import sys
 import pickle
@@ -105,40 +106,35 @@ def get_stations():
 
 @app.route("/available/<int:station_id>")
 def get_station(station_id):
+
     midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    station_information = session.query(Availability).filter(
+        Availability.time_updated > midnight, Availability.station_id == station_id).all()
+
+    station_data = pd.DataFrame([row.__dict__ for row in station_information])
+
+    station_data['hour'] = station_data['time_updated'].dt.hour
+    station_data = station_data[['hour', 'available_bikes', 'bike_stands']]
 
     weather_historical = session.query(Weather).filter(
         Weather.time_updated > midnight).all()
 
     weather_historical_df = pd.DataFrame(
         [row.__dict__ for row in weather_historical])
+
     weather_historical_df = weather_historical_df[[
-        'time_updated', 'temperature', 'wind_speed', 'humidity']]
+        'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
 
-    weather_data = requests.get(FORECAST_URI, params={
-                                "units": "metric", "lat": 53.344, "lon": -6.2672, "appid": db_info["weatherKey"]})
-    weather_info = weather_data.json()
+    weather_predictive = session.query(WeatherPredictive).all()
+    weather_predictive_df = pd.DataFrame(
+        [row.__dict__ for row in weather_predictive])
+    weather_predictive_df['type'] = weather_predictive_df['weather_type']
+    weather_predictive_df = weather_predictive_df[[
+        'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
 
-    predicted_weather_df = pd.DataFrame(weather_info['list'])
-    predicted_weather_df['temperature'] = [row['main']['temp']
-                                           for row in weather_info['list']]
-    predicted_weather_df['humidity'] = [row['main']['humidity']
-                                        for row in weather_info['list']]
-    predicted_weather_df['wind_speed'] = [row['wind']['speed']
-                                          for row in weather_info['list']]
-    predicted_weather_df['time_updated'] = pd.to_datetime(
-        predicted_weather_df['dt_txt'])
-
-    predicted_weather_df['humidity'] = predicted_weather_df['humidity'].astype(
-        'int64')
-    predicted_weather_df['temperature'] = predicted_weather_df['temperature'].astype(
-        'float64')
-    predicted_weather_df['wind_speed'] = predicted_weather_df['wind_speed'].astype(
-        'float64')
-    predicted_weather_df = predicted_weather_df[[
-        'time_updated', 'temperature', 'wind_speed', 'humidity']]
-
-    weather_combined = pd.concat([weather_historical_df, predicted_weather_df])
+    weather_combined = pd.concat(
+        [weather_historical_df, weather_predictive_df])
 
     current_date = datetime.now()
 
@@ -158,8 +154,15 @@ def get_station(station_id):
     for day in days:
         df[day] = df['weekday'] == day
 
+    df['rain'] = df['type'] == 'Rain'
+
     df.drop('time_updated', axis=1, inplace=True)
     df.drop('weekday', axis=1, inplace=True)
+    df.drop('type', axis=1, inplace=True)
+
+    # Get the columns in the right order
+    df = df[['temperature', 'wind_speed', 'humidity', 'hour', 'rain', 'Friday',
+             'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday', 'Wednesday']]
 
     with open(f'../ML_models/station_{station_id}.pkl', 'rb') as file:
         # Load the model from the file
@@ -169,9 +172,21 @@ def get_station(station_id):
     poly_features = poly.fit_transform(df)
 
     df['predicted_available'] = poly_reg_model.predict(poly_features)
+    df['predicted_available'] = np.clip(
+        df['predicted_available'], 0, station_data['bike_stands'])
 
-    # row = session.query(Availability).filter_by(station_id=station_id)
-    return df[['hour', 'predicted_available']].to_json()
+    data = {'predicted': [],
+            'historical': []
+            }
+    for iter, row in df.iterrows():
+        data['predicted'].append([row.hour, row.predicted_available])
+
+    for iter, row in station_data.iterrows():
+        data['historical'].append([row.hour, row.available_bikes])
+
+    print(data, file=sys.stdout)
+    return jsonify(data)
+
 
 @app.route('/')
 def root():
