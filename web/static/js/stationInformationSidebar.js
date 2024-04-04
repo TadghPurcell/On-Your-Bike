@@ -25,9 +25,16 @@ export async function stationInformationSidebar(
   const { DistanceMatrixService } = await google.maps.importLibrary("routes");
   const distanceService = new DistanceMatrixService();
 
-  const aside = document.querySelector(".station_information_sidebar");
-  aside.style.display = "block";
-  aside.innerHTML = "";
+  const btnJourneyPlanner = document.querySelector('.btn-journey-planner')
+  const btnNearestStations = document.querySelector('.btn-stations')
+  const btnStationInfo = document.querySelector('.btn-station-info')
+
+  btnStationInfo.classList.add('btn-aside-active')
+  btnJourneyPlanner.classList.remove('btn-aside-active')
+  btnNearestStations.classList.remove('btn-aside-active')
+
+  const asideMain = document.querySelector(".aside-main");
+  asideMain.innerHTML = "";
 
   const topDiv = document.createElement("div");
 
@@ -93,30 +100,30 @@ export async function stationInformationSidebar(
   quickInfo.appendChild(stationDistance);
   quickInfo.appendChild(stationWalkTime);
   topDiv.appendChild(quickInfo);
-  aside.appendChild(topDiv);
+  asideMain.appendChild(topDiv);
 
   const directions = document.createElement("button");
   directions.classList.add("directions-button");
   directions.textContent = "Directions";
-  aside.appendChild(directions);
+  asideMain.appendChild(directions);
 
   const availability_title = document.createElement("h2");
   availability_title.classList.add("closest_station_head");
   availability_title.textContent = "Predicted Bike Availability";
-  aside.appendChild(availability_title);
+  asideMain.appendChild(availability_title);
 
   const availability_chart = document.createElement("div");
   availability_chart.id = "availability-chart";
-  aside.appendChild(availability_chart);
+  asideMain.appendChild(availability_chart);
 
   const avail_station_title = document.createElement("h2");
   avail_station_title.classList.add("closest_station_head");
   avail_station_title.textContent = "Predicted Station Availability";
-  aside.appendChild(avail_station_title);
+  asideMain.appendChild(avail_station_title);
 
   const station_chart = document.createElement("div");
   station_chart.id = "avail-station-chart";
-  aside.appendChild(station_chart);
+  asideMain.appendChild(station_chart);
 
   // Create predicted availability chart
   // Get the predicted availability for the station

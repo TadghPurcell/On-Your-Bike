@@ -1,5 +1,6 @@
 import { initAside } from "./aside.js";
 import { initJourneyPlanner } from "./journeyPlanner.js";
+import { getStationInfo } from "./getStationInfo.js";
 import { stationInformationSidebar } from "./stationInformationSidebar.js";
 async function initMap() {
   let mapStyleId;

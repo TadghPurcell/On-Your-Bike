@@ -8,28 +8,26 @@ export async function initAside(map, data) {
   const aside = document.querySelector("aside");
   const stationDataPiece = document.createElement("div");
    
-  const btnsAside = document.querySelectorAll('.btn-aside')
   const btnJourneyPlanner = document.querySelector('.btn-journey-planner')
   const btnNearestStations = document.querySelector('.btn-stations')
+  const btnStationInfo = document.querySelector('.btn-station-info')
   
   initJourneyPlanner(map)
   
-  btnsAside.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      btnsAside.forEach(btn => {
-        btn.classList.remove('btn-aside-active')
-      })
-      e.target.classList.add('btn-aside-active')
-      if (e.target.textContent == 'Nearest Stations') {
-      }
-    })
+  btnJourneyPlanner.addEventListener('click', () => {
+    btnNearestStations.classList.remove('btn-aside-active')
+    btnStationInfo.classList.remove('btn-aside-active')
+    btnJourneyPlanner.classList.add('btn-aside-active')
+    initJourneyPlanner(map)
   })
-  
   btnNearestStations.addEventListener('click', () => {
+    btnJourneyPlanner.classList.remove('btn-aside-active')
+    btnStationInfo.classList.remove('btn-aside-active')
+    btnNearestStations.classList.add('btn-aside-active')
     getClosestStations(map, data)
   })
-  btnJourneyPlanner.addEventListener('click', () => {
-      initJourneyPlanner(map)
+  btnStationInfo.addEventListener('click', () => {
+    console.log('test')
   })
   
   aside.appendChild(stationDataPiece);
