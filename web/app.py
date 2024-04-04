@@ -178,13 +178,12 @@ def get_station(station_id):
     data = {'predicted': [],
             'historical': []
             }
-    for iter, row in df.iterrows():
-        data['predicted'].append([row.hour, row.predicted_available])
+    for hour, pred_avail in zip(df['hour'].values.tolist(), df['predicted_available'].values.tolist()):
+        data['predicted'].append([hour, pred_avail])
 
-    for iter, row in station_data.iterrows():
-        data['historical'].append([row.hour, row.available_bikes])
+    for hour, bikes in zip(station_data['hour'].values.tolist(), station_data['available_bikes'].values.tolist()):
+        data['historical'].append([hour, bikes])
 
-    print(data, file=sys.stdout)
     return jsonify(data)
 
 
