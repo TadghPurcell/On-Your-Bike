@@ -160,6 +160,43 @@ async function initMap() {
     }
   );
 
+  // Add user location marker
+  if (navigator.geolocation) {
+    // Get the current location
+    navigator.geolocation.getCurrentPosition(
+      function (position) {
+        // Retrieve latitude and longitude
+        let userLatLng = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        // Create a marker for the user's current location
+        // Create a marker for the user's current location
+        let userMarker = new google.maps.Marker({
+          position: userLatLng,
+          map: map, // Assuming 'map' is your map instance
+          title: "Your Current Location",
+          icon: {
+            url: "./img/circle.svg",
+            scaledSize: new google.maps.Size(40, 40), // Adjust the size of the icon as needed
+            origin: new google.maps.Point(0, 0), // Set origin to (0, 0)
+            anchor: new google.maps.Point(20, 20), // Set anchor to the center of the image
+          },
+        });
+        // // Center the map on the user's current location
+        // map.setCenter(userLatLng);
+      },
+      function () {
+        // Handle errors if Geolocation fails
+        alert("Geolocation service failed.");
+      }
+    );
+  } else {
+    // Browser doesn't support Geolocation
+    alert("Geolocation not supported by your browser.");
+  }
+
   initAside(map, data);
   const markerCluster = new markerClusterer.MarkerClusterer({ markers, map });
 }
