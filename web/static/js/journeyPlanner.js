@@ -4,26 +4,9 @@ export async function initJourneyPlanner(map) {
 
     const directionsService = new DirectionsService()
     const directionsRenderer = new DirectionsRenderer()
-    // directionsRenderer.setMap(map)
 
-    const journeyPlannerBtn = document.querySelector('.btn-journey-planner')
-
-    journeyPlannerBtn.addEventListener("click", async () => {
-        const otherAside = document.querySelector('.nearest_stations_sidebar')
-        otherAside.style.display = 'none'
-        otherAside.classList.remove('drop-down')
-        
-        const aside = document.querySelector('.journey_planner_sidebar')
-        aside.style.display = 'flex'
-        // remove original aside html
-        aside.innerHTML = ""
-        aside.classList.add('drop-down')
-
-        const asideTitle = document.createElement('h2')
-        asideTitle.classList.add('journey_planner_head')
-        asideTitle.textContent = "Plan Your Journey"
-
-        aside.appendChild(asideTitle)
+        const asideMain = document.querySelector('.aside-main')
+        asideMain.innerHTML = ""
 
         const journeyForm = document.createElement('form')
         journeyForm.setAttribute('method', 'post')
@@ -160,7 +143,5 @@ export async function initJourneyPlanner(map) {
         formButtonsDiv.appendChild(resetBtn)
         journeyForm.appendChild(formButtonsDiv)
 
-        aside.appendChild(journeyForm)
-
-    })
+        asideMain.appendChild(journeyForm)
 }

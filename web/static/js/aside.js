@@ -1,4 +1,5 @@
 import { getClosestStations } from "./closestStations.js";
+import { initJourneyPlanner } from "./journeyPlanner.js";
 
 //This is a placeholder function that will populate the side bar with machine learning predictions in time
 export async function initAside(map, data) {
@@ -15,6 +16,7 @@ export async function initAside(map, data) {
   stationDataPieceTitle.textContent = `Predicted Station Availability`;
 
   const btnsAside = document.querySelectorAll('.btn-aside')
+  const btnJourneyPlanner = document.querySelector('.btn-journey-planner')
   const btnNearestStations = document.querySelector('.btn-stations')
   
   btnsAside.forEach(btn => {
@@ -31,6 +33,10 @@ export async function initAside(map, data) {
   btnNearestStations.addEventListener('click', () => {
     getClosestStations(map, data)
   })
+  btnJourneyPlanner.addEventListener('click', () => {
+      initJourneyPlanner(map)
+  })
+  
   stationDataPiece;
   stationDataPiece.appendChild(stationDataPieceTitle);
   stationDataPiece.appendChild(busynessChart);

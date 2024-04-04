@@ -86,7 +86,7 @@ button {
   font-weight: 500;
 }
 
-.form-btn, .btn-journey-planner, .btn-stations, .custom-map-control-button   {
+.form-btn {
   background-color: var(--light-green);
   color: white;
   padding: 10px 15px;
@@ -128,6 +128,8 @@ aside {
   display: flex;
   flex-direction: column;
   gap: 3rem;
+  overflow: scroll;
+  overflow-x: hidden;
 }
 
 .btn-aside-div {
