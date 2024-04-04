@@ -132,11 +132,15 @@ export async function stationInformationSidebar(
   }
 
   // Iterate over the hours and add to data
-  var availability_data = json.predicted;
-
+  var availability_data = json.data;
+  console.log(availability_data);
   var avail_station_data = [];
   for (var row of availability_data) {
-    avail_station_data.push([row[0], totalBikesStands - row[1]]);
+    avail_station_data.push([
+      row[0],
+      totalBikesStands - row[1],
+      totalBikesStands - row[2],
+    ]);
   }
 
   google.charts.setOnLoadCallback(drawChart);
@@ -144,17 +148,19 @@ export async function stationInformationSidebar(
   function drawChart() {
     var data = new google.visualization.DataTable();
     data.addColumn("string", "Hour");
-    data.addColumn("number", "Busyness Level");
+    data.addColumn("number", "Historical Available Bikes");
+    data.addColumn("number", "Predicted Avaiable Bikes");
     data.addRows(availability_data);
 
     var station_data = new google.visualization.DataTable();
     station_data.addColumn("string", "Hour");
-    station_data.addColumn("number", "Busyness Level");
+    station_data.addColumn("number", "Historical Available Stations");
+    station_data.addColumn("number", "Predicted Avaiable Stations");
     station_data.addRows(avail_station_data);
 
     var options = {
       legend: "none",
-      colors: ["#4286f4"],
+      colors: ["#ff0000", "#4286f4"],
       opacity: 0.3,
       vAxis: {
         minValue: 0,

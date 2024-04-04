@@ -106,7 +106,6 @@ def get_stations():
 
 @app.route("/available/<int:station_id>")
 def get_station(station_id):
-
     midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     station_information = session.query(Availability).filter(
@@ -114,6 +113,10 @@ def get_station(station_id):
 
     station_data = pd.DataFrame([row.__dict__ for row in station_information])
 
+    station_data = station_data.groupby(station_data['time_updated'].dt.floor('H')).agg({
+        'available_bikes': 'mean',  # Example: Calculate mean temperature for each hour
+        'bike_stands': 'mean'      # Example: Calculate mean humidity for each hour
+    }).reset_index()
     station_data['hour'] = station_data['time_updated'].dt.hour
     station_data = station_data[['hour', 'available_bikes', 'bike_stands']]
 
@@ -133,56 +136,58 @@ def get_station(station_id):
     weather_predictive_df = weather_predictive_df[[
         'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
 
-    weather_combined = pd.concat(
-        [weather_historical_df, weather_predictive_df])
-
-    current_date = datetime.now()
-
     # Generate a list of hours for today
+    current_date = datetime.now()
+    current_hour = current_date.hour
     hours_today = [current_date.replace(
-        hour=h, minute=30, second=0, microsecond=0) for h in range(24)]
+        hour=h, minute=30, second=0, microsecond=0) for h in range(current_hour, 24)]
     hourly_df = pd.DataFrame(hours_today, columns=['time_updated'])
 
-    df = pd.merge_asof(hourly_df, weather_combined, on='time_updated')
+    weather_predictive_df = pd.merge_asof(
+        hourly_df, weather_predictive_df, on='time_updated', direction='nearest')
 
     days = ['Friday', 'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday',
             'Wednesday']
-
     # One hot encode day of the week
-    df['weekday'] = df['time_updated'].dt.day_name()
-    df['hour'] = df['time_updated'].dt.hour
+    weather_predictive_df['weekday'] = weather_predictive_df['time_updated'].dt.day_name(
+    )
+    weather_predictive_df['hour'] = weather_predictive_df['time_updated'].dt.hour
     for day in days:
-        df[day] = df['weekday'] == day
+        weather_predictive_df[day] = weather_predictive_df['weekday'] == day
 
-    df['rain'] = df['type'] == 'Rain'
+    weather_predictive_df['rain'] = weather_predictive_df['type'] == 'Rain'
 
-    df.drop('time_updated', axis=1, inplace=True)
-    df.drop('weekday', axis=1, inplace=True)
-    df.drop('type', axis=1, inplace=True)
+    weather_predictive_df.drop('time_updated', axis=1, inplace=True)
+    weather_predictive_df.drop('weekday', axis=1, inplace=True)
+    weather_predictive_df.drop('type', axis=1, inplace=True)
 
     # Get the columns in the right order
-    df = df[['temperature', 'wind_speed', 'humidity', 'hour', 'rain', 'Friday',
-             'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday', 'Wednesday']]
+    weather_predictive_df = weather_predictive_df[['temperature', 'wind_speed', 'humidity', 'hour', 'rain', 'Friday',
+                                                   'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday', 'Wednesday']]
 
     with open(f'../ML_models/station_{station_id}.pkl', 'rb') as file:
         # Load the model from the file
         poly_reg_model = pickle.load(file)
 
     poly = PolynomialFeatures(degree=3, include_bias=False)
-    poly_features = poly.fit_transform(df)
+    poly_features = poly.fit_transform(weather_predictive_df)
 
-    df['predicted_available'] = poly_reg_model.predict(poly_features)
-    df['predicted_available'] = np.clip(
-        df['predicted_available'], 0, station_data['bike_stands'])
+    weather_predictive_df['predicted_available'] = poly_reg_model.predict(
+        poly_features)
 
-    data = {'predicted': [],
-            'historical': []
+    weather_predictive_df.loc[:, 'predicted_available'] = np.clip(
+        weather_predictive_df['predicted_available'], 0, station_data['bike_stands'][0])
+
+    combined_df = pd.concat(
+        [station_data[['hour', 'available_bikes']], weather_predictive_df[['hour', 'predicted_available']]])
+    combined_df.replace(np.nan, None, inplace=True)
+
+    data = {'data': []
             }
-    for hour, pred_avail in zip(df['hour'].values.tolist(), df['predicted_available'].values.tolist()):
-        data['predicted'].append([str(hour), pred_avail])
+    for hour, avail_bikes, pred_avail in zip(combined_df['hour'].values.tolist(), combined_df['available_bikes'].values.tolist(), combined_df['predicted_available'].values.tolist()):
+        data['data'].append([str(hour), avail_bikes, pred_avail])
 
-    for hour, bikes in zip(station_data['hour'].values.tolist(), station_data['available_bikes'].values.tolist()):
-        data['historical'].append([str(hour), bikes])
+    print(data, file=sys.stdout)
 
     return jsonify(data)
 
