@@ -1,12 +1,7 @@
-export async function getClosestStations(data) {
+export async function getClosestStations(map, data) {
     // Import google library
   const { DistanceMatrixService } = await google.maps.importLibrary("routes")
-
-    // Select HTML button
-    const nearestStationsBtn = document.querySelector('.btn-stations');
-
-    nearestStationsBtn.addEventListener("click", async () => {
-    const distanceService = new DistanceMatrixService()
+  const distanceService = new DistanceMatrixService()
     
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (position) => {
@@ -16,7 +11,7 @@ export async function getClosestStations(data) {
           };
           
           const stationDistances = await Promise.all(data.map(({name: sName, latitude: lat, longitude: lng, 
-            available_bikes: availableBikes}) => {
+            available_bikes: availableBikes, available_bike_stands: availableBikeStands}) => {
               return new Promise((resolve, reject) => {
                 distanceService.getDistanceMatrix({
                   origins: [pos],
@@ -27,6 +22,8 @@ export async function getClosestStations(data) {
                   resolve({
                     sName,
                     availableBikes,
+                    pos: {lat, lng},
+                    availableBikeStands,
                     distanceVal: response.rows[0].elements[0].distance.value,
                     distanceText: response.rows[0].elements[0].distance.text,
                     walkTime: response.rows[0].elements[0].duration.text
@@ -36,23 +33,12 @@ export async function getClosestStations(data) {
                 }
               });
             });
-          }));
+          }))
           
-          const otherAside = document.querySelector('.journey_planner_sidebar')
-          otherAside.style.display = 'none'
-          otherAside.classList.remove('drop-down')
+          const asideMain = document.querySelector('.aside-main')
+          asideMain.classList.remove('drop-down')
+          asideMain.innerHTML = ''
 
-          const aside = document.querySelector('.nearest_stations_sidebar')
-          aside.style.display = 'flex'
-          // remove original aside html
-          aside.innerHTML = ""
-          aside.classList.add('drop-down')
-
-
-          const asideTitle = document.createElement('h2')
-          asideTitle.classList.add('closest_station_head')
-          asideTitle.textContent = "Nearest Stations"
-          aside.appendChild(asideTitle)
           const closestStations = stationDistances.sort((a, b) => a.distanceVal - b.distanceVal).slice(0, 5)
           closestStations.forEach( station => {
             const stationDiv = document.createElement('div')
@@ -65,6 +51,10 @@ export async function getClosestStations(data) {
             const stationBikes = document.createElement('p')
             stationBikes.classList.add('closest_station_bikes')
             stationBikes.textContent = station.availableBikes
+
+            const stationParking = document.createElement('p')
+            stationParking.classList.add('closest-station-parking')
+            stationParking.textContent = station.availableBikeStands
             
             const stationDistance = document.createElement('p')
             stationDistance.classList.add('closest_station_distance')
@@ -76,10 +66,15 @@ export async function getClosestStations(data) {
 
             stationDiv.appendChild(stationTitle)
             stationDiv.appendChild(stationBikes)
+            stationDiv.appendChild(stationParking)
             stationDiv.appendChild(stationDistance)
             stationDiv.appendChild(stationWalkTime)
 
-            aside.appendChild(stationDiv)
+            stationDiv.addEventListener('click', () => {
+              map.setCenter(station.pos)
+              map.setZoom(15)
+            })
+            asideMain.appendChild(stationDiv)
           })
           
         }, (error) => {
@@ -89,5 +84,4 @@ export async function getClosestStations(data) {
       else {
         handleLocationError(false, infoWindow, map.getCenter());
       }
-});
 }

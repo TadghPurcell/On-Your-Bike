@@ -68,6 +68,9 @@ header > p {
 .gm-style {
   font-family: inherit;
 }
+.GMAMP-maps-pin-view {
+  cursor: pointer;
+}
 /* style info window */
 .gm-style-iw-d {
   font-size: inherit;
@@ -83,11 +86,17 @@ main {
 
 button,
 .custom-map-control-button {
+  cursor: pointer;
   background-color: var(--light-green);
   color: white;
   font-family: inherit;
   font-size: inherit;
   font-weight: 500;
+}
+
+.form-btn {
+  background-color: var(--light-green);
+  color: white;
   padding: 10px 15px;
   box-shadow: var(--box-shadow);
   border: none;
@@ -109,27 +118,58 @@ button,
 /* Maps Zoom Buttons*/
 
 .gmnoprint {
-  margin-left: calc(2rem - 10px);
+  margin-left: 2rem;
 }
 /* Sidebar Section */
 aside {
-  display: none;
-  border-radius: 4px;
   margin: 2rem;
   position: absolute;
   background-color: white;
   box-shadow: var(--box-shadow);
   color: var(--dark-green);
-  height: 90vh;
+  height: 90%;
   max-width: 30%;
   z-index: 4;
   right: 0px;
   top: 0px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   gap: 3rem;
   overflow: scroll;
   overflow-x: hidden;
+}
+
+.btn-aside-div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-aside {
+  /* box-shadow: var(--box-shadow); */
+  font-size: 1rem;
+  text-align: center;
+  width: 33%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: rgb(170, 170, 170);
+  background-color: #fff;
+  border: none;
+  transition: color 0.3s, border-bottom-color 0.3s;
+}
+
+.btn-aside-active, .btn-aside:hover {
+  /* background-color: var(--light-green); */
+  box-shadow: var(--box-shadow);
+  background-color: rgb(248, 248, 248);
+  /* border-radius: 15px; */
+  color: var(--dark-green);
+  /* padding-bottom: 8px; */
+  border-bottom: 1px solid var(--light-green);
 }
 
 /* Aside dropdown animation */
@@ -175,11 +215,11 @@ aside::-webkit-scrollbar-thumb {
 }
 
 /* Nearest Stations Sidebar */
-.nearest_stations_sidebar {
+/* .nearest_stations_sidebar {
   display: none;
   flex-direction: column;
   gap: 1rem;
-}
+} */
 
 .closest_station_head {
   text-align: center;
@@ -201,12 +241,10 @@ aside::-webkit-scrollbar-thumb {
   gap: 0.5rem;
   padding: 10px;
   display: flex;
-  /* flex-direction: column; */
   align-items: center;
-  /* justify-items: center; */
   grid-template-columns: 2fr 1fr;
   grid-template-rows: 1fr 1fr;
-  margin: 0 20px 0 20px;
+  margin: 0 20px 10px 20px;
 }
 
 .closest_station:hover {
@@ -216,15 +254,17 @@ aside::-webkit-scrollbar-thumb {
 }
 
 .closest_station_title {
-  align-self: center;
-  font-size: 1rem;
+  font-size: 0.75rem;
   white-space: no-wrap;
-  grid-column: 1;
-  grid-row: 1 / 3;
 }
 
 .closest_station_bikes::before {
-  content: url("/img/bike.svg");
+  content: url('/img/bike.svg');
+  width: 5px;
+  height: 5px;
+}
+.closest-station-parking::before {
+  content: url('/img/available_spaces.svg');
   width: 10px;
   height: 10px;
 }
@@ -248,7 +288,6 @@ aside::-webkit-scrollbar-thumb {
 }
 
 /* Station information */
-
 .station_information {
   display: flex;
   flex-direction: row;
@@ -287,4 +326,25 @@ aside::-webkit-scrollbar-thumb {
   content: url("/img/walking.svg");
   width: 10px;
   height: 10px;
+}
+/* Journey Planner Sidebar */
+.journey_planner_head {
+  text-align: center;
+  margin-bottom: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 2rem;
+}
+
+.form-buttons-box {
+  display: flex;
+  gap: 16px;
+}
+
+.form-btn {
+  padding: 8px 18px;
 }

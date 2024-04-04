@@ -25,9 +25,16 @@ export async function stationInformationSidebar(
   const { DistanceMatrixService } = await google.maps.importLibrary("routes");
   const distanceService = new DistanceMatrixService();
 
-  const aside = document.querySelector(".station_information_sidebar");
-  aside.style.display = "block";
-  aside.innerHTML = "";
+  const btnJourneyPlanner = document.querySelector(".btn-journey-planner");
+  const btnNearestStations = document.querySelector(".btn-stations");
+  const btnStationInfo = document.querySelector(".btn-station-info");
+
+  btnStationInfo.classList.add("btn-aside-active");
+  btnJourneyPlanner.classList.remove("btn-aside-active");
+  btnNearestStations.classList.remove("btn-aside-active");
+
+  const asideMain = document.querySelector(".aside-main");
+  asideMain.innerHTML = "";
 
   const topDiv = document.createElement("div");
 
@@ -93,30 +100,31 @@ export async function stationInformationSidebar(
   quickInfo.appendChild(stationDistance);
   quickInfo.appendChild(stationWalkTime);
   topDiv.appendChild(quickInfo);
-  aside.appendChild(topDiv);
+  asideMain.appendChild(topDiv);
 
   const directions = document.createElement("button");
   directions.classList.add("directions-button");
   directions.textContent = "Directions";
-  aside.appendChild(directions);
+  asideMain.appendChild(directions);
 
   const availability_title = document.createElement("h2");
   availability_title.classList.add("closest_station_head");
-  availability_title.textContent = "Predicted Bike Availability";
-  aside.appendChild(availability_title);
+  availability_title.textContent = "Bike Availability";
+  asideMain.appendChild(availability_title);
 
   const availability_chart = document.createElement("div");
   availability_chart.id = "availability-chart";
-  aside.appendChild(availability_chart);
+  asideMain.appendChild(availability_chart);
 
   const avail_station_title = document.createElement("h2");
   avail_station_title.classList.add("closest_station_head");
-  avail_station_title.textContent = "Predicted Station Availability";
-  aside.appendChild(avail_station_title);
+
+  avail_station_title.textContent = "Station Availability";
+  asideMain.appendChild(avail_station_title);
 
   const station_chart = document.createElement("div");
   station_chart.id = "avail-station-chart";
-  aside.appendChild(station_chart);
+  asideMain.appendChild(station_chart);
 
   // Create predicted availability chart
   // Get the predicted availability for the station
@@ -132,20 +140,22 @@ export async function stationInformationSidebar(
   }
 
   // Iterate over the hours and add to data
-  var availability_data = [];
-  for (var idx in json.hour) {
-    availability_data.push([
-      json.hour[idx].toString(),
-      json.predicted_available[idx],
-    ]);
-  }
-
+  var availability_data = json.data;
   var avail_station_data = [];
-  for (var idx in json.hour) {
-    avail_station_data.push([
-      json.hour[idx].toString(),
-      totalBikesStands - json.predicted_available[idx],
-    ]);
+  for (var row of availability_data) {
+    let new_row = [row[0]];
+    if (row[1] !== null) {
+      new_row.push(totalBikesStands - row[1]);
+    } else {
+      new_row.push(null);
+    }
+
+    if (row[2] !== null) {
+      new_row.push(totalBikesStands - row[2]);
+    } else {
+      new_row.push(null);
+    }
+    avail_station_data.push(new_row);
   }
 
   google.charts.setOnLoadCallback(drawChart);
@@ -153,17 +163,19 @@ export async function stationInformationSidebar(
   function drawChart() {
     var data = new google.visualization.DataTable();
     data.addColumn("string", "Hour");
-    data.addColumn("number", "Busyness Level");
+    data.addColumn("number", "Available Bikes");
+    data.addColumn("number", "Predicted Bikes");
     data.addRows(availability_data);
 
     var station_data = new google.visualization.DataTable();
     station_data.addColumn("string", "Hour");
-    station_data.addColumn("number", "Busyness Level");
+    station_data.addColumn("number", "Available Stations");
+    station_data.addColumn("number", "Predicted Stations");
     station_data.addRows(avail_station_data);
 
     var options = {
       legend: "none",
-      colors: ["#4286f4"],
+      colors: ["#4286f4", "#03a981"],
       opacity: 0.3,
       vAxis: {
         minValue: 0,
