@@ -180,12 +180,18 @@ def get_station(station_id):
 
     combined_df = pd.concat(
         [station_data[['hour', 'available_bikes']], weather_predictive_df[['hour', 'predicted_available']]])
+    combined_df['available_bikes'] = combined_df['available_bikes'].apply(
+        lambda x: int(x) if not pd.isna(x) else np.nan)
+    combined_df['predicted_available'] = combined_df['predicted_available'].apply(
+        lambda x: int(x) if not pd.isna(x) else np.nan)
+
     combined_df.replace(np.nan, None, inplace=True)
 
     data = {'data': []
             }
     for hour, avail_bikes, pred_avail in zip(combined_df['hour'].values.tolist(), combined_df['available_bikes'].values.tolist(), combined_df['predicted_available'].values.tolist()):
-        data['data'].append([str(hour) + ":00", avail_bikes, pred_avail])
+        data['data'].append(
+            [str(hour) + ":00", avail_bikes, pred_avail])
 
     print(data, file=sys.stdout)
 
