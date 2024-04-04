@@ -110,7 +110,7 @@ export async function stationInformationSidebar(
   const availability_title = document.createElement("h2");
   availability_title.classList.add("closest_station_head");
   availability_title.textContent = "Bike Availability";
-  aside.appendChild(availability_title);
+  asideMain.appendChild(availability_title);
 
   const availability_chart = document.createElement("div");
   availability_chart.id = "availability-chart";
@@ -120,7 +120,7 @@ export async function stationInformationSidebar(
   avail_station_title.classList.add("closest_station_head");
 
   avail_station_title.textContent = "Station Availability";
-  aside.appendChild(avail_station_title);
+  asideMain.appendChild(avail_station_title);
 
   const station_chart = document.createElement("div");
   station_chart.id = "avail-station-chart";
