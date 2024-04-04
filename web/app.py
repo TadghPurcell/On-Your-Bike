@@ -1,5 +1,5 @@
 from db_config import Base
-from flask import Flask, g, jsonify, render_template
+from flask import Flask, g, jsonify, render_template, request
 from Database import Station, Availability, Weather, WeatherPredictive
 from sqlalchemy import create_engine, func, Column, String, Integer, Double, Boolean
 from sqlalchemy.orm import sessionmaker, joinedload
@@ -9,7 +9,7 @@ import json
 import sys
 import pickle
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.model_selection import train_test_split
@@ -70,7 +70,6 @@ def get_all_stations():
         "wind speed": weather.wind_speed
 
     }
-    print(data, file=sys.stdout)
     row = session.query(Station).all()
 
     return jsonify(data)
@@ -164,7 +163,50 @@ def get_station(station_id):
 @app.route('/routeplanning', methods=['POST'])
 def route_planning():
     if request.method == 'POST':
-        data = request.json()
+        data = request.json
+        # convert the time to np.datetime
+        pred_time = datetime.strptime(data['time'], "%Y-%m-%d %H:%M:%S")
+
+        if pred_time > datetime.now() + timedelta(days=5):
+            return jsonify({'message': 'Invalid time. Time cannot be more than 5 days from now.'}), 400
+
+        # Get the predicted weather for that day
+        weather_predictive = session.query(WeatherPredictive).all()
+        weather_predictive_df = pd.DataFrame(
+            [row.__dict__ for row in weather_predictive])
+        weather_predictive_df = weather_predictive_df[
+            weather_predictive_df['time_updated'].dt.date == pred_time.date()]
+
+        weather_predictive_df['type'] = weather_predictive_df['weather_type']
+        weather_predictive_df = weather_predictive_df[[
+            'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
+
+        current_hour = 0
+        hours_today = [pred_time.replace(
+            hour=h, minute=30, second=0, microsecond=0) for h in range(current_hour, 24)]
+        hourly_df = pd.DataFrame(hours_today, columns=['time_updated'])
+
+        weather_predictive_df = pd.merge_asof(
+            hourly_df, weather_predictive_df, on='time_updated', direction='nearest')
+
+        latest_dynamic_data = session.query(
+            func.max(Availability.time_updated)).scalar_subquery()
+
+        station_data = session.query(Availability.station_id, Availability.bike_stands).filter(
+            Availability.time_updated == latest_dynamic_data, Availability.station_id.in_(data['station_ids'])).all()
+
+        total_bike_stands = {}
+        for station_id, bike_stands in station_data:
+            total_bike_stands[station_id] = bike_stands
+
+        for station_id in data['station_ids']:
+            new_weather_predictive_df = make_prediction_for_times(
+                station_id, weather_predictive_df.copy(), total_bike_stands[station_id])
+            print(new_weather_predictive_df, file=sys.stdout)
+
+        # For each station, send a dataframe to the ml model
+        # Convert the predicted stations back into a repsonse format
+
     return 'YOYOYO'
 
 

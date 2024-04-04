@@ -48,4 +48,4 @@ def make_prediction_for_times(station_id, weather_df, max_bikes):
     weather_df.loc[:, 'predicted_available'] = np.clip(
         weather_df['predicted_available'], 0, max_bikes)
 
-    return weather_df
+    return weather_df[['hour', 'predicted_available']]
