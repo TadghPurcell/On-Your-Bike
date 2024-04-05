@@ -160,7 +160,7 @@ def get_station(station_id):
     return jsonify(data)
 
 
-@app.route('/routeplanning', methods=['POST'])
+@app.route('/routeplanning/', methods=['POST'])
 def route_planning():
     if request.method == 'POST':
         req = request.json

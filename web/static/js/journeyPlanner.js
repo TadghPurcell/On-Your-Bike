@@ -10,7 +10,7 @@ export async function initJourneyPlanner(map) {
 
         const journeyForm = document.createElement('form')
         journeyForm.setAttribute('method', 'post')
-        journeyForm.setAttribute('action', '#')
+        journeyForm.setAttribute('action', '/routeplanning/')
 
         const startingPoint = document.createElement('div')
         startingPoint.classList.add('searchbar-div')
@@ -20,6 +20,7 @@ export async function initJourneyPlanner(map) {
         const startingPointInput = document.createElement('input')
         startingPointInput.setAttribute('type', 'text')
         startingPointInput.setAttribute('id', 'start')
+        startingPointInput.setAttribute('name', 'start')
         startingPointInput.setAttribute('class', 'controls')
         startingPointInput.setAttribute('placeholder', 'Choose a starting point..')
         
@@ -36,6 +37,7 @@ export async function initJourneyPlanner(map) {
         const destinationInput = document.createElement('input')
         destinationInput.setAttribute('type', 'text')
         destinationInput.setAttribute('id', 'destination')
+        destinationInput.setAttribute('name', 'destination')
         destinationInput.setAttribute('class', 'controls')
         destinationInput.setAttribute('placeholder', 'Choose a destination..')
         
@@ -78,6 +80,10 @@ export async function initJourneyPlanner(map) {
         dateInput.setAttribute('type', 'date')
         dateInput.setAttribute('id', 'date')
         dateInput.setAttribute('type', 'date')
+        dateInput.setAttribute('name', 'date')
+        dateInput.setAttribute('value', `${new Date().toISOString().slice(0, 10)}`)
+        dateInput.setAttribute('min', `${new Date().toISOString().slice(0, 10)}`)
+        dateInput.setAttribute('max', `${new Date((new Date().getTime()) + 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)}`)
 
         const timeDiv = document.createElement('div')
         timeDiv.classList.add('time-box')
@@ -87,7 +93,10 @@ export async function initJourneyPlanner(map) {
         timeLabel.setAttribute('for', 'time')
         timeInput.setAttribute('type', 'time')
         timeInput.setAttribute('id', 'time')
+        timeInput.setAttribute('name', 'time')
         timeInput.setAttribute('type', 'time')
+        timeInput.setAttribute('value', `${new Date().toLocaleTimeString().slice(0, 5)}`)
+        
 
         dateDiv.appendChild(dateLabel)
         dateDiv.appendChild(dateInput)
@@ -106,6 +115,25 @@ export async function initJourneyPlanner(map) {
         
         submitBtn.addEventListener('click', (e) => {
             e.preventDefault()
+
+            let formData = new FormData(journeyForm);
+            
+
+            // Get Timestamp
+            const dateTime = `${formData.get('date')} ${formData.get('time')}`
+            console.log(dateTime)
+            
+            // getDate5DaysAway()
+            
+
+            console.log(formData)
+            console.log(formData.get('start'))
+            console.log(formData.get('destination'))
+            console.log(formData.get('date'))
+            console.log(formData.get('time'))
+            // Get closest stations start point end point
+            // Post request to backend
+
             let request = {
                 origin: startingPointInput.value,
                 destination: destinationInput.value,
