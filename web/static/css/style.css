@@ -237,11 +237,13 @@ aside::-webkit-scrollbar-thumb {
 }
 
 .closest_station {
+  font-size: 0.75rem;
   background-color: rgb(238, 238, 238);
   gap: 0.5rem;
   padding: 10px;
   display: flex;
   align-items: center;
+  justify-content: space-evenly;
   grid-template-columns: 2fr 1fr;
   grid-template-rows: 1fr 1fr;
   margin: 0 20px 10px 20px;
@@ -312,20 +314,19 @@ aside::-webkit-scrollbar-thumb {
 
 .station_information_bikes::before {
   content: url("/img/bike.svg");
-  width: 10px;
-  height: 10px;
+  width: 5px;
+  height: 5px;
 }
 
 .station_information_distance::before {
   content: url("/img/distance.svg");
-
-  width: 10px;
-  height: 10px;
+  width: 5px;
+  height: 5px;
 }
 .station_information_walk_time::before {
   content: url("/img/walking.svg");
-  width: 10px;
-  height: 10px;
+  width: 5px;
+  height: 5px;
 }
 /* Journey Planner Sidebar */
 .journey_planner_head {
