@@ -12,10 +12,13 @@ export async function initJourneyPlanner(map) {
         journeyForm.setAttribute('method', 'post')
         journeyForm.setAttribute('action', '/routeplanning/')
 
+        const addressDiv = document.createElement('div')
+        addressDiv.classList.add('address-div')
+
         const startingPoint = document.createElement('div')
         startingPoint.classList.add('searchbar-div')
         const startingPointLabel = document.createElement('label')
-        startingPointLabel.textContent = 'Choose a starting point'
+        startingPointLabel.textContent = 'Starting Point'
         startingPointLabel.setAttribute('for', 'start')
         const startingPointInput = document.createElement('input')
         startingPointInput.setAttribute('type', 'text')
@@ -27,12 +30,12 @@ export async function initJourneyPlanner(map) {
         startingPoint.appendChild(startingPointLabel)
         startingPoint.appendChild(startingPointInput)
         
-        journeyForm.appendChild(startingPoint)
+
         
         const destination = document.createElement('div')
         destination.classList.add('searchbar-div')
         const destinationLabel = document.createElement('label')
-        destinationLabel.textContent = 'Choose a destination'
+        destinationLabel.textContent = 'Destination'
         destinationLabel.setAttribute('for', 'destination')
         const destinationInput = document.createElement('input')
         destinationInput.setAttribute('type', 'text')
@@ -44,8 +47,11 @@ export async function initJourneyPlanner(map) {
         destination.appendChild(destinationLabel)
         destination.appendChild(destinationInput)
         
-        journeyForm.appendChild(destination)
+        addressDiv.appendChild(startingPoint)
+        addressDiv.appendChild(destination)
         
+        journeyForm.appendChild(addressDiv)
+
         // create search boxes
         const center = { lat: 53.344, lng: -6.2672 };
         // Create a bounding box with sides ~10km away from the center point
@@ -96,7 +102,6 @@ export async function initJourneyPlanner(map) {
         timeInput.setAttribute('name', 'time')
         timeInput.setAttribute('type', 'time')
         timeInput.setAttribute('value', `${new Date().toLocaleTimeString().slice(0, 5)}`)
-        
 
         dateDiv.appendChild(dateLabel)
         dateDiv.appendChild(dateInput)
@@ -122,7 +127,7 @@ export async function initJourneyPlanner(map) {
             // Get Timestamp
             const dateTime = `${formData.get('date')} ${formData.get('time')}`
             console.log(dateTime)
-            
+
             // getDate5DaysAway()
             
 
