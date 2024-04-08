@@ -30,8 +30,6 @@ export async function initJourneyPlanner(map) {
         startingPoint.appendChild(startingPointLabel)
         startingPoint.appendChild(startingPointInput)
         
-
-        
         const destination = document.createElement('div')
         destination.classList.add('searchbar-div')
         const destinationLabel = document.createElement('label')
@@ -168,6 +166,8 @@ export async function initJourneyPlanner(map) {
             directionsRenderer.setPanel(null);
             directionsRenderer.setDirections(null)
             directionsRenderer.setMap(null)
+            dateInput.value = `${new Date().toISOString().slice(0, 10)}`
+            timeInput.value = `${new Date().toLocaleTimeString().slice(0, 5)}`
         })
 
         const formButtonsDiv = document.createElement('div')
