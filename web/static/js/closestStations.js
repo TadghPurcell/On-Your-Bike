@@ -1,4 +1,4 @@
-export async function getClosestStations(map, data) {
+export async function ClosestStations(map, data) {
     // Import google library
   const { DistanceMatrixService } = await google.maps.importLibrary("routes")
   const distanceService = new DistanceMatrixService()

@@ -1,10 +1,12 @@
-export async function initJourneyPlanner(map) {
+import { getClosestStations } from "./getClosestStations.js";
+
+export async function initJourneyPlanner(map, data) {
     const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary("places");
     const { DirectionsService, DirectionsRenderer } = await google.maps.importLibrary("routes")
 
     const directionsService = new DirectionsService()
     const directionsRenderer = new DirectionsRenderer()
-
+    
         const asideMain = document.querySelector('.aside-main')
         asideMain.innerHTML = ""
 
@@ -59,7 +61,7 @@ export async function initJourneyPlanner(map) {
         east: center.lng + 0.1,
         west: center.lng - 0.1,
         };
-        console.log(map)
+
         const options = {
             bounds: defaultBounds,
             componentRestrictions: { country: "ie" },
@@ -116,42 +118,61 @@ export async function initJourneyPlanner(map) {
         submitBtn.setAttribute('type', 'submit')
         submitBtn.textContent = 'Submit'
         
-        submitBtn.addEventListener('click', (e) => {
+        submitBtn.addEventListener('click', async (e) => {
             e.preventDefault()
 
+            let res = {} 
+            
             let formData = new FormData(journeyForm);
+
+            res.time = `${formData.get('date')} ${formData.get('time')}`
             
 
             // Get Timestamp
-            const dateTime = `${formData.get('date')} ${formData.get('time')}`
-            console.log(dateTime)
+            let start = {}
+            let destination = {}
 
-            // getDate5DaysAway()
-            
-
-            console.log(formData)
-            console.log(formData.get('start'))
-            console.log(formData.get('destination'))
-            console.log(formData.get('date'))
-            console.log(formData.get('time'))
-            // Get closest stations start point end point
-            // Post request to backend
+            start.name = formData.get('start')
+            destination.name = formData.get('destination')
 
             let request = {
-                origin: startingPointInput.value,
-                destination: destinationInput.value,
+                origin: formData.get('start'),
+                destination: formData.get('destination'),
                 travelMode: 'BICYCLING',
                 region: 'ie'
             }
             
-            directionsService.route(request, (result, status) => {
+            await directionsService.route(request, (result, status) => {
                 if (status == 'OK') {
-                    console.log(result)
                     directionsRenderer.setMap(map)
                     directionsRenderer.setDirections(result)
-                    directionsRenderer.setPanel(aside);
+                    directionsRenderer.setPanel(asideMain);
+                    start.pos = {lat: result.routes[0].bounds.Zh.lo, lng: result.routes[0].bounds.Jh.hi}
+                    destination.pos = {lat: result.routes[0].bounds.Zh.hi, lng: result.routes[0].bounds.Jh.lo}
                 }
             })
+
+            // MAKE SURE IT DOESN'T SUBMIT WITH EMPTY VALUES
+            const startClosestStations = await getClosestStations(data, start, 3)
+            const destinationClosestStations = await getClosestStations(data, destination, 3)
+            res['start_closest_stations'] = startClosestStations.map(station => station.sId)
+            res['destination_closest_stations'] = destinationClosestStations.map(station => station.sId)
+
+            try {
+                const response = await fetch(journeyForm.action, {
+                    method: 'POST',
+                    body: JSON.stringify(res)
+                })
+
+                if (!response.ok) {
+                    throw new Error(`Journey Planner Form Error: ${response.status}`)
+                }
+
+                const data = await response.json()
+                console.log(data)
+            } catch (err) {
+                console.error(`Error Journey Planner: ${err}`)
+            }
         })
         
         const resetBtn = document.createElement('button')

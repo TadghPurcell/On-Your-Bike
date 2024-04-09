@@ -1,4 +1,4 @@
-import { getClosestStations } from "./closestStations.js";
+import { ClosestStations } from "./closestStations.js";
 import { initJourneyPlanner } from "./journeyPlanner.js";
 
 //This is a placeholder function that will populate the side bar with machine learning predictions in time
@@ -12,7 +12,7 @@ export async function initAside(map, data) {
   const btnNearestStations = document.querySelector('.btn-stations')
   const btnStationInfo = document.querySelector('.btn-station-info')
   
-  initJourneyPlanner(map)
+  initJourneyPlanner(map, data)
   
   btnJourneyPlanner.addEventListener('click', () => {
     btnNearestStations.classList.remove('btn-aside-active')
@@ -24,7 +24,7 @@ export async function initAside(map, data) {
     btnJourneyPlanner.classList.remove('btn-aside-active')
     btnStationInfo.classList.remove('btn-aside-active')
     btnNearestStations.classList.add('btn-aside-active')
-    getClosestStations(map, data)
+    ClosestStations(map, data)
   })
   btnStationInfo.addEventListener('click', () => {
     console.log('test')

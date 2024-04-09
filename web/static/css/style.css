@@ -357,6 +357,10 @@ form {
   padding: 6px 48px;
 }
 
+.form-btn:hover {
+  transform: scale(1.2);
+}
+
 .address-div {
   grid-area: a;
 }
