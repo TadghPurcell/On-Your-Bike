@@ -72,7 +72,7 @@ def get_all_stations():
 
         return jsonify(data)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"error: failed to get station - {str(e)}"}), 500
 
 
 # Joins stations tables to give static data and latest dynamic data
