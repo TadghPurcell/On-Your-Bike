@@ -354,11 +354,19 @@ form {
 }
 
 .form-btn {
+  background-color: var(--light-green);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
   padding: 6px 48px;
+  transition: all 0.2s ease-out;
+  box-shadow: var(--box-shadow);
 }
 
 .form-btn:hover {
-  transform: scale(1.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
 }
 
 .address-div {
@@ -400,11 +408,9 @@ input:focus {
   outline: none;
   border: 1px solid var(--light-green);
 }
+
 .error {
   border: 1px solid red;
   background-color: rgba(255, 0, 0, 0.025);
 }
-/* input[type="text"]::placeholder {
-  color: #266052;
-  color: var(--light-green);
-} */
+

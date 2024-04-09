@@ -207,6 +207,8 @@ export async function initJourneyPlanner(map, data) {
             directionsRenderer.setMap(null)
             dateInput.value = `${new Date().toISOString().slice(0, 10)}`
             timeInput.value = `${new Date().toLocaleTimeString().slice(0, 5)}`
+            map.setCenter({ lat: 53.346, lng: -6.25 })
+            map.setZoom(14)
         })
 
         const formButtonsDiv = document.createElement('div')
