@@ -78,30 +78,33 @@ def get_all_stations():
 # Joins stations tables to give static data and latest dynamic data
 @app.route("/stations/")
 def get_stations():
-    # subquery to find latest data in availability
-    latest_dynamic_data = session.query(
-        func.max(Availability.time_updated)).scalar_subquery()
+    try:
+        # subquery to find latest data in availability
+        latest_dynamic_data = session.query(
+            func.max(Availability.time_updated)).scalar_subquery()
 
-    station_data = session.query(Station, Availability).\
-        join(Availability, Station.station_id == Availability.station_id).\
-        filter(Availability.time_updated == latest_dynamic_data).all()
+        station_data = session.query(Station, Availability).\
+            join(Availability, Station.station_id == Availability.station_id).\
+            filter(Availability.time_updated == latest_dynamic_data).all()
 
-    data = []
+        data = []
 
-    for station, availability in station_data:
-        station_data = {
-            'station_id': station.station_id,
-            'name': station.name,
-            'latitude': station.latitude,
-            'longitude': station.longitude,
-            'payment_terminal': station.payment_terminal,
-            'total_bike_stands': availability.bike_stands,
-            'available_bikes': availability.available_bikes,
-            'available_bike_stands': availability.available_bike_stands,
-            'time_updated': availability.time_updated
-        }
-        data.append(station_data)
-    return jsonify(data)
+        for station, availability in station_data:
+            station_data = {
+                'station_id': station.station_id,
+                'name': station.name,
+                'latitude': station.latitude,
+                'longitude': station.longitude,
+                'payment_terminal': station.payment_terminal,
+                'total_bike_stands': availability.bike_stands,
+                'available_bikes': availability.available_bikes,
+                'available_bike_stands': availability.available_bike_stands,
+                'time_updated': availability.time_updated
+            }
+            data.append(station_data)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/available/<int:station_id>")
