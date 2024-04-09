@@ -109,73 +109,77 @@ def get_stations():
 
 @app.route("/available/<int:station_id>")
 def get_station(station_id):
-    midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    try:
+        midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
-    weather_historical = session.query(Weather).filter(
-        Weather.time_updated > midnight).all()
+        weather_historical = session.query(Weather).filter(
+            Weather.time_updated > midnight).all()
 
-    weather_historical_df = pd.DataFrame(
-        [row.__dict__ for row in weather_historical])
-    weather_historical_df = weather_historical_df[[
-        'time_updated', 'temperature', 'wind_speed', 'humidity']]
+        weather_historical_df = pd.DataFrame(
+            [row.__dict__ for row in weather_historical])
+        weather_historical_df = weather_historical_df[[
+            'time_updated', 'temperature', 'wind_speed', 'humidity']]
 
-    weather_data = requests.get(FORECAST_URI, params={
-                                "units": "metric", "lat": 53.344, "lon": -6.2672, "appid": db_info["weatherKey"]})
-    weather_info = weather_data.json()
+        weather_data = requests.get(FORECAST_URI, params={
+                                    "units": "metric", "lat": 53.344, "lon": -6.2672, "appid": db_info["weatherKey"]})
+        weather_info = weather_data.json()
 
-    predicted_weather_df = pd.DataFrame(weather_info['list'])
-    predicted_weather_df['temperature'] = [row['main']['temp']
-                                           for row in weather_info['list']]
-    predicted_weather_df['humidity'] = [row['main']['humidity']
-                                        for row in weather_info['list']]
-    predicted_weather_df['wind_speed'] = [row['wind']['speed']
-                                          for row in weather_info['list']]
-    predicted_weather_df['time_updated'] = pd.to_datetime(
-        predicted_weather_df['dt_txt'])
+        predicted_weather_df = pd.DataFrame(weather_info['list'])
+        predicted_weather_df['temperature'] = [row['main']['temp']
+                                            for row in weather_info['list']]
+        predicted_weather_df['humidity'] = [row['main']['humidity']
+                                            for row in weather_info['list']]
+        predicted_weather_df['wind_speed'] = [row['wind']['speed']
+                                            for row in weather_info['list']]
+        predicted_weather_df['time_updated'] = pd.to_datetime(
+            predicted_weather_df['dt_txt'])
 
-    predicted_weather_df['humidity'] = predicted_weather_df['humidity'].astype(
-        'int64')
-    predicted_weather_df['temperature'] = predicted_weather_df['temperature'].astype(
-        'float64')
-    predicted_weather_df['wind_speed'] = predicted_weather_df['wind_speed'].astype(
-        'float64')
-    predicted_weather_df = predicted_weather_df[[
-        'time_updated', 'temperature', 'wind_speed', 'humidity']]
+        predicted_weather_df['humidity'] = predicted_weather_df['humidity'].astype(
+            'int64')
+        predicted_weather_df['temperature'] = predicted_weather_df['temperature'].astype(
+            'float64')
+        predicted_weather_df['wind_speed'] = predicted_weather_df['wind_speed'].astype(
+            'float64')
+        predicted_weather_df = predicted_weather_df[[
+            'time_updated', 'temperature', 'wind_speed', 'humidity']]
 
-    weather_combined = pd.concat([weather_historical_df, predicted_weather_df])
+        weather_combined = pd.concat([weather_historical_df, predicted_weather_df])
 
-    current_date = datetime.now()
+        current_date = datetime.now()
 
-    # Generate a list of hours for today
-    hours_today = [current_date.replace(
-        hour=h, minute=30, second=0, microsecond=0) for h in range(24)]
-    hourly_df = pd.DataFrame(hours_today, columns=['time_updated'])
+        # Generate a list of hours for today
+        hours_today = [current_date.replace(
+            hour=h, minute=30, second=0, microsecond=0) for h in range(24)]
+        hourly_df = pd.DataFrame(hours_today, columns=['time_updated'])
 
-    df = pd.merge_asof(hourly_df, weather_combined, on='time_updated')
+        df = pd.merge_asof(hourly_df, weather_combined, on='time_updated')
 
-    days = ['Friday', 'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday',
-            'Wednesday']
+        days = ['Friday', 'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday',
+                'Wednesday']
 
-    # One hot encode day of the week
-    df['weekday'] = df['time_updated'].dt.day_name()
-    df['hour'] = df['time_updated'].dt.hour
-    for day in days:
-        df[day] = df['weekday'] == day
+        # One hot encode day of the week
+        df['weekday'] = df['time_updated'].dt.day_name()
+        df['hour'] = df['time_updated'].dt.hour
+        for day in days:
+            df[day] = df['weekday'] == day
 
-    df.drop('time_updated', axis=1, inplace=True)
-    df.drop('weekday', axis=1, inplace=True)
+        df.drop('time_updated', axis=1, inplace=True)
+        df.drop('weekday', axis=1, inplace=True)
 
-    with open(f'../ML_models/station_{station_id}.pkl', 'rb') as file:
-        # Load the model from the file
-        poly_reg_model = pickle.load(file)
+        with open(f'../ML_models/station_{station_id}.pkl', 'rb') as file:
+            # Load the model from the file
+            poly_reg_model = pickle.load(file)
 
-    poly = PolynomialFeatures(degree=3, include_bias=False)
-    poly_features = poly.fit_transform(df)
+        poly = PolynomialFeatures(degree=3, include_bias=False)
+        poly_features = poly.fit_transform(df)
 
-    df['predicted_available'] = poly_reg_model.predict(poly_features)
+        df['predicted_available'] = poly_reg_model.predict(poly_features)
 
-    # row = session.query(Availability).filter_by(station_id=station_id)
-    return df[['hour', 'predicted_available']].to_json()
+        # row = session.query(Availability).filter_by(station_id=station_id)
+        return df[['hour', 'predicted_available']].to_json()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/')
 def root():
