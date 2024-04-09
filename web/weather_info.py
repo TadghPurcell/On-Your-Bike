@@ -25,7 +25,6 @@ WEATHER_URI = 'https://api.openweathermap.org/data/2.5/weather'
 weather_data = requests.get(WEATHER_URI, params={
                             "units": "metric", "lat": 53.344, "lon": -6.2672, "appid": WEATHER_API_KEY})
 weather_info = weather_data.json()
-
 # use pd.DataFrame because data is already an object
 df = pd.DataFrame([weather_info])
 

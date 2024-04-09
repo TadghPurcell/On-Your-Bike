@@ -1,5 +1,7 @@
-import { getClosestStations } from "./closestStations.js";
+import { initAside } from "./aside.js";
 import { initJourneyPlanner } from "./journeyPlanner.js";
+import { getStationInfo } from "./getStationInfo.js";
+import { stationInformationSidebar } from "./stationInformationSidebar.js";
 async function initMap() {
   let mapStyleId;
 
@@ -17,24 +19,27 @@ async function initMap() {
   }
 
   // The location of Dublin
-  const position = { lat: 53.344, lng: -6.2672 };
+  const position = { lat: 53.346, lng: -6.25 };
+  // 53.34611327830516, -6.264972599005677
 
   // Request needed libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
   const { Place } = await google.maps.importLibrary("places");
-  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
-  const { DistanceMatrixService } = await google.maps.importLibrary("routes")
+  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
+    "marker"
+  );
+  const { DistanceMatrixService } = await google.maps.importLibrary("routes");
 
   // The map, centered at Dublin
   let map = new Map(document.getElementById("map"), {
-    zoom: 13,
+    zoom: 14,
     center: position,
     fullscreenControl: false,
     mapTypeControl: false,
     streetViewControl: false,
     zoomControl: true,
     zoomControlOptions: {
-      position: google.maps.ControlPosition.LEFT_CENTER,
+      position: google.maps.ControlPosition.LEFT_BOTTOM,
     },
     mapId: mapStyleId,
   });
@@ -64,7 +69,6 @@ async function initMap() {
       payment_terminal: paymentTerminal,
       time_updated: latestTimeUpdate,
     }) => {
-
       let modifiedName = sName
         .split(" ")
         .map((e) => {
@@ -81,17 +85,30 @@ async function initMap() {
           return newName[0].toUpperCase() + newName.slice(1);
         })
         .join(" ");
-
+      
       const glyphImg = document.createElement("img");
       glyphImg.classList.add("bike-logo");
-      glyphImg.src = "/img/bike.svg";
       glyphImg.alt = "marker logo";
-      const pinElement = new google.maps.marker.PinElement({
-        background: "#03a981",
-        borderColor: "#266052",
-        glyph: glyphImg,
-        scale: 1,
-      });
+      glyphImg.classList.add("bike-logo");
+      let pinElement
+      if (availableBikes != 0) {
+        glyphImg.src = "/img/bike.svg"
+        pinElement = new google.maps.marker.PinElement({
+          background: "#03a981",
+          borderColor: "#266052",
+          glyph: glyphImg,
+          scale: 1,
+        })
+      }
+      else {
+        glyphImg.src = "/img/bike_unavailable.svg";
+        pinElement = new google.maps.marker.PinElement({
+          background: "#f21800",
+          borderColor: "#603126",
+          glyph: glyphImg,
+          scale: 1,
+        });
+      }
 
       const marker = new AdvancedMarkerElement({
         position: { lat, lng },
@@ -101,51 +118,6 @@ async function initMap() {
       });
 
       //Create Pop up Window
-      function getStationInfo(
-        name,
-        totalBikesStands,
-        availableBikes,
-        availableBikeStands,
-        paymentTerminal,
-        latestTimeUpdate
-      ) {
-        const stationInfoWindow = document.createElement("div");
-        stationInfoWindow.classList.add("station-window");
-
-        //total, bikes, stands, pay, update
-
-        const stationName = document.createElement("h1");
-        stationName.textContent = name;
-
-        const stationTotalBikeStands = document.createElement("p");
-        stationTotalBikeStands.textContent = `Total Bike Stands: ${totalBikesStands}`;
-
-        const stationAvailableBikes = document.createElement("p");
-        stationAvailableBikes.textContent = `Available Bikes: ${availableBikes}`;
-
-        const stationAvailableBikeStands = document.createElement("p");
-        stationAvailableBikeStands.textContent = `Available Bike Stands: ${availableBikeStands}`;
-
-        const stationPaymentTerminal = document.createElement("p");
-        stationPaymentTerminal.textContent = `Payment Terminal: ${
-          paymentTerminal ? "Yes" : "No"
-        }`;
-
-        const stationLastUpdate = document.createElement("p");
-        stationLastUpdate.textContent = `Latest Update Time: ${latestTimeUpdate.slice(
-          17,
-          26
-        )}`;
-
-        stationInfoWindow.appendChild(stationName);
-        stationInfoWindow.appendChild(stationTotalBikeStands);
-        stationInfoWindow.appendChild(stationAvailableBikes);
-        stationInfoWindow.appendChild(stationAvailableBikeStands);
-        stationInfoWindow.appendChild(stationPaymentTerminal);
-        stationInfoWindow.appendChild(stationLastUpdate);
-
-        return stationInfoWindow;
-      }
 
       marker.content.addEventListener("mouseover", () => {
         const stationInfo = getStationInfo(
@@ -165,62 +137,36 @@ async function initMap() {
       });
 
       marker.content.addEventListener("click", async () => {
-        // Close the info window, this allows the user to know that the marker was clicked
         infoWindow.close(map, marker);
-
-        // Create predicted availability chart
-        // Get the predicted availability for the station
-        let json;
-        try {
-          const res = await fetch(`/available/${id}`);
-          if (!res.ok) {
-            throw new Error("Couldn't find station ID");
-          }
-          json = await res.json();
-        } catch (e) {
-          console.error("Error connecting to DB: ", e);
-        }
-
-        // Iterate over the hours and add to data
-        var availability_data = [];
-        for (var idx in json.hour) {
-          availability_data.push([
-            json.hour[idx].toString(),
-            json.predicted_available[idx],
-          ]);
-        }
-
-        google.charts.setOnLoadCallback(drawChart);
-
-        function drawChart() {
-          var data = new google.visualization.DataTable();
-          data.addColumn("string", "Hour");
-          data.addColumn("number", "Busyness Level");
-          data.addRows(availability_data);
-
-          var options = {
-            legend: "none",
-            colors: ["#4286f4"],
-            opacity: 0.3,
-            vAxis: {
-              minValue: 0,
-              viewWindow: { min: 0 },
-            },
-            curveType: "function",
-          };
-          var chart = new google.visualization.LineChart(
-            document.getElementById("availability-chart")
-          );
-          chart.draw(data, options);
-        }
+        console.log({
+          id,
+          lat,
+          lng,
+          modifiedName,
+          totalBikesStands,
+          availableBikes,
+          availableBikeStands,
+          paymentTerminal,
+          latestTimeUpdate,
+        });
+        stationInformationSidebar(
+          id,
+          lat,
+          lng,
+          modifiedName,
+          totalBikesStands,
+          availableBikes,
+          availableBikeStands,
+          paymentTerminal,
+          latestTimeUpdate
+        );
       });
 
       return marker;
     }
   );
 
-getClosestStations(data)
-initJourneyPlanner(map)
+initAside(map, data)
 const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
 }
 
