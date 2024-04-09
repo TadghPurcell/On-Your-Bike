@@ -158,9 +158,11 @@ export async function initJourneyPlanner(map, data) {
             res['start_closest_stations'] = startClosestStations.map(station => station.sId)
             res['destination_closest_stations'] = destinationClosestStations.map(station => station.sId)
 
+            console.log(JSON.stringify(res))
             try {
                 const response = await fetch(journeyForm.action, {
-                    method: 'POST',
+                    method: "POST",
+                    headers: { "Content-Type": "application/json"},
                     body: JSON.stringify(res)
                 })
 
@@ -169,7 +171,6 @@ export async function initJourneyPlanner(map, data) {
                 }
 
                 const data = await response.json()
-                console.log(data)
             } catch (err) {
                 console.error(`Error Journey Planner: ${err}`)
             }

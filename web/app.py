@@ -165,7 +165,7 @@ def route_planning():
     if request.method == 'POST':
         req = request.json
         # convert the time to np.datetime
-        pred_time = datetime.strptime(req['time'], "%Y-%m-%d %H:%M:%S")
+        pred_time = datetime.strptime(req['time'], "%Y-%m-%d %H:%M")
 
         if pred_time > datetime.now() + timedelta(days=5):
             return jsonify({'message': 'Invalid time. Time cannot be more than 5 days from now.'}), 400
