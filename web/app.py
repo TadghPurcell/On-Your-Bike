@@ -36,42 +36,43 @@ session = Session()
 print("connected")
 
 # Gives all of the data needed for the home page
-
-
 @app.route("/home/")
 def get_all_stations():
-    # Station ID, Name, longitude, latitude
-    # Weather data
-    # Station availability
-    data = {"stations": {},
-            "weather": {}}
-    bike_stations = session.query(Station).all()
-    bike_availability = session.query(Availability).filter(
-        Availability.time_updated == func.max(Availability.time_updated).select()).all()
-    weather = session.query(Weather).filter(
-        Weather.time_updated == func.max(Weather.time_updated).select()).first()
+    try:
+        # Station ID, Name, longitude, latitude
+        # Weather data
+        # Station availability
+        data = {"stations": {},
+                "weather": {}}
+        bike_stations = session.query(Station).all()
+        bike_availability = session.query(Availability).filter(
+            Availability.time_updated == func.max(Availability.time_updated).select()).all()
+        weather = session.query(Weather).filter(
+            Weather.time_updated == func.max(Weather.time_updated).select()).first()
 
-    for row in bike_availability:
-        data["stations"][row.station_id] = {
-            "available_bikes": row.available_bikes,
-            "available_bike_stands": row.available_bike_stands
+        for row in bike_availability:
+            data["stations"][row.station_id] = {
+                "available_bikes": row.available_bikes,
+                "available_bike_stands": row.available_bike_stands
+            }
+
+        for row in bike_stations:
+            data["stations"][row.station_id]["name"] = row.name
+            data["stations"][row.station_id]["latitude"] = row.latitude
+            data["stations"][row.station_id]["longitude"] = row.longitude
+        data["weather"] = {
+            "type": weather.type,
+            "temperature": weather.temperature,
+            "humidity": weather.humidity,
+            "wind speed": weather.wind_speed
+
         }
+        print(data, file=sys.stdout)
+        row = session.query(Station).all()
 
-    for row in bike_stations:
-        data["stations"][row.station_id]["name"] = row.name
-        data["stations"][row.station_id]["latitude"] = row.latitude
-        data["stations"][row.station_id]["longitude"] = row.longitude
-    data["weather"] = {
-        "type": weather.type,
-        "temperature": weather.temperature,
-        "humidity": weather.humidity,
-        "wind speed": weather.wind_speed
-
-    }
-    print(data, file=sys.stdout)
-    row = session.query(Station).all()
-
-    return jsonify(data)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # Joins stations tables to give static data and latest dynamic data
