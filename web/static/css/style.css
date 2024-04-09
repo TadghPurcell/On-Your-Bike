@@ -400,6 +400,10 @@ input:focus {
   outline: none;
   border: 1px solid var(--light-green);
 }
+.error {
+  border: 1px solid red;
+  background-color: rgba(255, 0, 0, 0.025);
+}
 /* input[type="text"]::placeholder {
   color: #266052;
   color: var(--light-green);

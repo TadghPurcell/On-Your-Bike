@@ -26,7 +26,7 @@ export async function initJourneyPlanner(map, data) {
         startingPointInput.setAttribute('type', 'text')
         startingPointInput.setAttribute('id', 'start')
         startingPointInput.setAttribute('name', 'start')
-        startingPointInput.setAttribute('class', 'controls')
+        startingPointInput.required = true
         startingPointInput.setAttribute('placeholder', 'Choose a starting point..')
         
         startingPoint.appendChild(startingPointLabel)
@@ -41,7 +41,7 @@ export async function initJourneyPlanner(map, data) {
         destinationInput.setAttribute('type', 'text')
         destinationInput.setAttribute('id', 'destination')
         destinationInput.setAttribute('name', 'destination')
-        destinationInput.setAttribute('class', 'controls')
+        destinationInput.required = true
         destinationInput.setAttribute('placeholder', 'Choose a destination..')
         
         destination.appendChild(destinationLabel)
@@ -117,16 +117,32 @@ export async function initJourneyPlanner(map, data) {
         submitBtn.classList.add('form-btn')
         submitBtn.setAttribute('type', 'submit')
         submitBtn.textContent = 'Submit'
+
+        journeyForm.addEventListener('keydown', (e) => {
+            if (e.key == 'Enter') {
+                e.preventDefault()
+            }
+        })
         
         submitBtn.addEventListener('click', async (e) => {
             e.preventDefault()
 
             let res = {} 
-            
             let formData = new FormData(journeyForm);
 
+            startingPointInput.classList.remove('error')
+            destinationInput.classList.remove('error')
+
+
+            if (formData.get('start') == '') {
+                startingPointInput.classList.add('error')
+            }
+
+            if (formData.get('destination') == '') {
+                destinationInput.classList.add('error')
+            }
+
             res.time = `${formData.get('date')} ${formData.get('time')}`
-            
 
             // Get Timestamp
             let start = {}
@@ -134,7 +150,7 @@ export async function initJourneyPlanner(map, data) {
 
             start.name = formData.get('start')
             destination.name = formData.get('destination')
-
+            
             let request = {
                 origin: formData.get('start'),
                 destination: formData.get('destination'),
@@ -158,7 +174,6 @@ export async function initJourneyPlanner(map, data) {
             res['start_closest_stations'] = startClosestStations.map(station => station.sId)
             res['destination_closest_stations'] = destinationClosestStations.map(station => station.sId)
 
-            console.log(JSON.stringify(res))
             try {
                 const response = await fetch(journeyForm.action, {
                     method: "POST",
@@ -184,7 +199,9 @@ export async function initJourneyPlanner(map, data) {
         resetBtn.addEventListener('click', (e) => {
             e.preventDefault()
             startingPointInput.value = ''
+            startingPointInput.classList.remove('error')
             destinationInput.value = ''
+            destinationInput.classList.remove('error')
             directionsRenderer.setPanel(null);
             directionsRenderer.setDirections(null)
             directionsRenderer.setMap(null)
