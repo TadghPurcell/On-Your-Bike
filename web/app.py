@@ -104,7 +104,7 @@ def get_stations():
             data.append(station_data)
         return jsonify(data)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"error: failed to get station - {str(e)}"}), 500
 
 
 @app.route("/available/<int:station_id>")
@@ -178,7 +178,7 @@ def get_station(station_id):
         # row = session.query(Availability).filter_by(station_id=station_id)
         return df[['hour', 'predicted_available']].to_json()
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"error: failed to get station - {str(e)}"}), 500
 
 
 @app.route('/')
