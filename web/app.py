@@ -197,7 +197,7 @@ def route_planning():
         if pred_time.date() == pd.Timestamp.now().date():
             date_today = True
         else:
-            date_today = False
+            date_today = Falsex
 
         # Get historic availability data if planning to travel today
         if date_today:
@@ -273,8 +273,6 @@ def route_planning():
                     [station_hist_by_id, new_weather_predictive_df])
                 combined_df = combined_df[[
                     'hour', 'available_bikes', 'predicted_available']]
-                print("STATION {}".format(station_id), file=sys.stdout)
-                print(combined_df, file=sys.stdout)
                 # combined_df = pd.concat(
                 #     [station_hist_by_id[['hour', 'available_bikes']], weather_predictive_df[['hour', 'predicted_available']]])
                 combined_df['available_bikes'] = combined_df['available_bikes'].apply(
