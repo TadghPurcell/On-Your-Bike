@@ -23,9 +23,13 @@
       <div id="map"></div>
       <aside>
         <div class="btn-aside-div">
-          <button class="btn-aside btn-journey-planner btn-aside-active">Journey Planner</button>
+          <button class="btn-aside btn-journey-planner btn-aside-active">
+            Journey Planner
+          </button>
           <button class="btn-aside btn-stations">Nearest Stations</button>
-          <button class="btn-aside btn-station-info">Station Information</button>
+          <button class="btn-aside btn-station-info">
+            Station Information
+          </button>
         </div>
         <div class="aside-main"></div>
       </aside>
@@ -67,6 +71,7 @@
           : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
       })({ key: "{{ mapsAPIKey }}", v: "weekly" });
     </script>
+
     <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script

@@ -25,6 +25,7 @@ async function initMap() {
   // Request needed libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
   const { Place } = await google.maps.importLibrary("places");
+  const { HeatmapLayer } = await google.maps.importLibrary("visualization");
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
     "marker"
   );
@@ -55,7 +56,7 @@ async function initMap() {
 
   const res = await fetch("/stations/");
   const data = await res.json();
-
+  console.log(data);
   // The markers for each station
   const markers = data.map(
     ({
@@ -85,22 +86,21 @@ async function initMap() {
           return newName[0].toUpperCase() + newName.slice(1);
         })
         .join(" ");
-      
+
       const glyphImg = document.createElement("img");
       glyphImg.classList.add("bike-logo");
       glyphImg.alt = "marker logo";
       glyphImg.classList.add("bike-logo");
-      let pinElement
+      let pinElement;
       if (availableBikes != 0) {
-        glyphImg.src = "/img/bike.svg"
+        glyphImg.src = "/img/bike.svg";
         pinElement = new google.maps.marker.PinElement({
           background: "#03a981",
           borderColor: "#266052",
           glyph: glyphImg,
           scale: 1,
-        })
-      }
-      else {
+        });
+      } else {
         glyphImg.src = "/img/bike_unavailable.svg";
         pinElement = new google.maps.marker.PinElement({
           background: "#f21800",
@@ -166,8 +166,19 @@ async function initMap() {
     }
   );
 
-initAside(map, data)
-const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
+  const heatmapData = data.map(({ latitude, longitude }) => {
+    return new google.maps.LatLng(latitude, longitude);
+  });
+
+  console.log(google.maps.visualization.HeatmapLayer);
+  var heatmap = new HeatmapLayer({
+    data: heatmapData,
+    radius: 55,
+  });
+  heatmap.setMap(map);
+
+  initAside(map, data);
+  const markerCluster = new markerClusterer.MarkerClusterer({ markers, map });
 }
 
 initMap();
