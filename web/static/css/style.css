@@ -94,16 +94,6 @@ button,
   font-weight: 500;
 }
 
-.form-btn {
-  background-color: var(--light-green);
-  color: white;
-  padding: 10px 15px;
-  box-shadow: var(--box-shadow);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 .buttons,
 .custom-map-control-button {
   margin: 2rem;
@@ -260,27 +250,36 @@ aside::-webkit-scrollbar-thumb {
   white-space: no-wrap;
 }
 
+.closest_station > p {
+  white-space: nowrap;
+}
+
+.closest_station_walk_time {
+  overflow: hidden; 
+  text-overflow: ellipsis;
+}
+
+*::before {
+  display: inline-block;
+  background-position: center;
+  width: 24px;
+  height: 24px;
+  padding-top: 4px;
+  padding-right: 4px;
+}
+
 .closest_station_bikes::before {
   content: url('/img/bike.svg');
-  width: 5px;
-  height: 5px;
 }
 .closest-station-parking::before {
   content: url('/img/available_spaces.svg');
-  width: 10px;
-  height: 10px;
 }
 
 .closest_station_distance::before {
   content: url("/img/distance.svg");
-
-  width: 10px;
-  height: 10px;
 }
 .closest_station_walk_time::before {
   content: url("/img/walking.svg");
-  width: 10px;
-  height: 10px;
 }
 
 /* journey planner */
@@ -328,6 +327,7 @@ aside::-webkit-scrollbar-thumb {
   width: 5px;
   height: 5px;
 }
+
 /* Journey Planner Sidebar */
 .journey_planner_head {
   text-align: center;
@@ -353,7 +353,7 @@ form {
   gap: 16px;
 }
 
-.form-btn {
+.form-btn, .directions-button {
   background-color: var(--light-green);
   color: white;
   border: none;
@@ -364,7 +364,7 @@ form {
   box-shadow: var(--box-shadow);
 }
 
-.form-btn:hover {
+.form-btn:hover, .directions-button:hover {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   transform: scale(1.1);
 }
