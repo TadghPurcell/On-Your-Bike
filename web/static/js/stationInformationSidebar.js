@@ -1,5 +1,6 @@
 import { getStationInfo } from "./getStationInfo.js";
-
+import { initJourneyPlanner } from "./journeyPlanner.js";
+import { activateSideBar } from "./script.js";
  // Make the station information sidebar
 export async function stationInformationSidebar(
   id,
@@ -10,7 +11,9 @@ export async function stationInformationSidebar(
   availableBikes,
   availableBikeStands,
   paymentTerminal,
-  latestTimeUpdate
+  latestTimeUpdate,
+  data,
+  map
 ) {
   const stationInfo = getStationInfo(
     modifiedName,
@@ -120,6 +123,11 @@ export async function stationInformationSidebar(
   directions.classList.add("directions-button");
   directions.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="120 -840 720 720" width="20"><path fill="#ffffff" d="M480-840q74 0 139.5 28.5T734-734q49 49 77.5 114.5T840-480q0 74-28.5 139.5T734-226q-49 49-114.5 77.5T480-120q-41 0-79-9t-76-26l61-61q23 8 46.5 12t47.5 4q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 24 4 47.5t12 46.5l-60 60q-18-36-27-74.5t-9-79.5q0-74 28.5-139.5T226-734q49-49 114.5-77.5T480-840Zm40 520v-144L176-120l-56-56 344-344H320v-80h280v280h-80Z"/></svg>';
   topDiv.appendChild(directions);
+
+  directions.addEventListener('click', () => {
+    activateSideBar('journey')
+    initJourneyPlanner(map, data, modifiedName)
+  })
 
   const availability_title = document.createElement("h2");
   availability_title.classList.add("closest_station_head");

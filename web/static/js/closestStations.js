@@ -1,13 +1,10 @@
+import { activateSideBar } from "./script.js"
 import { stationInformationSidebar } from "./stationInformationSidebar.js"
 
 export async function ClosestStations(map, data) {
     // Import google library
   const { DistanceMatrixService } = await google.maps.importLibrary("routes")
   const distanceService = new DistanceMatrixService()
-
-  const btnJourneyPlanner = document.querySelector('.btn-journey-planner')
-  const btnNearestStations = document.querySelector('.btn-stations')
-  const btnStationInfo = document.querySelector('.btn-station-info')
     
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (position) => {
@@ -16,7 +13,6 @@ export async function ClosestStations(map, data) {
             lng: position.coords.longitude,
           };
           
-          console.log(data[0])
           const stationDistances = await Promise.all(data.map(({name: sName, station_id: sId, latitude: lat, longitude: lng, 
             available_bikes: availableBikes, available_bike_stands: availableBikeStands, 
             total_bike_stands: totalBikesStands, payment_terminal: paymentTerminal, time_updated: latestTimeUpdate}) => {
@@ -102,10 +98,7 @@ export async function ClosestStations(map, data) {
 
               map.setCenter(station.pos)
               map.setZoom(15)
-              btnJourneyPlanner.classList.remove('btn-aside-active')
-              btnNearestStations.classList.remove('btn-aside-active')
-              btnStationInfo.classList.add('btn-aside-active')
-              console.log(station)
+              activateSideBar('info')
               stationInformationSidebar(
                 station.sId,
                 station.pos.lat,

@@ -157,7 +157,9 @@ async function initMap() {
           availableBikes,
           availableBikeStands,
           paymentTerminal,
-          latestTimeUpdate
+          latestTimeUpdate,
+          data,
+          map
         );
       });
 
@@ -169,4 +171,25 @@ initAside(map, data)
 const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
 }
 
+export const activateSideBar = (sidebar) => {
+  const btnJourneyPlanner = document.querySelector('.btn-journey-planner')
+  const btnNearestStations = document.querySelector('.btn-stations')
+  const btnStationInfo = document.querySelector('.btn-station-info')
+  if (sidebar == 'journey') {    
+    btnJourneyPlanner.classList.add('btn-aside-active')
+    btnNearestStations.classList.remove('btn-aside-active')
+    btnStationInfo.classList.remove('btn-aside-active')
+  }
+  if (sidebar == 'nearest') {
+    btnJourneyPlanner.classList.remove('btn-aside-active')
+    btnNearestStations.classList.add('btn-aside-active')
+    btnStationInfo.classList.remove('btn-aside-active')
+  }
+  if (sidebar == 'info') {
+    btnJourneyPlanner.classList.remove('btn-aside-active')
+    btnNearestStations.classList.remove('btn-aside-active')
+    btnStationInfo.classList.add('btn-aside-active')
+  }
+
+}
 initMap();

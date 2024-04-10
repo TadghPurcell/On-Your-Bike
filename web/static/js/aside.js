@@ -1,5 +1,6 @@
 import { ClosestStations } from "./closestStations.js";
 import { initJourneyPlanner } from "./journeyPlanner.js";
+import { activateSideBar } from "./script.js";
 
 //This is a placeholder function that will populate the side bar with machine learning predictions in time
 export async function initAside(map, data) {
@@ -10,25 +11,18 @@ export async function initAside(map, data) {
    
   const btnJourneyPlanner = document.querySelector('.btn-journey-planner')
   const btnNearestStations = document.querySelector('.btn-stations')
-  const btnStationInfo = document.querySelector('.btn-station-info')
   
   initJourneyPlanner(map, data)
   
   btnJourneyPlanner.addEventListener('click', () => {
-    btnNearestStations.classList.remove('btn-aside-active')
-    btnStationInfo.classList.remove('btn-aside-active')
-    btnJourneyPlanner.classList.add('btn-aside-active')
+    activateSideBar('journey')
     initJourneyPlanner(map)
   })
   btnNearestStations.addEventListener('click', () => {
-    btnJourneyPlanner.classList.remove('btn-aside-active')
-    btnStationInfo.classList.remove('btn-aside-active')
-    btnNearestStations.classList.add('btn-aside-active')
+    activateSideBar('nearest')
     ClosestStations(map, data)
   })
-  btnStationInfo.addEventListener('click', () => {
-  })
-  
+
   aside.appendChild(stationDataPiece);
 }
 

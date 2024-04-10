@@ -1,6 +1,6 @@
 import { getClosestStations } from "./getClosestStations.js";
 
-export async function initJourneyPlanner(map, data) {
+export async function initJourneyPlanner(map, data, selectedStation) {
     const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary("places");
     const { DirectionsService, DirectionsRenderer } = await google.maps.importLibrary("routes")
 
@@ -43,6 +43,9 @@ export async function initJourneyPlanner(map, data) {
         destinationInput.setAttribute('name', 'destination')
         destinationInput.required = true
         destinationInput.setAttribute('placeholder', 'Choose a destination..')
+        if (selectedStation) {
+            destinationInput.setAttribute('value', selectedStation)
+        }
         
         destination.appendChild(destinationLabel)
         destination.appendChild(destinationInput)
@@ -219,4 +222,7 @@ export async function initJourneyPlanner(map, data) {
         journeyForm.appendChild(formButtonsDiv)
 
         asideMain.appendChild(journeyForm)
+        if (selectedStation) {
+            startingPointInput.focus()
+        }
 }
