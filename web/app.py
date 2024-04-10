@@ -193,7 +193,6 @@ def route_planning():
         if pred_time > datetime.now() + timedelta(days=5):
             return jsonify({'message': 'Invalid time. Time cannot be more than 5 days from now.'}), 400
 
-        # TODO: If date is today get historic data
         # Check if it's today's date, will have to get historic data if so
         if pred_time.date() == pd.Timestamp.now().date():
             date_today = True
