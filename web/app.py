@@ -279,9 +279,11 @@ def route_planning():
                     lambda x: int(x) if not pd.isna(x) else np.nan)
                 combined_df['predicted_available'] = combined_df['predicted_available'].apply(
                     lambda x: int(x) if not pd.isna(x) else np.nan)
+
+                combined_df.replace(np.nan, None, inplace=True)
             else:
                 combined_df = new_weather_predictive_df
-                combined_df['available_bikes'] = np.nan
+                combined_df['available_bikes'] = None
 
             # If it's one of the available_ids we only want bike availability data, otherwise we want station availbility data
             if station_id in req['available_ids']:
@@ -296,8 +298,13 @@ def route_planning():
                     stations_predicted)
                 data['available_station_data'][station_str] = []
                 for hour, pred_avail, hist_avail in zip(combined_df['hour'], combined_df['predicted_available'], combined_df['available_bikes']):
+                    stations_pred = stands - \
+                        bikes_predicted if not pd.isna(
+                            bikes_predicted) else None
+                    stations_historical = stands - \
+                        hist_avail if not pd.isna(hist_avail) else None
                     data['available_station_data'][station_str].append(
-                        [str(hour) + ":00", stands - pred_avail, stands - hist_avail])
+                        [str(hour) + ":00", stations_pred, stations_historical])
 
         # For each station, send a dataframe to the ml model
         # Convert the predicted stations back into a repsonse format
