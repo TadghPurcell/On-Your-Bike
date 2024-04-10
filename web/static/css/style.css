@@ -225,6 +225,7 @@ aside::-webkit-scrollbar-thumb {
   align-items: center;
   justify-content: space-evenly;
   margin: 0 20px 10px 20px;
+  cursor: pointer;
 }
 
 .closest_station:hover, .station_info_div:hover {
@@ -280,8 +281,8 @@ aside::-webkit-scrollbar-thumb {
 /* Station information */
 .station_info_div {
   display: grid;
-  grid-template-areas: "a a a c"
-  "b b b b";
+  grid-template-areas: "a a c c"
+                       "b b b b";
   background-color: rgb(238, 238, 238);
   gap: 0.5rem; 
   align-items: center;
@@ -289,6 +290,7 @@ aside::-webkit-scrollbar-thumb {
   padding: 10px;
   margin: 0 20px 20px 20px;
 }
+
 .closest_station_head {
   grid-area: a;
   justify-self: start;
@@ -369,7 +371,7 @@ form {
 
 .directions-button {
   grid-area: c;
-  width: 66%;
+  min-width: 66%;
   height: 50%;
   border-radius: 10%;
 }

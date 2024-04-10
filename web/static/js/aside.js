@@ -27,7 +27,6 @@ export async function initAside(map, data) {
     ClosestStations(map, data)
   })
   btnStationInfo.addEventListener('click', () => {
-    console.log('test')
   })
   
   aside.appendChild(stationDataPiece);

@@ -171,8 +171,8 @@ export async function initJourneyPlanner(map, data) {
             // MAKE SURE IT DOESN'T SUBMIT WITH EMPTY VALUES
             const startClosestStations = await getClosestStations(data, start, 3)
             const destinationClosestStations = await getClosestStations(data, destination, 3)
-            res['start_closest_stations'] = startClosestStations.map(station => station.sId)
-            res['destination_closest_stations'] = destinationClosestStations.map(station => station.sId)
+            res['available_ids'] = startClosestStations.map(station => station.sId)
+            res['station_ids'] = destinationClosestStations.map(station => station.sId)
 
             try {
                 const response = await fetch(journeyForm.action, {
@@ -186,6 +186,7 @@ export async function initJourneyPlanner(map, data) {
                 }
 
                 const data = await response.json()
+                console.log(data)
             } catch (err) {
                 console.error(`Error Journey Planner: ${err}`)
             }

@@ -1,7 +1,13 @@
+import { stationInformationSidebar } from "./stationInformationSidebar.js"
+
 export async function ClosestStations(map, data) {
     // Import google library
   const { DistanceMatrixService } = await google.maps.importLibrary("routes")
   const distanceService = new DistanceMatrixService()
+
+  const btnJourneyPlanner = document.querySelector('.btn-journey-planner')
+  const btnNearestStations = document.querySelector('.btn-stations')
+  const btnStationInfo = document.querySelector('.btn-station-info')
     
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (position) => {
@@ -10,8 +16,10 @@ export async function ClosestStations(map, data) {
             lng: position.coords.longitude,
           };
           
-          const stationDistances = await Promise.all(data.map(({name: sName, latitude: lat, longitude: lng, 
-            available_bikes: availableBikes, available_bike_stands: availableBikeStands}) => {
+          console.log(data[0])
+          const stationDistances = await Promise.all(data.map(({name: sName, station_id: sId, latitude: lat, longitude: lng, 
+            available_bikes: availableBikes, available_bike_stands: availableBikeStands, 
+            total_bike_stands: totalBikesStands, payment_terminal: paymentTerminal, time_updated: latestTimeUpdate}) => {
               return new Promise((resolve, reject) => {
                 distanceService.getDistanceMatrix({
                   origins: [pos],
@@ -21,9 +29,13 @@ export async function ClosestStations(map, data) {
                 if (status == 'OK') {
                   resolve({
                     sName,
+                    sId,
+                    totalBikesStands,
                     availableBikes,
                     pos: {lat, lng},
                     availableBikeStands,
+                    paymentTerminal,
+                    latestTimeUpdate,
                     distanceVal: response.rows[0].elements[0].distance.value,
                     distanceText: response.rows[0].elements[0].distance.text,
                     walkTime: response.rows[0].elements[0].duration.text
@@ -71,8 +83,40 @@ export async function ClosestStations(map, data) {
             stationDiv.appendChild(stationWalkTime)
 
             stationDiv.addEventListener('click', () => {
+              let modifiedName = station.sName
+              .split(" ")
+              .map((e) => {
+                let newName = e.toLowerCase();
+                if (newName == "(o'connell's)") {
+                  return "(O'Connell's)";
+                }
+                if (newName == "o'connell") {
+                  return "O'Connell";
+                }
+                if (newName[0] == "(") {
+                  return newName[0] + newName[1].toUpperCase() + newName.slice(2);
+                }
+                return newName[0].toUpperCase() + newName.slice(1);
+              })
+              .join(" ");
+
               map.setCenter(station.pos)
               map.setZoom(15)
+              btnJourneyPlanner.classList.remove('btn-aside-active')
+              btnNearestStations.classList.remove('btn-aside-active')
+              btnStationInfo.classList.add('btn-aside-active')
+              console.log(station)
+              stationInformationSidebar(
+                station.sId,
+                station.pos.lat,
+                station.pos.lng,
+                modifiedName,
+                station.totalBikesStands,
+                station.availableBikes,
+                station.availableBikeStands,
+                station.paymentTerminal,
+                station.latestTimeUpdate
+              );
             })
             asideMain.appendChild(stationDiv)
           })

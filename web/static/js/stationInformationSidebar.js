@@ -1,6 +1,6 @@
 import { getStationInfo } from "./getStationInfo.js";
 
-// Make the station information sidebar
+ // Make the station information sidebar
 export async function stationInformationSidebar(
   id,
   lat,
