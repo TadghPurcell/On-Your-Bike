@@ -239,35 +239,39 @@ def route_planning():
             func.max(Availability.time_updated)).scalar_subquery()
 
         station_data_now = session.query(Availability.station_id, Availability.bike_stands).filter(
-            Availability.time_updated == latest_dynamic_data, Availability.station_id.in_(req['station_ids'])).all()
+            Availability.time_updated == latest_dynamic_data, Availability.station_id.in_(req['station_ids'] + req['available_ids'])).all()
 
         total_bike_stands = {}
         for station_id, bike_stands in station_data_now:
             total_bike_stands[station_id] = bike_stands
 
         data = {"available_bikes": {},
-                "available_stations": {}, "availability_data": {}}
+                "available_stations": {}, "availability_data": {}, "available_station_data": {}}
 
-        for station_id in req['station_ids']:
+        for station_id in req['available_ids'] + req['station_ids']:
             station_str = str(station_id)
             stands = total_bike_stands[station_id]
+
             new_weather_predictive_df = make_prediction_for_times(
                 station_id, weather_predictive_df.copy(), total_bike_stands[station_id])
 
             bikes_predicted = new_weather_predictive_df.loc[new_weather_predictive_df['hour']
                                                             == pred_time.hour, 'predicted_available'].values[0]
-            stations_predicted = stands - bikes_predicted
-            data['available_bikes'][station_str] = bikes_predicted
-            data['available_stations'][station_str] = stations_predicted
 
-            data['availability_data'][station_str] = []
-            data['availability_data'][station_str] = []
-
-            for hour, avail_bikes in zip(new_weather_predictive_df['hour'], new_weather_predictive_df['predicted_available']):
-                data['availability_data'][station_str].append(
-                    [str(hour) + ":00", avail_bikes, None])
-                data['availability_data'][station_str].append(
-                    [str(hour) + ":00", stands - avail_bikes, None])
+            if station_id in req['available_ids']:
+                data['available_bikes'][station_str] = int(bikes_predicted)
+                data['availability_data'][station_str] = []
+                for hour, avail_bikes in zip(new_weather_predictive_df['hour'], new_weather_predictive_df['predicted_available']):
+                    data['availability_data'][station_str].append(
+                        [str(hour) + ":00", avail_bikes, None])
+            else:
+                stations_predicted = stands - bikes_predicted
+                data['available_stations'][station_str] = int(
+                    stations_predicted)
+                data['available_station_data'][station_str] = []
+                for hour, avail_bikes in zip(new_weather_predictive_df['hour'], new_weather_predictive_df['predicted_available']):
+                    data['available_station_data'][station_str].append(
+                        [str(hour) + ":00", stands - avail_bikes, None])
 
         # For each station, send a dataframe to the ml model
         # Convert the predicted stations back into a repsonse format
