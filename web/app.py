@@ -38,6 +38,8 @@ session = Session()
 print("connected")
 
 # Gives all of the data needed for the home page
+
+
 @app.route("/home/")
 def get_all_stations():
     try:
@@ -69,7 +71,6 @@ def get_all_stations():
             "wind speed": weather.wind_speed
 
         }
-        print(data, file=sys.stdout)
         row = session.query(Station).all()
 
         for row in bike_stations:
@@ -134,8 +135,8 @@ def get_station(station_id):
             [row.__dict__ for row in station_information])
 
         station_data_df = station_data_df.groupby(station_data_df['time_updated'].dt.floor('H')).agg({
-            'available_bikes': 'mean',  # Example: Calculate mean temperature for each hour
-            'bike_stands': 'mean'      # Example: Calculate mean humidity for each hour
+            'available_bikes': 'mean',
+            'bike_stands': 'mean'
         }).reset_index()
         station_data_df['hour'] = station_data_df['time_updated'].dt.hour
         station_data_df = station_data_df[[
@@ -188,8 +189,32 @@ def route_planning():
         # convert the time to np.datetime
         pred_time = datetime.strptime(req['time'], "%Y-%m-%d %H:%M")
 
+        # Can only predict weather 5 days in advance, if predicted time is further out return 400
         if pred_time > datetime.now() + timedelta(days=5):
             return jsonify({'message': 'Invalid time. Time cannot be more than 5 days from now.'}), 400
+
+        # TODO: If date is today get historic data
+        # Check if it's today's date, will have to get historic data if so
+        if pred_time.normalize() == pd.Timestamp.now().normalize():
+            date_today = True
+        else:
+            date_today = False
+
+        print(date_today, file=sys.stdout)
+        # if date_today:
+        #     midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        #     station_information = session.query(Availability).filter(
+        #         Availability.time_updated > midnight, Availability.station_id == station_id).all()
+        #     station_data_df = pd.DataFrame(
+        #         [row.__dict__ for row in station_information])
+
+        #     station_data_df = station_data_df.groupby(station_data_df['time_updated'].dt.floor('H')).agg({
+        #         'available_bikes': 'mean',
+        #         'bike_stands': 'mean'
+        #     }).reset_index()
+        #     station_data_df['hour'] = station_data_df['time_updated'].dt.hour
+        #     station_data_df = station_data_df[['station_id',
+        #         'hour', 'available_bikes', 'bike_stands']]
 
         # Get the predicted weather for that day
         weather_predictive = session.query(WeatherPredictive).all()
@@ -213,11 +238,11 @@ def route_planning():
         latest_dynamic_data = session.query(
             func.max(Availability.time_updated)).scalar_subquery()
 
-        station_data = session.query(Availability.station_id, Availability.bike_stands).filter(
+        station_data_now = session.query(Availability.station_id, Availability.bike_stands).filter(
             Availability.time_updated == latest_dynamic_data, Availability.station_id.in_(req['station_ids'])).all()
 
         total_bike_stands = {}
-        for station_id, bike_stands in station_data:
+        for station_id, bike_stands in station_data_now:
             total_bike_stands[station_id] = bike_stands
 
         data = {"available_bikes": {},
@@ -237,13 +262,12 @@ def route_planning():
 
             data['availability_data'][station_str] = []
             data['availability_data'][station_str] = []
+
             for hour, avail_bikes in zip(new_weather_predictive_df['hour'], new_weather_predictive_df['predicted_available']):
                 data['availability_data'][station_str].append(
                     [str(hour) + ":00", avail_bikes, None])
                 data['availability_data'][station_str].append(
                     [str(hour) + ":00", stands - avail_bikes, None])
-
-            print(data, file=sys.stdout)
 
         # For each station, send a dataframe to the ml model
         # Convert the predicted stations back into a repsonse format
