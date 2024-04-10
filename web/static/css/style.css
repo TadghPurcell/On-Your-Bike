@@ -13,12 +13,6 @@
   font-variation-settings: "wdth" 100;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
 html,
 body {
   height: 100%;
@@ -211,10 +205,6 @@ aside::-webkit-scrollbar-thumb {
   gap: 1rem;
 } */
 
-.closest_station_head {
-  text-align: center;
-  margin-bottom: 0;
-}
 
 @keyframes stationZoom {
   0% {
@@ -234,12 +224,10 @@ aside::-webkit-scrollbar-thumb {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr 1fr;
   margin: 0 20px 10px 20px;
 }
 
-.closest_station:hover {
+.closest_station:hover, .station_info_div:hover {
   animation: stationZoom 0.15s ease-in-out;
   border: 1px solid var(--light-green);
   transform: scale(1.05);
@@ -260,6 +248,7 @@ aside::-webkit-scrollbar-thumb {
 }
 
 *::before {
+  box-sizing: border-box;
   display: inline-block;
   background-position: center;
   width: 24px;
@@ -271,7 +260,7 @@ aside::-webkit-scrollbar-thumb {
 .closest_station_bikes::before {
   content: url('/img/bike.svg');
 }
-.closest-station-parking::before {
+.closest-station-parking::before, .station_information_parking::before {
   content: url('/img/available_spaces.svg');
 }
 
@@ -289,22 +278,42 @@ aside::-webkit-scrollbar-thumb {
 }
 
 /* Station information */
+.station_info_div {
+  display: grid;
+  grid-template-areas: "a a a c"
+  "b b b b";
+  background-color: rgb(238, 238, 238);
+  gap: 0.5rem; 
+  align-items: center;
+  justify-items: center;
+  padding: 10px;
+  margin: 0 20px 20px 20px;
+}
+.closest_station_head {
+  grid-area: a;
+  justify-self: start;
+  text-align: center;
+  padding: 0 10px;
+}
+
 .station_information {
+  grid-area: b;
+  width: 100%;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: no-wrap;
   justify-content: space-evenly;
-  align-items: flex-end;
+  align-items: center;
+}
+
+.station_information > p {
+  white-space: nowrap;
+  text-align: center;
 }
 
 .station_information_data {
   margin: 0;
   padding-top: 5px;
-}
-
-.directions-button {
-  content: url("/img/bike.svg");
-  margin: 10px;
 }
 
 .station_information_sidebar {
@@ -313,19 +322,17 @@ aside::-webkit-scrollbar-thumb {
 
 .station_information_bikes::before {
   content: url("/img/bike.svg");
-  width: 5px;
-  height: 5px;
 }
 
 .station_information_distance::before {
   content: url("/img/distance.svg");
-  width: 5px;
-  height: 5px;
 }
 .station_information_walk_time::before {
   content: url("/img/walking.svg");
-  width: 5px;
-  height: 5px;
+}
+
+.station_information_payment::before {
+  content: url("/img/payment_terminal.svg");
 }
 
 /* Journey Planner Sidebar */
@@ -339,8 +346,6 @@ form {
   grid-template-areas: "a a b"
                        "a a b"
                        "c c c";
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
   padding: 20px;
   gap: 1rem;
   align-items: center;
@@ -357,11 +362,21 @@ form {
   background-color: var(--light-green);
   color: white;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  padding: 6px 48px;
   transition: all 0.2s ease-out;
   box-shadow: var(--box-shadow);
+}
+
+.directions-button {
+  grid-area: c;
+  width: 66%;
+  height: 50%;
+  border-radius: 10%;
+}
+
+.form-btn {
+  padding: 6px 48px;
+  border-radius: 4px;
 }
 
 .form-btn:hover, .directions-button:hover {
