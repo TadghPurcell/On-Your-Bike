@@ -187,7 +187,7 @@ def route_planning():
     if request.method == 'POST':
         req = request.json
         # convert the time to np.datetime
-        pred_time = datetime.strptime(req['time'], "%Y-%m-%d %H:%M")
+        pred_time = datetime.strptime(req['time'], "%Y-%m-%d %H:%M:%S")
 
         # Can only predict weather 5 days in advance, if predicted time is further out return 400
         if pred_time > datetime.now() + timedelta(days=5):
