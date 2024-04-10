@@ -201,20 +201,24 @@ def route_planning():
             date_today = False
 
         print(date_today, file=sys.stdout)
-        # if date_today:
-        #     midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        #     station_information = session.query(Availability).filter(
-        #         Availability.time_updated > midnight, Availability.station_id == station_id).all()
-        #     station_data_df = pd.DataFrame(
-        #         [row.__dict__ for row in station_information])
+        # Get historic availability data if planning to travel today
+        if date_today:
+            midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            station_information = session.query(Availability.station_id, Availability.time_updated, Availability.available_bikes, Availability.available_bike_stands).filter(
+                Availability.time_updated > midnight, Availability.station_id.in_(req['station_ids'] + req['available_ids'])).all()
+            station_data_df = pd.DataFrame(station_information, columns=[
+                                           'station_id', 'time_updated', 'available_bikes', 'bike_stands'])
 
-        #     station_data_df = station_data_df.groupby(station_data_df['time_updated'].dt.floor('H')).agg({
-        #         'available_bikes': 'mean',
-        #         'bike_stands': 'mean'
-        #     }).reset_index()
-        #     station_data_df['hour'] = station_data_df['time_updated'].dt.hour
-        #     station_data_df = station_data_df[['station_id',
-        #         'hour', 'available_bikes', 'bike_stands']]
+            print(station_data_df, file=sys.stdout)
+            station_data_df = station_data_df.groupby([station_data_df['time_updated'].dt.floor('H'), station_data_df['station_id']]).agg({
+                'available_bikes': 'mean',
+                'bike_stands': 'mean'
+            }).reset_index()
+            print(station_data_df, file=sys.stdout)
+
+            station_data_df['hour'] = station_data_df['time_updated'].dt.hour
+            station_data_df = station_data_df[['station_id',
+                                               'hour', 'available_bikes', 'bike_stands']]
 
         # Get the predicted weather for that day
         weather_predictive = session.query(WeatherPredictive).all()
