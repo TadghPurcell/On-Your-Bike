@@ -195,7 +195,7 @@ def route_planning():
 
         # TODO: If date is today get historic data
         # Check if it's today's date, will have to get historic data if so
-        if pred_time.normalize() == pd.Timestamp.now().normalize():
+        if pred_time.date() == pd.Timestamp.now().date():
             date_today = True
         else:
             date_today = False
