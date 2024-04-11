@@ -183,85 +183,85 @@ def get_station(station_id):
 
 @app.route('/routeplanning', methods=['POST'])
 def route_planning():
-    if request.method == 'POST':
-        req = request.json
-        # convert the time to np.datetime
-        pred_time = datetime.strptime(req['time'], "%Y-%m-%d %H:%M:%S")
+    try:
+        if request.method == 'POST':
+            req = request.json
+            # convert the time to np.datetime
+            pred_time = datetime.strptime(req['time'], "%Y-%m-%d %H:%M:%S")
 
-        if pred_time > datetime.now() + timedelta(days=5):
-            return jsonify({'message': 'Invalid time. Time cannot be more than 5 days from now.'}), 400
+            if pred_time > datetime.now() + timedelta(days=5):
+                return jsonify({'message': 'Invalid time. Time cannot be more than 5 days from now.'}), 400
 
-        # Get the predicted weather for that day
-        weather_predictive = session.query(WeatherPredictive).all()
-        weather_predictive_df = pd.DataFrame(
-            [row.__dict__ for row in weather_predictive])
-        weather_predictive_df = weather_predictive_df[
-            weather_predictive_df['time_updated'].dt.date == pred_time.date()]
+            # Get the predicted weather for that day
+            weather_predictive = session.query(WeatherPredictive).all()
+            weather_predictive_df = pd.DataFrame(
+                [row.__dict__ for row in weather_predictive])
+            weather_predictive_df = weather_predictive_df[
+                weather_predictive_df['time_updated'].dt.date == pred_time.date()]
 
-        weather_predictive_df['type'] = weather_predictive_df['weather_type']
-        weather_predictive_df = weather_predictive_df[[
-            'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
+            weather_predictive_df['type'] = weather_predictive_df['weather_type']
+            weather_predictive_df = weather_predictive_df[[
+                'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
 
-        current_hour = 0
-        hours_today = [pred_time.replace(
-            hour=h, minute=30, second=0, microsecond=0) for h in range(current_hour, 24)]
-        hourly_df = pd.DataFrame(hours_today, columns=['time_updated'])
+            current_hour = 0
+            hours_today = [pred_time.replace(
+                hour=h, minute=30, second=0, microsecond=0) for h in range(current_hour, 24)]
+            hourly_df = pd.DataFrame(hours_today, columns=['time_updated'])
 
-        weather_predictive_df = pd.merge_asof(
-            hourly_df, weather_predictive_df, on='time_updated', direction='nearest')
+            weather_predictive_df = pd.merge_asof(
+                hourly_df, weather_predictive_df, on='time_updated', direction='nearest')
 
-        latest_dynamic_data = session.query(
-            func.max(Availability.time_updated)).scalar_subquery()
+            latest_dynamic_data = session.query(
+                func.max(Availability.time_updated)).scalar_subquery()
 
-        station_data = session.query(Availability.station_id, Availability.bike_stands).filter(
-            Availability.time_updated == latest_dynamic_data, Availability.station_id.in_(req['station_ids'])).all()
+            station_data = session.query(Availability.station_id, Availability.bike_stands).filter(
+                Availability.time_updated == latest_dynamic_data, Availability.station_id.in_(req['station_ids'])).all()
 
-        total_bike_stands = {}
-        for station_id, bike_stands in station_data:
-            total_bike_stands[station_id] = bike_stands
+            total_bike_stands = {}
+            for station_id, bike_stands in station_data:
+                total_bike_stands[station_id] = bike_stands
 
-        data = {"available_bikes": {},
-                "available_stations": {}, "availability_data": {}}
+            data = {"available_bikes": {},
+                    "available_stations": {}, "availability_data": {}}
 
-        for station_id in req['station_ids']:
-            station_str = str(station_id)
-            stands = total_bike_stands[station_id]
-            new_weather_predictive_df = make_prediction_for_times(
-                station_id, weather_predictive_df.copy(), total_bike_stands[station_id])
+            for station_id in req['station_ids']:
+                station_str = str(station_id)
+                stands = total_bike_stands[station_id]
+                new_weather_predictive_df = make_prediction_for_times(
+                    station_id, weather_predictive_df.copy(), total_bike_stands[station_id])
 
-            bikes_predicted = new_weather_predictive_df.loc[new_weather_predictive_df['hour']
-                                                            == pred_time.hour, 'predicted_available'].values[0]
-            stations_predicted = stands - bikes_predicted
-            data['available_bikes'][station_str] = bikes_predicted
-            data['available_stations'][station_str] = stations_predicted
+                bikes_predicted = new_weather_predictive_df.loc[new_weather_predictive_df['hour']
+                                                                == pred_time.hour, 'predicted_available'].values[0]
+                stations_predicted = stands - bikes_predicted
+                data['available_bikes'][station_str] = bikes_predicted
+                data['available_stations'][station_str] = stations_predicted
 
-            data['availability_data'][station_str] = []
-            data['availability_data'][station_str] = []
-            for hour, avail_bikes in zip(new_weather_predictive_df['hour'], new_weather_predictive_df['predicted_available']):
-                data['availability_data'][station_str].append(
-                    [str(hour) + ":00", avail_bikes, None])
-                data['availability_data'][station_str].append(
-                    [str(hour) + ":00", stands - avail_bikes, None])
+                data['availability_data'][station_str] = []
+                data['availability_data'][station_str] = []
+                for hour, avail_bikes in zip(new_weather_predictive_df['hour'], new_weather_predictive_df['predicted_available']):
+                    data['availability_data'][station_str].append(
+                        [str(hour) + ":00", avail_bikes, None])
+                    data['availability_data'][station_str].append(
+                        [str(hour) + ":00", stands - avail_bikes, None])
 
-            print(data, file=sys.stdout)
+                print(data, file=sys.stdout)
 
-        # For each station, send a dataframe to the ml model
-        # Convert the predicted stations back into a repsonse format
+            # For each station, send a dataframe to the ml model
+            # Convert the predicted stations back into a repsonse format
 
-    return jsonify(data)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": f"error: failed to get station - {str(e)}"}), 500
 
 
 @app.route('/')
 def root():
-    try:
         data = []
         rows = session.query(Station).all()
         for row in rows:
             data.append(row.station_id)
         # Changed to render_template as we will be importing data and I was getting errors.
         return render_template('index.html', data=data, mapsAPIKey=db_info['mapsAPIKey'])
-    except Exception as e:
-        return jsonify({"error": f"error: failed to get station - {str(e)}"}), 500
 
 
 if __name__ == "__main__":
