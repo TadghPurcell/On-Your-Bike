@@ -1,6 +1,7 @@
 import { initAside } from "./aside.js";
 import { getStationInfo } from "./getStationInfo.js";
 import { stationInformationSidebar } from "./stationInformationSidebar.js";
+import { getDirectionsRenderer, getDirectionsService } from "./getDirections.js";
 async function initMap() {
   let mapStyleId;
 
@@ -28,6 +29,9 @@ async function initMap() {
     "marker"
   );
   const { DistanceMatrixService } = await google.maps.importLibrary("routes");
+
+  const directionsService = await getDirectionsService();
+  const directionsRenderer = await getDirectionsRenderer();
 
   // The map, centered at Dublin
   let map = new Map(document.getElementById("map"), {
@@ -158,6 +162,8 @@ async function initMap() {
           availableBikeStands,
           paymentTerminal,
           latestTimeUpdate,
+          directionsRenderer,
+          directionsService,
           data,
           map
         );
@@ -167,7 +173,8 @@ async function initMap() {
     }
   );
 
-initAside(map, data)
+initAside(map, data, directionsRenderer, directionsService)
+
 const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
 }
 

@@ -1,12 +1,8 @@
 import { getClosestStations } from "./getClosestStations.js";
 
-export async function initJourneyPlanner(map, data, selectedStation) {
+export async function initJourneyPlanner(map, data, directionsRenderer, directionsService, selectedStation) {
     const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary("places");
-    const { DirectionsService, DirectionsRenderer } = await google.maps.importLibrary("routes")
 
-    const directionsService = new DirectionsService()
-    const directionsRenderer = new DirectionsRenderer()
-    
         const asideMain = document.querySelector('.aside-main')
         asideMain.innerHTML = ""
 
@@ -144,7 +140,7 @@ export async function initJourneyPlanner(map, data, selectedStation) {
             if (formData.get('destination') == '') {
                 destinationInput.classList.add('error')
             }
-
+            
             res.time = `${formData.get('date')} ${formData.get('time')}`
 
             // Get Timestamp
@@ -160,9 +156,11 @@ export async function initJourneyPlanner(map, data, selectedStation) {
                 travelMode: 'BICYCLING',
                 region: 'ie'
             }
-            
+            console.log(directionsService)
             await directionsService.route(request, (result, status) => {
                 if (status == 'OK') {
+                    directionsRenderer.setDirections(null)
+                    directionsRenderer.setPanel(null);
                     directionsRenderer.setMap(map)
                     directionsRenderer.setDirections(result)
                     directionsRenderer.setPanel(asideMain);

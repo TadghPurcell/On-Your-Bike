@@ -12,6 +12,8 @@ export async function stationInformationSidebar(
   availableBikeStands,
   paymentTerminal,
   latestTimeUpdate,
+  directionsRenderer,
+  directionsService,
   data,
   map
 ) {
@@ -126,7 +128,7 @@ export async function stationInformationSidebar(
 
   directions.addEventListener('click', () => {
     activateSideBar('journey')
-    initJourneyPlanner(map, data, modifiedName)
+    initJourneyPlanner(map, data, directionsRenderer, directionsService, modifiedName)
   })
 
   const availability_title = document.createElement("h2");

@@ -1,7 +1,7 @@
 import { activateSideBar } from "./script.js"
 import { stationInformationSidebar } from "./stationInformationSidebar.js"
 
-export async function ClosestStations(map, data) {
+export async function ClosestStations(map, data, directionsRenderer, directionsService) {
     // Import google library
   const { DistanceMatrixService } = await google.maps.importLibrary("routes")
   const distanceService = new DistanceMatrixService()
@@ -108,7 +108,11 @@ export async function ClosestStations(map, data) {
                 station.availableBikes,
                 station.availableBikeStands,
                 station.paymentTerminal,
-                station.latestTimeUpdate
+                station.latestTimeUpdate,
+                directionsRenderer,
+                directionsService,
+                data,
+                map
               );
             })
             asideMain.appendChild(stationDiv)
