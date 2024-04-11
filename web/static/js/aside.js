@@ -16,7 +16,7 @@ export async function initAside(map, data, directionsRenderer, directionsService
   
   btnJourneyPlanner.addEventListener('click', () => {
     activateSideBar('journey')
-    initJourneyPlanner(map, directionsRenderer, directionsService)
+    initJourneyPlanner(map, data, directionsRenderer, directionsService)
   })
   btnNearestStations.addEventListener('click', () => {
     activateSideBar('nearest')

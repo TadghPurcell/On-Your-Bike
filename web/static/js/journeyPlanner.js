@@ -156,14 +156,10 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
                 travelMode: 'BICYCLING',
                 region: 'ie'
             }
-            console.log(directionsService)
             await directionsService.route(request, (result, status) => {
                 if (status == 'OK') {
-                    directionsRenderer.setDirections(null)
-                    directionsRenderer.setPanel(null);
                     directionsRenderer.setMap(map)
                     directionsRenderer.setDirections(result)
-                    directionsRenderer.setPanel(asideMain);
                     start.pos = {lat: result.routes[0].bounds.Zh.lo, lng: result.routes[0].bounds.Jh.hi}
                     destination.pos = {lat: result.routes[0].bounds.Zh.hi, lng: result.routes[0].bounds.Jh.lo}
                 }
@@ -187,7 +183,6 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
                 }
 
                 const data = await response.json()
-                console.log(data)
             } catch (err) {
                 console.error(`Error Journey Planner: ${err}`)
             }
@@ -204,7 +199,6 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
             startingPointInput.classList.remove('error')
             destinationInput.value = ''
             destinationInput.classList.remove('error')
-            directionsRenderer.setPanel(null);
             directionsRenderer.setDirections(null)
             directionsRenderer.setMap(null)
             dateInput.value = `${new Date().toISOString().slice(0, 10)}`
