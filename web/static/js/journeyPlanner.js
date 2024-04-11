@@ -193,11 +193,14 @@ export async function initJourneyPlanner(map, data, selectedStation) {
     });
 
     // MAKE SURE IT DOESN'T SUBMIT WITH EMPTY VALUES
-    const startClosestStations = await getClosestStations(data, start, 3);
+    let closestStartStation;
+    let closestDestStation;
+    while (!closestStartStation) {}
+    const startClosestStations = await getClosestStations(data, start, 5);
     const destinationClosestStations = await getClosestStations(
       data,
       destination,
-      3
+      5
     );
     res["available_ids"] = startClosestStations.map((station) => station.sId);
     res["station_ids"] = destinationClosestStations.map(
@@ -218,8 +221,7 @@ export async function initJourneyPlanner(map, data, selectedStation) {
       const data = await response.json();
 
       //   Get the closest stations to start and end that have bikes.
-      let closestStartStation;
-      let closestDestStation;
+
       for (let station of startClosestStations) {
         if (data["available_bikes"][station.sId]) {
           closestStartStation = station;
@@ -242,8 +244,11 @@ export async function initJourneyPlanner(map, data, selectedStation) {
         }
       }
 
+      console.log(data);
+
       for (let station of destinationClosestStations) {
         if (data["available_stations"][station.sId]) {
+          console.log(station);
           closestDestStation = station;
           closestDestStation.modifiedName = closestDestStation.sName
             .split(" ")
@@ -264,24 +269,37 @@ export async function initJourneyPlanner(map, data, selectedStation) {
         }
       }
 
-      //   Add divs for charts
-      const leg1Title = document.createElement("h2");
+      if (!closestDestStation || closestStartStation) {
+        console.log(closestStartStation);
+        console.log(closestDestStation);
+      }
 
+      //   Clear previous directions
+      resultDiv.innerHTML = "";
+      //   Add divs for charts
+      const leg1Title = document.createElement("h3");
+      leg1Title.classList.add("journey-instruction");
       leg1Title.innerText = `Walk to ${closestStartStation.modifiedName}`;
 
       const availChart = document.createElement("div");
       availChart.id = "availability-chart";
 
-      const leg2Title = document.createElement("h2");
-      leg2Title.innerText = `Cycle to ${closestDestStation.modifiedName}`;
+      const leg2Title = document.createElement("h3");
+      leg2Title.classList.add("journey-instruction");
+      leg2Title.innerText = `Then, cycle to ${closestDestStation.modifiedName}`;
 
       const stationChart = document.createElement("div");
       stationChart.id = "avail-station-chart";
+
+      const leg3Title = document.createElement("h3");
+      leg3Title.classList.add("journey-instruction");
+      leg3Title.innerText = `Finally, walk to ${destination.name}`;
 
       resultDiv.appendChild(leg1Title);
       resultDiv.appendChild(availChart);
       resultDiv.appendChild(leg2Title);
       resultDiv.appendChild(stationChart);
+      resultDiv.appendChild(leg3Title);
 
       google.charts.setOnLoadCallback(drawChart);
 

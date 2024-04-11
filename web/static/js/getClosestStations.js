@@ -1,4 +1,8 @@
-export async function getClosestStations(data, loc, amount) {
+// Gets the closest stations
+// data - station data
+// loc - location to get the closest stations to
+// closest - closest station to get, if set to 0 will start at the closest station, if set to 3 will start at the 3rd closest station
+export async function getClosestStations(data, loc, closest, amount) {
   // Import google library
   const { DistanceMatrixService } = await google.maps.importLibrary("routes");
   const distanceService = new DistanceMatrixService();
@@ -42,5 +46,5 @@ export async function getClosestStations(data, loc, amount) {
   );
   return stationDistances
     .sort((a, b) => a.distanceVal - b.distanceVal)
-    .slice(0, amount);
+    .slice(closest, closest + amount);
 }
