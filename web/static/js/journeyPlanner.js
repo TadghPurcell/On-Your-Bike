@@ -1,6 +1,7 @@
 import { getClosestStations } from "./getClosestStations.js";
 
 export async function initJourneyPlanner(map, data, selectedStation) {
+  console.log(data);
   const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary(
     "places"
   );
@@ -176,10 +177,23 @@ export async function initJourneyPlanner(map, data, selectedStation) {
       travelMode: "BICYCLING",
       region: "ie",
     };
+    await directionsService.route(request, (result, status) => {
+      if (status == "OK") {
+        directionsRenderer.setMap(map);
+        directionsRenderer.setDirections(result);
+        directionsRenderer.setPanel(asideMain);
+        start.pos = {
+          lat: result.routes[0].bounds.Zh.lo,
+          lng: result.routes[0].bounds.Jh.hi,
+        };
+        destination.pos = {
+          lat: result.routes[0].bounds.Zh.hi,
+          lng: result.routes[0].bounds.Jh.lo,
+        };
+      }
+    });
 
     // MAKE SURE IT DOESN'T SUBMIT WITH EMPTY VALUES
-    console.log(data);
-    console.log(start);
     const startClosestStations = await getClosestStations(data, start, 3);
     const destinationClosestStations = await getClosestStations(
       data,
@@ -203,7 +217,6 @@ export async function initJourneyPlanner(map, data, selectedStation) {
       }
 
       const data = await response.json();
-      console.log(data);
 
       //   Get the closest stations to start and end that have bikes.
       let closestStartStation;
@@ -215,24 +228,25 @@ export async function initJourneyPlanner(map, data, selectedStation) {
       }
 
       for (let station of destinationClosestStations) {
-        if (data["available_bikes"][station.sId]) {
+        console.log(data["available_stations"][station.sId]);
+        if (data["available_stations"][station.sId]) {
           closestDestStation = station;
         }
       }
+      console.log(closestDestStation);
 
       //   Add divs for charts
-
       const leg1Title = document.createElement("h2");
-      leg1Title.innerText = `Walk to ${closestStartStation.title}`;
+      leg1Title.innerText = `Walk to`;
 
       const availChart = document.createElement("div");
-      availChart.classList.add("availability-chart");
+      availChart.id = "availability-chart";
 
       const leg2Title = document.createElement("h2");
-      leg2Title.innerText = `Walk to ${closestDestStation.title}`;
+      leg2Title.innerText = `Walk to`;
 
       const stationChart = document.createElement("div");
-      availChart.classList.add("avail-station-chart");
+      stationChart.id = "avail-station-chart";
 
       resultDiv.appendChild(leg1Title);
       resultDiv.appendChild(availChart);
@@ -242,17 +256,23 @@ export async function initJourneyPlanner(map, data, selectedStation) {
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
-        var data = new google.visualization.DataTable();
-        data.addColumn("string", "Hour");
-        data.addColumn("number", "Available Bikes");
-        data.addColumn("number", "Predicted Bikes");
-        data.addRows(availability_data);
+        var availability_table = new google.visualization.DataTable();
+        availability_table.addColumn("string", "Hour");
+        availability_table.addColumn("number", "Available Bikes");
+        availability_table.addColumn("number", "Predicted Bikes");
 
-        var station_data = new google.visualization.DataTable();
-        station_data.addColumn("string", "Hour");
-        station_data.addColumn("number", "Available Stations");
-        station_data.addColumn("number", "Predicted Stations");
-        station_data.addRows(avail_station_data);
+        availability_table.addRows(
+          data["availability_data"][closestStartStation.sId]
+        );
+
+        var station_table = new google.visualization.DataTable();
+        station_table.addColumn("string", "Hour");
+        station_table.addColumn("number", "Available Stations");
+        station_table.addColumn("number", "Predicted Stations");
+        console.log(closestDestStation.sId);
+        station_table.addRows(
+          data["available_station_data"][closestDestStation.sId]
+        );
 
         var options = {
           legend: "none",
@@ -260,8 +280,20 @@ export async function initJourneyPlanner(map, data, selectedStation) {
           opacity: 0.3,
           vAxis: {
             minValue: 0,
-            maxValue: totalBikesStands,
-            viewWindow: { min: 0, max: totalBikesStands },
+            maxValue: closestStartStation.total_bike_stands,
+            viewWindow: { min: 0, max: closestStartStation.total_bike_stands },
+          },
+          curveType: "function",
+        };
+
+        var station_options = {
+          legend: "none",
+          colors: ["#4286f4", "#03a981"],
+          opacity: 0.3,
+          vAxis: {
+            minValue: 0,
+            maxValue: closestDestStation.total_bike_stands,
+            viewWindow: { min: 0, max: closestDestStation.total_bike_stands },
           },
           curveType: "function",
         };
@@ -272,25 +304,9 @@ export async function initJourneyPlanner(map, data, selectedStation) {
           document.getElementById("avail-station-chart")
         );
 
-        chart.draw(data, options);
-        station_chart.draw(station_data, options);
+        chart.draw(availability_table, options);
+        station_chart.draw(station_table, options);
       }
-
-      await directionsService.route(request, (result, status) => {
-        if (status == "OK") {
-          directionsRenderer.setMap(map);
-          directionsRenderer.setDirections(result);
-          directionsRenderer.setPanel(asideMain);
-          start.pos = {
-            lat: result.routes[0].bounds.Zh.lo,
-            lng: result.routes[0].bounds.Jh.hi,
-          };
-          destination.pos = {
-            lat: result.routes[0].bounds.Zh.hi,
-            lng: result.routes[0].bounds.Jh.lo,
-          };
-        }
-      });
     } catch (err) {
       console.error(`Error Journey Planner: ${err}`);
     }

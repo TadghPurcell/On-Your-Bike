@@ -15,6 +15,7 @@ export async function stationInformationSidebar(
   data,
   map
 ) {
+  console.log(data);
   const stationInfo = getStationInfo(
     modifiedName,
     totalBikesStands,

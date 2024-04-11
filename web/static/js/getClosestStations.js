@@ -2,7 +2,6 @@ export async function getClosestStations(data, loc, amount) {
   // Import google library
   const { DistanceMatrixService } = await google.maps.importLibrary("routes");
   const distanceService = new DistanceMatrixService();
-  console.log(loc);
   const stationDistances = await Promise.all(
     data.map(
       ({
