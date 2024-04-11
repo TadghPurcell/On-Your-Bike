@@ -298,7 +298,6 @@ def route_planning():
                     stations_predicted)
                 data['available_station_data'][station_str] = []
                 for hour, pred_avail, hist_avail in zip(combined_df['hour'], combined_df['predicted_available'], combined_df['available_bikes']):
-                    print(pred_avail, file=sys.stdout)
                     stations_pred = stands - \
                         pred_avail if not pd.isna(
                             pred_avail) else None

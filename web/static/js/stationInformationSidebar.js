@@ -15,7 +15,6 @@ export async function stationInformationSidebar(
   data,
   map
 ) {
-  console.log(data);
   const stationInfo = getStationInfo(
     modifiedName,
     totalBikesStands,
@@ -180,8 +179,6 @@ export async function stationInformationSidebar(
     }
     avail_station_data.push(new_row);
   }
-
-  console.log(avail_station_data);
 
   google.charts.setOnLoadCallback(drawChart);
 

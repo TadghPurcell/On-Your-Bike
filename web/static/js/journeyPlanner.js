@@ -1,7 +1,6 @@
 import { getClosestStations } from "./getClosestStations.js";
 
 export async function initJourneyPlanner(map, data, selectedStation) {
-  console.log(data);
   const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary(
     "places"
   );
@@ -224,26 +223,57 @@ export async function initJourneyPlanner(map, data, selectedStation) {
       for (let station of startClosestStations) {
         if (data["available_bikes"][station.sId]) {
           closestStartStation = station;
+          closestStartStation.modifiedName = closestStartStation.sName
+            .split(" ")
+            .map((e) => {
+              let newName = e.toLowerCase();
+              if (newName == "(o'connell's)") {
+                return "(O'Connell's)";
+              }
+              if (newName == "o'connell") {
+                return "O'Connell";
+              }
+              if (newName[0] == "(") {
+                return newName[0] + newName[1].toUpperCase() + newName.slice(2);
+              }
+              return newName[0].toUpperCase() + newName.slice(1);
+            })
+            .join(" ");
         }
       }
 
       for (let station of destinationClosestStations) {
-        console.log(data["available_stations"][station.sId]);
         if (data["available_stations"][station.sId]) {
           closestDestStation = station;
+          closestDestStation.modifiedName = closestDestStation.sName
+            .split(" ")
+            .map((e) => {
+              let newName = e.toLowerCase();
+              if (newName == "(o'connell's)") {
+                return "(O'Connell's)";
+              }
+              if (newName == "o'connell") {
+                return "O'Connell";
+              }
+              if (newName[0] == "(") {
+                return newName[0] + newName[1].toUpperCase() + newName.slice(2);
+              }
+              return newName[0].toUpperCase() + newName.slice(1);
+            })
+            .join(" ");
         }
       }
-      console.log(closestDestStation);
 
       //   Add divs for charts
       const leg1Title = document.createElement("h2");
-      leg1Title.innerText = `Walk to`;
+
+      leg1Title.innerText = `Walk to ${closestStartStation.modifiedName}`;
 
       const availChart = document.createElement("div");
       availChart.id = "availability-chart";
 
       const leg2Title = document.createElement("h2");
-      leg2Title.innerText = `Walk to`;
+      leg2Title.innerText = `Cycle to ${closestDestStation.modifiedName}`;
 
       const stationChart = document.createElement("div");
       stationChart.id = "avail-station-chart";
@@ -269,7 +299,6 @@ export async function initJourneyPlanner(map, data, selectedStation) {
         station_table.addColumn("string", "Hour");
         station_table.addColumn("number", "Available Stations");
         station_table.addColumn("number", "Predicted Stations");
-        console.log(closestDestStation.sId);
         station_table.addRows(
           data["available_station_data"][closestDestStation.sId]
         );
