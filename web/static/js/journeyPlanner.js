@@ -195,12 +195,11 @@ export async function initJourneyPlanner(map, data, selectedStation) {
     // MAKE SURE IT DOESN'T SUBMIT WITH EMPTY VALUES
     let closestStartStation;
     let closestDestStation;
-    while (!closestStartStation) {}
-    const startClosestStations = await getClosestStations(data, start, 5);
+    const startClosestStations = await getClosestStations(data, start, 30);
     const destinationClosestStations = await getClosestStations(
       data,
       destination,
-      5
+      30
     );
     res["available_ids"] = startClosestStations.map((station) => station.sId);
     res["station_ids"] = destinationClosestStations.map(
@@ -281,12 +280,20 @@ export async function initJourneyPlanner(map, data, selectedStation) {
       leg1Title.classList.add("journey-instruction");
       leg1Title.innerText = `Walk to ${closestStartStation.modifiedName}`;
 
+      const leg1GraphTitle = document.createElement("h4");
+      leg1GraphTitle.classList.add("journey-instruction");
+      leg1GraphTitle.innerText = "Available Bikes:";
+
       const availChart = document.createElement("div");
       availChart.id = "availability-chart";
 
       const leg2Title = document.createElement("h3");
       leg2Title.classList.add("journey-instruction");
       leg2Title.innerText = `Then, cycle to ${closestDestStation.modifiedName}`;
+
+      const leg2GraphTitle = document.createElement("h4");
+      leg2GraphTitle.classList.add("journey-instruction");
+      leg2GraphTitle.innerText = "Available Stations";
 
       const stationChart = document.createElement("div");
       stationChart.id = "avail-station-chart";
@@ -296,8 +303,10 @@ export async function initJourneyPlanner(map, data, selectedStation) {
       leg3Title.innerText = `Finally, walk to ${destination.name}`;
 
       resultDiv.appendChild(leg1Title);
+      resultDiv.appendChild(leg1GraphTitle);
       resultDiv.appendChild(availChart);
       resultDiv.appendChild(leg2Title);
+      resultDiv.appendChild(leg2GraphTitle);
       resultDiv.appendChild(stationChart);
       resultDiv.appendChild(leg3Title);
 

@@ -441,4 +441,10 @@ input:focus {
 
 .journey-instruction {
   padding: 10px;
+  margin: 0px;
+}
+
+h4.journey-instruction {
+  margin: 0px;
+  padding-bottom: 0;
 }
