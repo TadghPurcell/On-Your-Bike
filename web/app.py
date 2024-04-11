@@ -256,12 +256,15 @@ def route_planning():
 
 @app.route('/')
 def root():
+    try:
         data = []
         rows = session.query(Station).all()
         for row in rows:
             data.append(row.station_id)
         # Changed to render_template as we will be importing data and I was getting errors.
         return render_template('index.html', data=data, mapsAPIKey=db_info['mapsAPIKey'])
+    except Exception as e:
+        return jsonify({"error": f"error: failed to get station - {str(e)}"}), 500
 
 
 if __name__ == "__main__":
