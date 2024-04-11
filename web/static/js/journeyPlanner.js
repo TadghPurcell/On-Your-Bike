@@ -58,6 +58,9 @@ export async function initJourneyPlanner(map, data, selectedStation) {
 
   journeyForm.appendChild(addressDiv);
 
+  const resultDiv = document.createElement("div");
+  resultDiv.classList.add("directions");
+
   // create search boxes
   const center = { lat: 53.344, lng: -6.2672 };
   // Create a bounding box with sides ~10km away from the center point
@@ -174,23 +177,9 @@ export async function initJourneyPlanner(map, data, selectedStation) {
       region: "ie",
     };
 
-    await directionsService.route(request, (result, status) => {
-      if (status == "OK") {
-        directionsRenderer.setMap(map);
-        directionsRenderer.setDirections(result);
-        directionsRenderer.setPanel(asideMain);
-        start.pos = {
-          lat: result.routes[0].bounds.Zh.lo,
-          lng: result.routes[0].bounds.Jh.hi,
-        };
-        destination.pos = {
-          lat: result.routes[0].bounds.Zh.hi,
-          lng: result.routes[0].bounds.Jh.lo,
-        };
-      }
-    });
-
     // MAKE SURE IT DOESN'T SUBMIT WITH EMPTY VALUES
+    console.log(data);
+    console.log(start);
     const startClosestStations = await getClosestStations(data, start, 3);
     const destinationClosestStations = await getClosestStations(
       data,
@@ -221,15 +210,87 @@ export async function initJourneyPlanner(map, data, selectedStation) {
       let closestDestStation;
       for (let station of startClosestStations) {
         if (data["available_bikes"][station.sId]) {
-          closestStartStation = station.sId;
+          closestStartStation = station;
         }
       }
 
       for (let station of destinationClosestStations) {
         if (data["available_bikes"][station.sId]) {
-          closestDestStation = station.sId;
+          closestDestStation = station;
         }
       }
+
+      //   Add divs for charts
+
+      const leg1Title = document.createElement("h2");
+      leg1Title.innerText = `Walk to ${closestStartStation.title}`;
+
+      const availChart = document.createElement("div");
+      availChart.classList.add("availability-chart");
+
+      const leg2Title = document.createElement("h2");
+      leg2Title.innerText = `Walk to ${closestDestStation.title}`;
+
+      const stationChart = document.createElement("div");
+      availChart.classList.add("avail-station-chart");
+
+      resultDiv.appendChild(leg1Title);
+      resultDiv.appendChild(availChart);
+      resultDiv.appendChild(leg2Title);
+      resultDiv.appendChild(stationChart);
+
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn("string", "Hour");
+        data.addColumn("number", "Available Bikes");
+        data.addColumn("number", "Predicted Bikes");
+        data.addRows(availability_data);
+
+        var station_data = new google.visualization.DataTable();
+        station_data.addColumn("string", "Hour");
+        station_data.addColumn("number", "Available Stations");
+        station_data.addColumn("number", "Predicted Stations");
+        station_data.addRows(avail_station_data);
+
+        var options = {
+          legend: "none",
+          colors: ["#4286f4", "#03a981"],
+          opacity: 0.3,
+          vAxis: {
+            minValue: 0,
+            maxValue: totalBikesStands,
+            viewWindow: { min: 0, max: totalBikesStands },
+          },
+          curveType: "function",
+        };
+        var chart = new google.visualization.AreaChart(
+          document.getElementById("availability-chart")
+        );
+        var station_chart = new google.visualization.AreaChart(
+          document.getElementById("avail-station-chart")
+        );
+
+        chart.draw(data, options);
+        station_chart.draw(station_data, options);
+      }
+
+      await directionsService.route(request, (result, status) => {
+        if (status == "OK") {
+          directionsRenderer.setMap(map);
+          directionsRenderer.setDirections(result);
+          directionsRenderer.setPanel(asideMain);
+          start.pos = {
+            lat: result.routes[0].bounds.Zh.lo,
+            lng: result.routes[0].bounds.Jh.hi,
+          };
+          destination.pos = {
+            lat: result.routes[0].bounds.Zh.hi,
+            lng: result.routes[0].bounds.Jh.lo,
+          };
+        }
+      });
     } catch (err) {
       console.error(`Error Journey Planner: ${err}`);
     }
@@ -262,6 +323,7 @@ export async function initJourneyPlanner(map, data, selectedStation) {
   journeyForm.appendChild(formButtonsDiv);
 
   asideMain.appendChild(journeyForm);
+  asideMain.appendChild(resultDiv);
   if (selectedStation) {
     startingPointInput.focus();
   }
