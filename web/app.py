@@ -291,20 +291,21 @@ def route_planning():
                 data['availability_data'][station_str] = []
                 for hour, pred_avail, hist_avail in zip(combined_df['hour'], combined_df['predicted_available'], combined_df['available_bikes']):
                     data['availability_data'][station_str].append(
-                        [str(hour) + ":00", pred_avail, hist_avail])
+                        [str(hour) + ":00", hist_avail, pred_avail])
             else:
                 stations_predicted = stands - bikes_predicted
                 data['available_stations'][station_str] = int(
                     stations_predicted)
                 data['available_station_data'][station_str] = []
                 for hour, pred_avail, hist_avail in zip(combined_df['hour'], combined_df['predicted_available'], combined_df['available_bikes']):
+                    print(pred_avail, file=sys.stdout)
                     stations_pred = stands - \
-                        bikes_predicted if not pd.isna(
-                            bikes_predicted) else None
+                        pred_avail if not pd.isna(
+                            pred_avail) else None
                     stations_historical = stands - \
                         hist_avail if not pd.isna(hist_avail) else None
                     data['available_station_data'][station_str].append(
-                        [str(hour) + ":00", stations_pred, stations_historical])
+                        [str(hour) + ":00", stations_historical, stations_pred])
 
         # For each station, send a dataframe to the ml model
         # Convert the predicted stations back into a repsonse format
