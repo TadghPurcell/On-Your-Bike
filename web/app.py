@@ -340,7 +340,7 @@ def route_planning():
                         hist_avail if not pd.isna(hist_avail) else None
                     data['available_station_data'][station_str].append(
                         [str(hour) + ":00", stations_historical, stations_pred])
-                    break
+                break
 
         # For each station, send a dataframe to the ml model
         # Convert the predicted stations back into a repsonse format
