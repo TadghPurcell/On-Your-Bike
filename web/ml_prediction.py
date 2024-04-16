@@ -35,7 +35,7 @@ def make_prediction_for_times(station_id, weather_df, max_bikes):
     weather_df = weather_df[['temperature', 'wind_speed', 'humidity', 'hour', 'rain', 'Friday',
                              'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday', 'Wednesday']]
 
-    with open(f'../ML_models/station_{station_id}.pkl', 'rb') as file:
+    with open(f'./se-group27-project/ML_models/station_{station_id}.pkl', 'rb') as file:
         # Load the model from the file
         poly_reg_model = pickle.load(file)
 
