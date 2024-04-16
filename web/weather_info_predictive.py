@@ -23,8 +23,7 @@ weather_data = requests.get(WEATHER_URI, params={
                             "units": "metric", "lat": 53.344, "lon": -6.2672, "appid": WEATHER_API_KEY})
 weather_info = weather_data.json()
 
-engine = create_engine(
-    'mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DB), echo=True)
+engine = create_engine('mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
 
 # Takes all classes that extends from base and creates them in the
 # database connects to engine and creates table for each class
