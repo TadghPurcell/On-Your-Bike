@@ -21,6 +21,7 @@ def make_prediction_for_times(station_id, weather_df, max_bikes):
     # One hot encode day of the week
     weather_df['weekday'] = weather_df['time_updated'].dt.day_name(
     )
+    weather_df['day'] = weather_df['time_updated'].dt.day
     weather_df['hour'] = weather_df['time_updated'].dt.hour
     for day in days:
         weather_df[day] = weather_df['weekday'] == day
@@ -32,8 +33,9 @@ def make_prediction_for_times(station_id, weather_df, max_bikes):
     weather_df.drop('type', axis=1, inplace=True)
 
     # Get the columns in the right order
-    weather_df = weather_df[['temperature', 'wind_speed', 'humidity', 'hour', 'rain', 'Friday',
-                             'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday', 'Wednesday']]
+    weather_df = weather_df[['station_id', 'available_bikes', 'available_bike_stands', 'temperature',
+       'wind_speed', 'humidity', 'hour', 'day', 'rain', 'Friday', 'Monday',
+       'Saturday', 'Sunday', 'Thursday', 'Tuesday', 'Wednesday']]
 
     with open(f'../ML_models/station_{station_id}.pkl', 'rb') as file:
         # Load the model from the file

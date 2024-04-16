@@ -7,3 +7,4 @@ dublinbike-historical-all.csv
 bike_weather_joined.csv
 weather.csvweather_availability_joined.csv
 availability.csv
+dbinfo.json
