@@ -174,17 +174,18 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
         directionsRenderer.setMap(map);
         directionsRenderer.setDirections(result);
         start.pos = {
-          lat: result.routes[0].bounds.Zh.lo,
-          lng: result.routes[0].bounds.Jh.hi,
+          lat: result.routes[0].legs[0].start_location.lat(),
+          lng: result.routes[0].legs[0].start_location.lng(),
         };
         destination.pos = {
-          lat: result.routes[0].bounds.Zh.hi,
-          lng: result.routes[0].bounds.Jh.lo,
+          lat: result.routes[0].legs[0].end_location.lat(),
+          lng: result.routes[0].legs[0].end_location.lng(),
         };
       }
     });
 
-    // MAKE SURE IT DOESN'T SUBMIT WITH EMPTY VALUES
+    console.log(start)
+    console.log(destination)
     let closestStartStation;
     let closestDestStation;
     const startClosestStations = await getClosestStations(data, start, 30);
