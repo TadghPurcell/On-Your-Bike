@@ -1,5 +1,10 @@
-dbinfo.json
 dublin_bikes_static_info.csv
 svg
 .DS_Store
 maps_api.json
+/static/dbinfo.json
+dublinbike-historical-all.csv
+bike_weather_joined.csv
+weather.csvweather_availability_joined.csv
+availability.csv
+dbinfo.json

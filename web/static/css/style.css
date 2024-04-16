@@ -1,0 +1,450 @@
+/* Variables */
+:root {
+  --box-shadow: 0px 1px 4px -1px rgba(0, 0, 0, 0.3);
+  --dark-green: #266052;
+  --light-green: #03a981;
+}
+/* Import Font */
+.open-sans-standard {
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+}
+
+/* Header section */
+header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10rem;
+  /* background-color: hsl(61, 56%, 41%); */
+  background-color: var(--dark-green);
+  /* background-color: hsl(0, 43%, 26%); */
+  height: 3.5rem;
+  color: #fff;
+  /* box-shadow:  0 2px 5px 1px rgba(0, 0, 0, 0.2); */
+  box-shadow: var(--box-shadow);
+}
+
+header > p {
+  font-size: 2rem;
+}
+
+/* Styling dynamic section for current weather */
+.weather-info {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Map section */
+#map {
+  height: calc(100vh - 3.5rem);
+  width: 100%;
+}
+
+/* General style of markers including window */
+.gm-style {
+  font-family: inherit;
+}
+.GMAMP-maps-pin-view {
+  cursor: pointer;
+}
+/* style info window */
+.gm-style-iw-d {
+  font-size: inherit;
+  color: var(--dark-green);
+}
+
+/* Placed map, buttons and sidebar in main*/
+main {
+  position: relative;
+}
+
+/* Buttons Section */
+
+button,
+.custom-map-control-button {
+  cursor: pointer;
+  background-color: var(--light-green);
+  color: white;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 500;
+}
+
+.buttons,
+.custom-map-control-button {
+  margin: 2rem;
+  position: absolute;
+  z-index: 2;
+  left: 0px;
+  top: 0px;
+  display: flex;
+  gap: 1rem;
+}
+
+/* Maps Zoom Buttons*/
+
+.gmnoprint {
+  margin-left: 2rem;
+}
+/* Sidebar Section */
+aside {
+  margin: 2rem;
+  position: absolute;
+  background-color: white;
+  box-shadow: var(--box-shadow);
+  color: var(--dark-green);
+  height: 90%;
+  max-width: 30%;
+  z-index: 4;
+  right: 0px;
+  top: 0px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+.btn-aside-div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-aside {
+  /* box-shadow: var(--box-shadow); */
+  font-size: 1rem;
+  text-align: center;
+  width: 33%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: rgb(170, 170, 170);
+  background-color: #fff;
+  border: none;
+  transition: color 0.3s, border-bottom-color 0.3s;
+}
+
+.btn-aside-active,
+.btn-aside:hover {
+  /* background-color: var(--light-green); */
+  box-shadow: var(--box-shadow);
+  background-color: rgb(248, 248, 248);
+  /* border-radius: 15px; */
+  color: var(--dark-green);
+  /* padding-bottom: 8px; */
+  border-bottom: 1px solid var(--light-green);
+}
+
+/* Aside dropdown animation */
+@keyframes drop-down {
+  0% {
+    overflow: hidden;
+    height: 0px;
+  }
+  100% {
+    overflow: hidden;
+    height: 90%;
+  }
+}
+
+.drop-down {
+  animation: drop-down 1.4s ease-in-out;
+}
+
+.station-data-piece {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+  padding: 1rem 2rem;
+  margin-bottom: 4rem;
+  height: 20%;
+}
+
+.example-barchart {
+  display: inline-block;
+  min-height: 150px;
+  max-width: 100%;
+}
+
+/* Custom scrollbar for sidebar */
+aside::-webkit-scrollbar {
+  width: 12px;
+}
+
+aside::-webkit-scrollbar-thumb {
+  background-color: var(--light-green);
+  border-radius: 20px;
+  border: 3px solid white;
+}
+
+/* Nearest Stations Sidebar */
+/* .nearest_stations_sidebar {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+} */
+
+@keyframes stationZoom {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.05);
+    border: 1px solid var(--light-green);
+  }
+}
+
+.closest_station {
+  font-size: 0.75rem;
+  background-color: rgb(238, 238, 238);
+  gap: 0.5rem;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin: 0 20px 10px 20px;
+  cursor: pointer;
+}
+
+.closest_station:hover,
+.station_info_div:hover {
+  animation: stationZoom 0.15s ease-in-out;
+  border: 1px solid var(--light-green);
+  transform: scale(1.05);
+}
+
+.closest_station_title {
+  font-size: 0.75rem;
+  white-space: no-wrap;
+}
+
+.closest_station > p {
+  white-space: nowrap;
+}
+
+.closest_station_walk_time {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+*::before {
+  box-sizing: border-box;
+  display: inline-block;
+  background-position: center;
+  width: 24px;
+  height: 24px;
+  padding-top: 4px;
+  padding-right: 4px;
+}
+
+.closest_station_bikes::before {
+  content: url("/img/bike.svg");
+}
+.closest-station-parking::before,
+.station_information_parking::before {
+  content: url("/img/available_spaces.svg");
+}
+
+.closest_station_distance::before {
+  content: url("/img/distance.svg");
+}
+.closest_station_walk_time::before {
+  content: url("/img/walking.svg");
+}
+
+/* journey planner */
+
+.journey_planner_sidebar {
+  display: none;
+}
+
+/* Station information */
+.station_info_div {
+  display: grid;
+  grid-template-areas:
+    "a a c c"
+    "b b b b";
+  background-color: rgb(238, 238, 238);
+  gap: 0.5rem;
+  align-items: center;
+  justify-items: center;
+  padding: 10px;
+  margin: 0 20px 20px 20px;
+}
+
+.closest_station_head {
+  grid-area: a;
+  justify-self: start;
+  text-align: center;
+  padding: 0 10px;
+}
+
+.station_information {
+  grid-area: b;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: no-wrap;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.station_information > p {
+  white-space: nowrap;
+  text-align: center;
+}
+
+.station_information_data {
+  margin: 0;
+  padding-top: 5px;
+}
+
+.station_information_sidebar {
+  display: none;
+}
+
+.station_information_bikes::before {
+  content: url("/img/bike.svg");
+}
+
+.station_information_distance::before {
+  content: url("/img/distance.svg");
+}
+.station_information_walk_time::before {
+  content: url("/img/walking.svg");
+}
+
+.station_information_payment::before {
+  content: url("/img/payment_terminal.svg");
+}
+
+/* Journey Planner Sidebar */
+.journey_planner_head {
+  text-align: center;
+  margin-bottom: 0;
+}
+
+form {
+  display: grid;
+  grid-template-areas:
+    "a a b"
+    "a a b"
+    "c c c";
+  padding: 20px;
+  gap: 1rem;
+  align-items: center;
+}
+
+.form-buttons-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 16px;
+}
+
+.form-btn,
+.directions-button {
+  background-color: var(--light-green);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  box-shadow: var(--box-shadow);
+}
+
+.directions-button {
+  grid-area: c;
+  min-width: 66%;
+  height: 50%;
+  border-radius: 10%;
+}
+
+.form-btn {
+  padding: 6px 48px;
+  border-radius: 4px;
+}
+
+.form-btn:hover,
+.directions-button:hover {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+}
+
+.address-div {
+  grid-area: a;
+}
+
+.date-time-box {
+  grid-area: b;
+}
+
+.form-buttons-box {
+  grid-area: c;
+}
+
+.searchbar-div,
+.date-box,
+.time-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+}
+
+.date-time-box {
+  display: flex;
+  flex-direction: column;
+}
+
+/* form inputs */
+input {
+  border: 1px solid lightgray;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+input[type="text"] {
+  padding: 5px;
+}
+
+input:focus {
+  outline: none;
+  border: 1px solid var(--light-green);
+}
+
+.error {
+  border: 1px solid red;
+  background-color: rgba(255, 0, 0, 0.025);
+}
+
+.journey-instruction {
+  padding: 10px;
+  margin: 0px;
+}
+
+h4.journey-instruction {
+  margin: 0px;
+  padding-bottom: 0;
+}
