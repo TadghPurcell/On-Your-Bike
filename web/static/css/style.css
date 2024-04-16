@@ -146,7 +146,8 @@ aside {
   transition: color 0.3s, border-bottom-color 0.3s;
 }
 
-.btn-aside-active, .btn-aside:hover {
+.btn-aside-active,
+.btn-aside:hover {
   /* background-color: var(--light-green); */
   box-shadow: var(--box-shadow);
   background-color: rgb(248, 248, 248);
@@ -205,7 +206,6 @@ aside::-webkit-scrollbar-thumb {
   gap: 1rem;
 } */
 
-
 @keyframes stationZoom {
   0% {
     transform: scale(1);
@@ -228,7 +228,8 @@ aside::-webkit-scrollbar-thumb {
   cursor: pointer;
 }
 
-.closest_station:hover, .station_info_div:hover {
+.closest_station:hover,
+.station_info_div:hover {
   animation: stationZoom 0.15s ease-in-out;
   border: 1px solid var(--light-green);
   transform: scale(1.05);
@@ -244,7 +245,7 @@ aside::-webkit-scrollbar-thumb {
 }
 
 .closest_station_walk_time {
-  overflow: hidden; 
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
@@ -259,10 +260,11 @@ aside::-webkit-scrollbar-thumb {
 }
 
 .closest_station_bikes::before {
-  content: url('/img/bike.svg');
+  content: url("/img/bike.svg");
 }
-.closest-station-parking::before, .station_information_parking::before {
-  content: url('/img/available_spaces.svg');
+.closest-station-parking::before,
+.station_information_parking::before {
+  content: url("/img/available_spaces.svg");
 }
 
 .closest_station_distance::before {
@@ -281,10 +283,11 @@ aside::-webkit-scrollbar-thumb {
 /* Station information */
 .station_info_div {
   display: grid;
-  grid-template-areas: "a a c c"
-                       "b b b b";
+  grid-template-areas:
+    "a a c c"
+    "b b b b";
   background-color: rgb(238, 238, 238);
-  gap: 0.5rem; 
+  gap: 0.5rem;
   align-items: center;
   justify-items: center;
   padding: 10px;
@@ -345,9 +348,10 @@ aside::-webkit-scrollbar-thumb {
 
 form {
   display: grid;
-  grid-template-areas: "a a b"
-                       "a a b"
-                       "c c c";
+  grid-template-areas:
+    "a a b"
+    "a a b"
+    "c c c";
   padding: 20px;
   gap: 1rem;
   align-items: center;
@@ -360,7 +364,8 @@ form {
   gap: 16px;
 }
 
-.form-btn, .directions-button {
+.form-btn,
+.directions-button {
   background-color: var(--light-green);
   color: white;
   border: none;
@@ -381,7 +386,8 @@ form {
   border-radius: 4px;
 }
 
-.form-btn:hover, .directions-button:hover {
+.form-btn:hover,
+.directions-button:hover {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   transform: scale(1.1);
 }
@@ -398,7 +404,9 @@ form {
   grid-area: c;
 }
 
-.searchbar-div, .date-box, .time-box {
+.searchbar-div,
+.date-box,
+.time-box {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -431,3 +439,12 @@ input:focus {
   background-color: rgba(255, 0, 0, 0.025);
 }
 
+.journey-instruction {
+  padding: 10px;
+  margin: 0px;
+}
+
+h4.journey-instruction {
+  margin: 0px;
+  padding-bottom: 0;
+}

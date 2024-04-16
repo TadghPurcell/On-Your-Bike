@@ -38,6 +38,8 @@ session = Session()
 print("connected")
 
 # Gives all of the data needed for the home page
+
+
 @app.route("/home/")
 def get_all_stations():
     try:
@@ -69,7 +71,6 @@ def get_all_stations():
             "wind speed": weather.wind_speed
 
         }
-        print(data, file=sys.stdout)
         row = session.query(Station).all()
 
         for row in bike_stations:
@@ -134,8 +135,8 @@ def get_station(station_id):
             [row.__dict__ for row in station_information])
 
         station_data_df = station_data_df.groupby(station_data_df['time_updated'].dt.floor('H')).agg({
-            'available_bikes': 'mean',  # Example: Calculate mean temperature for each hour
-            'bike_stands': 'mean'      # Example: Calculate mean humidity for each hour
+            'available_bikes': 'mean',
+            'bike_stands': 'mean'
         }).reset_index()
         station_data_df['hour'] = station_data_df['time_updated'].dt.hour
         station_data_df = station_data_df[[
@@ -188,8 +189,33 @@ def route_planning():
         # convert the time to np.datetime
         pred_time = datetime.strptime(req['time'], "%Y-%m-%d %H:%M")
 
+        # Can only predict weather 5 days in advance, if predicted time is further out return 400
         if pred_time > datetime.now() + timedelta(days=5):
             return jsonify({'message': 'Invalid time. Time cannot be more than 5 days from now.'}), 400
+
+        # Check if it's today's date, will have to get historic data if so
+        if pred_time.date() == pd.Timestamp.now().date():
+            date_today = True
+        else:
+            date_today = False
+
+        # Get historic availability data if planning to travel today
+        if date_today:
+            midnight = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+            station_information = session.query(Availability.station_id, Availability.time_updated, Availability.available_bikes, Availability.available_bike_stands).filter(
+                Availability.time_updated > midnight, Availability.station_id.in_(req['station_ids'] + req['available_ids'])).all()
+            station_data_df = pd.DataFrame(station_information, columns=[
+                                           'station_id', 'time_updated', 'available_bikes', 'bike_stands'])
+
+            # Group by hour and station id and get mean avail bikes and bike stands
+            station_data_df = station_data_df.groupby([station_data_df['time_updated'].dt.floor('H'), station_data_df['station_id']]).agg({
+                'available_bikes': 'mean',
+                'bike_stands': 'mean'
+            }).reset_index()
+
+            station_data_df['hour'] = station_data_df['time_updated'].dt.hour
+            station_data_df = station_data_df[['station_id',
+                                               'hour', 'available_bikes', 'bike_stands']]
 
         # Get the predicted weather for that day
         weather_predictive = session.query(WeatherPredictive).all()
@@ -202,7 +228,12 @@ def route_planning():
         weather_predictive_df = weather_predictive_df[[
             'time_updated', 'temperature', 'wind_speed', 'humidity', 'type']]
 
-        current_hour = 0
+        # If the day is today we only want to predict available bikes after this hour
+        if date_today:
+            current_hour = pd.Timestamp.now().hour
+        else:
+            current_hour = 0
+
         hours_today = [pred_time.replace(
             hour=h, minute=30, second=0, microsecond=0) for h in range(current_hour, 24)]
         hourly_df = pd.DataFrame(hours_today, columns=['time_updated'])
@@ -213,37 +244,103 @@ def route_planning():
         latest_dynamic_data = session.query(
             func.max(Availability.time_updated)).scalar_subquery()
 
-        station_data = session.query(Availability.station_id, Availability.bike_stands).filter(
-            Availability.time_updated == latest_dynamic_data, Availability.station_id.in_(req['station_ids'])).all()
+        station_data_now = session.query(Availability.station_id, Availability.bike_stands).filter(
+            Availability.time_updated == latest_dynamic_data, Availability.station_id.in_(req['station_ids'] + req['available_ids'])).all()
 
         total_bike_stands = {}
-        for station_id, bike_stands in station_data:
+        for station_id, bike_stands in station_data_now:
             total_bike_stands[station_id] = bike_stands
 
         data = {"available_bikes": {},
-                "available_stations": {}, "availability_data": {}}
+                "available_stations": {}, "availability_data": {}, "available_station_data": {}}
 
+        # Iterate through all the stations and add available bikes, stations and data for each
+        for station_id in req['available_ids']:
+            station_str = str(station_id)
+            stands = total_bike_stands[station_id]
+
+            new_weather_predictive_df = make_prediction_for_times(
+                station_id, weather_predictive_df.copy(), total_bike_stands[station_id])
+            bikes_predicted = new_weather_predictive_df.loc[new_weather_predictive_df['hour']
+                                                            == pred_time.hour, 'predicted_available'].values[0]
+
+            if int(bikes_predicted) > 0:
+                # If date is today we want historical data in the combined dataframe, otherwise we just want an empty column
+                if date_today:
+                    station_hist_by_id = station_data_df[station_data_df['station_id'] == station_id]
+                    station_hist_by_id.reset_index(drop=True, inplace=True)
+                    new_weather_predictive_df.reset_index(
+                        drop=True, inplace=True)
+                    combined_df = pd.concat(
+                        [station_hist_by_id, new_weather_predictive_df])
+                    combined_df = combined_df[[
+                        'hour', 'available_bikes', 'predicted_available']]
+                    # combined_df = pd.concat(
+                    #     [station_hist_by_id[['hour', 'available_bikes']], weather_predictive_df[['hour', 'predicted_available']]])
+                    combined_df['available_bikes'] = combined_df['available_bikes'].apply(
+                        lambda x: int(x) if not pd.isna(x) else np.nan)
+                    combined_df['predicted_available'] = combined_df['predicted_available'].apply(
+                        lambda x: int(x) if not pd.isna(x) else np.nan)
+
+                    combined_df.replace(np.nan, None, inplace=True)
+                else:
+                    combined_df = new_weather_predictive_df
+                    combined_df['available_bikes'] = None
+
+                # If it's one of the available_ids we only want bike availability data, otherwise we want station availbility data
+
+                data['available_bikes'][station_str] = int(bikes_predicted)
+                data['availability_data'][station_str] = []
+                for hour, pred_avail, hist_avail in zip(combined_df['hour'], combined_df['predicted_available'], combined_df['available_bikes']):
+                    data['availability_data'][station_str].append(
+                        [str(hour) + ":00", hist_avail, pred_avail])
+                break
+
+                # Iterate through all the stations and add stations and data for each
         for station_id in req['station_ids']:
             station_str = str(station_id)
             stands = total_bike_stands[station_id]
+
             new_weather_predictive_df = make_prediction_for_times(
                 station_id, weather_predictive_df.copy(), total_bike_stands[station_id])
-
             bikes_predicted = new_weather_predictive_df.loc[new_weather_predictive_df['hour']
                                                             == pred_time.hour, 'predicted_available'].values[0]
-            stations_predicted = stands - bikes_predicted
-            data['available_bikes'][station_str] = bikes_predicted
-            data['available_stations'][station_str] = stations_predicted
+            if int(bikes_predicted) + 1 < stands:
+                # If date is today we want historical data in the combined dataframe, otherwise we just want an empty column
+                if date_today:
+                    station_hist_by_id = station_data_df[station_data_df['station_id'] == station_id]
+                    station_hist_by_id.reset_index(drop=True, inplace=True)
+                    new_weather_predictive_df.reset_index(
+                        drop=True, inplace=True)
+                    combined_df = pd.concat(
+                        [station_hist_by_id, new_weather_predictive_df])
+                    combined_df = combined_df[[
+                        'hour', 'available_bikes', 'predicted_available']]
+                    # combined_df = pd.concat(
+                    #     [station_hist_by_id[['hour', 'available_bikes']], weather_predictive_df[['hour', 'predicted_available']]])
+                    combined_df['available_bikes'] = combined_df['available_bikes'].apply(
+                        lambda x: int(x) if not pd.isna(x) else np.nan)
+                    combined_df['predicted_available'] = combined_df['predicted_available'].apply(
+                        lambda x: int(x) if not pd.isna(x) else np.nan)
 
-            data['availability_data'][station_str] = []
-            data['availability_data'][station_str] = []
-            for hour, avail_bikes in zip(new_weather_predictive_df['hour'], new_weather_predictive_df['predicted_available']):
-                data['availability_data'][station_str].append(
-                    [str(hour) + ":00", avail_bikes, None])
-                data['availability_data'][station_str].append(
-                    [str(hour) + ":00", stands - avail_bikes, None])
+                    combined_df.replace(np.nan, None, inplace=True)
+                else:
+                    combined_df = new_weather_predictive_df
+                    combined_df['available_bikes'] = None
 
-            print(data, file=sys.stdout)
+                stations_predicted = stands - bikes_predicted
+                data['available_stations'][station_str] = int(
+                    stations_predicted)
+                data['available_station_data'][station_str] = []
+                for hour, pred_avail, hist_avail in zip(combined_df['hour'], combined_df['predicted_available'], combined_df['available_bikes']):
+                    stations_pred = stands - \
+                        pred_avail if not pd.isna(
+                            pred_avail) else None
+                    stations_historical = stands - \
+                        hist_avail if not pd.isna(hist_avail) else None
+                    data['available_station_data'][station_str].append(
+                        [str(hour) + ":00", stations_historical, stations_pred])
+                break
 
         # For each station, send a dataframe to the ml model
         # Convert the predicted stations back into a repsonse format

@@ -58,7 +58,6 @@ async function initMap() {
 
   const res = await fetch("/stations/");
   const data = await res.json();
-
   // The markers for each station
   const markers = data.map(
     ({
@@ -72,6 +71,7 @@ async function initMap() {
       payment_terminal: paymentTerminal,
       time_updated: latestTimeUpdate,
     }) => {
+      // TODO: This needs to be added to data instead of being done separately in different scripts
       let modifiedName = sName
         .split(" ")
         .map((e) => {
@@ -88,22 +88,21 @@ async function initMap() {
           return newName[0].toUpperCase() + newName.slice(1);
         })
         .join(" ");
-      
+
       const glyphImg = document.createElement("img");
       glyphImg.classList.add("bike-logo");
       glyphImg.alt = "marker logo";
       glyphImg.classList.add("bike-logo");
-      let pinElement
+      let pinElement;
       if (availableBikes != 0) {
-        glyphImg.src = "/img/bike.svg"
+        glyphImg.src = "/img/bike.svg";
         pinElement = new google.maps.marker.PinElement({
           background: "#03a981",
           borderColor: "#266052",
           glyph: glyphImg,
           scale: 1,
-        })
-      }
-      else {
+        });
+      } else {
         glyphImg.src = "/img/bike_unavailable.svg";
         pinElement = new google.maps.marker.PinElement({
           background: "#f21800",
@@ -141,7 +140,6 @@ async function initMap() {
 
       marker.content.addEventListener("click", async () => {
         infoWindow.close(map, marker);
- 
         stationInformationSidebar(
           id,
           lat,
@@ -169,24 +167,23 @@ const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
 }
 
 export const activateSideBar = (sidebar) => {
-  const btnJourneyPlanner = document.querySelector('.btn-journey-planner')
-  const btnNearestStations = document.querySelector('.btn-stations')
-  const btnStationInfo = document.querySelector('.btn-station-info')
-  if (sidebar == 'journey') {    
-    btnJourneyPlanner.classList.add('btn-aside-active')
-    btnNearestStations.classList.remove('btn-aside-active')
-    btnStationInfo.classList.remove('btn-aside-active')
+  const btnJourneyPlanner = document.querySelector(".btn-journey-planner");
+  const btnNearestStations = document.querySelector(".btn-stations");
+  const btnStationInfo = document.querySelector(".btn-station-info");
+  if (sidebar == "journey") {
+    btnJourneyPlanner.classList.add("btn-aside-active");
+    btnNearestStations.classList.remove("btn-aside-active");
+    btnStationInfo.classList.remove("btn-aside-active");
   }
-  if (sidebar == 'nearest') {
-    btnJourneyPlanner.classList.remove('btn-aside-active')
-    btnNearestStations.classList.add('btn-aside-active')
-    btnStationInfo.classList.remove('btn-aside-active')
+  if (sidebar == "nearest") {
+    btnJourneyPlanner.classList.remove("btn-aside-active");
+    btnNearestStations.classList.add("btn-aside-active");
+    btnStationInfo.classList.remove("btn-aside-active");
   }
-  if (sidebar == 'info') {
-    btnJourneyPlanner.classList.remove('btn-aside-active')
-    btnNearestStations.classList.remove('btn-aside-active')
-    btnStationInfo.classList.add('btn-aside-active')
+  if (sidebar == "info") {
+    btnJourneyPlanner.classList.remove("btn-aside-active");
+    btnNearestStations.classList.remove("btn-aside-active");
+    btnStationInfo.classList.add("btn-aside-active");
   }
-
-}
+};
 initMap();
