@@ -10,7 +10,7 @@ from Database import Weather
 # Sets options to read entire data frame
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 
-with open('./static/dbinfo.json') as f:
+with open('./se-group27-project/web/static/dbinfo.json') as f:
     db_info = json.load(f)
 WEATHER_API_KEY = db_info['weatherKey']
 USER = db_info['dbConnection']['USER']
