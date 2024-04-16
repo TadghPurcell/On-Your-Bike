@@ -173,7 +173,6 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
       if (status == "OK") {
         directionsRenderer.setMap(map);
         directionsRenderer.setDirections(result);
-        directionsRenderer.setPanel(asideMain);
         start.pos = {
           lat: result.routes[0].bounds.Zh.lo,
           lng: result.routes[0].bounds.Jh.hi,
@@ -372,7 +371,6 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
     startingPointInput.classList.remove("error");
     destinationInput.value = "";
     destinationInput.classList.remove("error");
-    directionsRenderer.setPanel(null);
     directionsRenderer.setDirections(null);
     directionsRenderer.setMap(null);
     dateInput.value = `${new Date().toISOString().slice(0, 10)}`;
