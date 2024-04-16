@@ -30,8 +30,8 @@ DB = db_info['dbConnection']['DB']
 FORECAST_URI = 'https://api.openweathermap.org/data/2.5/forecast'
 
 # Create a new session
-engine = create_engine(
-    'mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DB), echo=True)
+engine = create_engine('mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
+
 Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
