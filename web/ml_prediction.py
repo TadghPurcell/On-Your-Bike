@@ -15,7 +15,10 @@ from sklearn.model_selection import train_test_split
 
 
 def make_prediction_for_times(station_id, weather_df, max_bikes):
-
+    print(station_id, file=sys.stdout)
+    print("here", file=sys.stdout)
+    print("here")
+#
     days = ['Friday', 'Monday', 'Saturday', 'Sunday', 'Thursday', 'Tuesday',
             'Wednesday']
     # One hot encode day of the week

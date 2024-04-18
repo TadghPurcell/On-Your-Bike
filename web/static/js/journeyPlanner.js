@@ -1,8 +1,50 @@
 import { getClosestStations } from "./getClosestStations.js";
 
-export async function initJourneyPlanner(map, data, directionsRenderer, directionsService, selectedStation) {
+export async function initJourneyPlanner(map, data, directionsRenderer, directionsService, selectedStation, lat, lng) {
     const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary("places");
+    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
+      "marker"
+    );
+    const geocoder = new google.maps.Geocoder();
 
+    function geocodeAddress(address) {
+      return new Promise((resolve, reject) => {
+        geocoder.geocode({ address }, (result, status) => {
+          if (status === google.maps.GeocoderStatus.OK) {
+            const lat = result[0].geometry.location.lat()
+            const lng = result[0].geometry.location.lng()
+            resolve({ lat, lng })
+          } else {
+            reject(new Error("Geocoding failed:", status))
+          }
+        })
+      })
+    }
+    
+    async function renderRoute(request, num) {
+      return new Promise((resolve, reject) => {
+      directionsService.route(request, (result, status) => {
+          const renderer = directionsRenderer[num]
+          if (status == "OK") {
+            renderer.setMap(map);
+            renderer.setDirections(result);
+            start.pos = {
+              lat: result.routes[0].legs[0].start_location.lat(),
+              lng: result.routes[0].legs[0].start_location.lng(),
+            };
+            destination.pos = {
+              lat: result.routes[0].legs[0].end_location.lat(),
+              lng: result.routes[0].legs[0].end_location.lng(),
+            };
+            console.log(result.routes[0].legs[0].duration.text)
+            resolve(result.routes[0].legs[0].duration.text)
+          } else {
+            reject(new Error("Directions Renderer Failed: ", status))
+          }
+        })
+        });
+      }
+      
         const asideMain = document.querySelector('.aside-main')
         asideMain.innerHTML = ""
 
@@ -162,37 +204,15 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
 
     start.name = formData.get("start");
     destination.name = formData.get("destination");
-
-    let request = {
-      origin: formData.get("start"),
-      destination: formData.get("destination"),
-      travelMode: "BICYCLING",
-      region: "ie",
-    };
-    await directionsService.route(request, (result, status) => {
-      if (status == "OK") {
-        directionsRenderer.setMap(map);
-        directionsRenderer.setDirections(result);
-        start.pos = {
-          lat: result.routes[0].legs[0].start_location.lat(),
-          lng: result.routes[0].legs[0].start_location.lng(),
-        };
-        destination.pos = {
-          lat: result.routes[0].legs[0].end_location.lat(),
-          lng: result.routes[0].legs[0].end_location.lng(),
-        };
-      }
-    });
-
-    console.log(start)
-    console.log(destination)
+    start.pos = await geocodeAddress(formData.get("start"))
+    destination.pos = selectedStation ? { lat, lng } : await geocodeAddress(formData.get("destination"))
     let closestStartStation;
     let closestDestStation;
     const startClosestStations = await getClosestStations(data, start, 30);
     const destinationClosestStations = await getClosestStations(
       data,
       destination,
-      30
+      
     );
     res["available_ids"] = startClosestStations.map((station) => station.sId);
     res["station_ids"] = destinationClosestStations.map(
@@ -236,8 +256,6 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
         }
       }
 
-      console.log(data);
-
       for (let station of destinationClosestStations) {
         if (data["available_stations"][station.sId]) {
           console.log(station);
@@ -265,13 +283,43 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
         console.log(closestStartStation);
         console.log(closestDestStation);
       }
+      let startClosestStationWalkRequest = {
+        origin: start.pos,
+        destination: closestStartStation.pos,
+        travelMode: "WALKING",
+        region: "ie",
+      };
+      let cycleBetweenStationsRequest = {
+        origin: closestStartStation.pos,
+        destination: closestDestStation.pos,
+        travelMode: "BICYCLING",
+        region: "ie",
+      };
+      let destinationClosestStationWalkRequest = {
+        origin: closestDestStation.pos,
+        destination: destination.pos,
+        travelMode: "WALKING",
+        region: "ie",
+      };
+      
+      let overallRequest = {
+        origin: start.pos,
+        destination: destination.pos,
+        travelMode: "WALKING",
+        region: "ie",
+      };
+
+      const startTime = await renderRoute(startClosestStationWalkRequest, 0);
+      const cycleTime = await renderRoute(cycleBetweenStationsRequest, 1);
+      const destinationTime = await renderRoute(destinationClosestStationWalkRequest, 2);
+      const overallTime = await renderRoute(overallRequest, 3);
 
       //   Clear previous directions
       resultDiv.innerHTML = "";
       //   Add divs for charts
       const leg1Title = document.createElement("h3");
       leg1Title.classList.add("journey-instruction");
-      leg1Title.innerText = `Walk to ${closestStartStation.modifiedName}`;
+      leg1Title.innerText = `Walk to ${closestStartStation.modifiedName} (${startTime})`;
 
       const leg1GraphTitle = document.createElement("h4");
       leg1GraphTitle.classList.add("journey-instruction");
@@ -282,7 +330,7 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
 
       const leg2Title = document.createElement("h3");
       leg2Title.classList.add("journey-instruction");
-      leg2Title.innerText = `Then, cycle to ${closestDestStation.modifiedName}`;
+      leg2Title.innerText = `Then, cycle to ${closestDestStation.modifiedName} (${cycleTime})`;
 
       const leg2GraphTitle = document.createElement("h4");
       leg2GraphTitle.classList.add("journey-instruction");
@@ -293,7 +341,7 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
 
       const leg3Title = document.createElement("h3");
       leg3Title.classList.add("journey-instruction");
-      leg3Title.innerText = `Finally, walk to ${destination.name}`;
+      leg3Title.innerText = `Finally, walk to ${destination.name} (${destinationTime})`;
 
       resultDiv.appendChild(leg1Title);
       resultDiv.appendChild(leg1GraphTitle);
@@ -366,20 +414,7 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
   resetBtn.setAttribute("type", "reset");
   resetBtn.textContent = "Reset";
 
-  resetBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    startingPointInput.value = "";
-    startingPointInput.classList.remove("error");
-    destinationInput.value = "";
-    destinationInput.classList.remove("error");
-    directionsRenderer.setDirections(null);
-    directionsRenderer.setMap(null);
-    dateInput.value = `${new Date().toISOString().slice(0, 10)}`;
-    timeInput.value = `${new Date().toLocaleTimeString().slice(0, 5)}`;
-    map.setCenter({ lat: 53.346, lng: -6.25 });
-    map.setZoom(14);
-  });
-
+  
   const formButtonsDiv = document.createElement("div");
   formButtonsDiv.classList.add("form-buttons-box");
   formButtonsDiv.appendChild(submitBtn);
@@ -388,6 +423,23 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
 
   asideMain.appendChild(journeyForm);
   asideMain.appendChild(resultDiv);
+  resetBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    resultDiv.innerHTML = "";
+    startingPointInput.value = "";
+    startingPointInput.classList.remove("error");
+    destinationInput.value = "";
+    destinationInput.classList.remove("error");
+    console.log(directionsRenderer)
+    directionsRenderer.forEach(renderer => {
+      renderer.setDirections(null);
+      renderer.setMap(null);
+    })
+    dateInput.value = `${new Date().toISOString().slice(0, 10)}`;
+    timeInput.value = `${new Date().toLocaleTimeString().slice(0, 5)}`;
+    map.setCenter({ lat: 53.346, lng: -6.25 });
+    map.setZoom(14);
+  });
   if (selectedStation) {
     startingPointInput.focus();
   }
