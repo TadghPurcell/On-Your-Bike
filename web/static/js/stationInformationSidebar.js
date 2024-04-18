@@ -148,7 +148,9 @@ export async function stationInformationSidebar(
       data,
       directionsRenderer,
       directionsService,
-      modifiedName
+      modifiedName,
+      lat,
+      lng,
     );
   });
 

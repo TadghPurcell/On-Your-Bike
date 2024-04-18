@@ -1,6 +1,6 @@
 import { getClosestStations } from "./getClosestStations.js";
 
-export async function initJourneyPlanner(map, data, directionsRenderer, directionsService, selectedStation) {
+export async function initJourneyPlanner(map, data, directionsRenderer, directionsService, selectedStation, lat, lng) {
     const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary("places");
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
       "marker"
@@ -205,8 +205,7 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
     start.name = formData.get("start");
     destination.name = formData.get("destination");
     start.pos = await geocodeAddress(formData.get("start"))
-    destination.pos = await geocodeAddress(formData.get("destination"))
-
+    destination.pos = selectedStation ? { lat, lng } : await geocodeAddress(formData.get("destination"))
     let closestStartStation;
     let closestDestStation;
     const startClosestStations = await getClosestStations(data, start, 30);
