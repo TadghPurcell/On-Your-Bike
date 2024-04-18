@@ -46,3 +46,4 @@ for row in df.itertuples():
                           row.position['lat'], row.position['lng'], row.banking)
         session.add(station)
 session.commit()
+session.close()

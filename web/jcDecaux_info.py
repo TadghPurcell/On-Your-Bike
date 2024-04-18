@@ -59,3 +59,4 @@ for row in df.itertuples():
     # print('-----------')
 
 session.commit()
+session.close()
