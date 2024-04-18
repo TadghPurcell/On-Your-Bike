@@ -19,7 +19,7 @@
   <body>
     <header>
       <div class="header-container">
-        <img src="../static/img/bicyc_road_bike.svg" id="logoimage"> <!-- logo to appear in header next to name "On Your Bike"  -->
+        <img src="{{ url_for('static', filename='img/bicyc_road_bike.svg') }}" id="logoimage"> <!-- logo to appear in header next to name "On Your Bike"  -->
         <p class="logo">On Your Bike</p>
       </div>
       <div class="weather-info"></div> <!-- weather information in header-->
