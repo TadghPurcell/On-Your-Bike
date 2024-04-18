@@ -33,6 +33,9 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+session.query(WeatherPredictive).delete()
+session.commit()
+
 # Create new weather row
 for i in range(len(weather_info['list'])):
     updated_predictive_weather = WeatherPredictive(
