@@ -39,16 +39,20 @@ header {
   box-shadow: var(--box-shadow);
 }
 
-header > p {
+.header-container {
+  display: flex;
+  align-items: center;
   font-size: 2rem;
+
 }
 
+/* header > p {
+  font-size: 2rem;
+} */
+
 #logoimage{
-  /* width: 80px;
+  width: 80px;
   height: 80px;
-  filter: none;
-  mix-blend-mode:multiply;
-  color: white; */
 }
 
 /* Styling dynamic section for current weather */
