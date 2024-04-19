@@ -39,8 +39,20 @@ header {
   box-shadow: var(--box-shadow);
 }
 
-header > p {
+.header-container {
+  display: flex;
+  align-items: center;
   font-size: 2rem;
+
+}
+
+/* header > p {
+  font-size: 2rem;
+} */
+
+#logoimage{
+  width: 80px;
+  height: 80px;
 }
 
 /* Styling dynamic section for current weather */
