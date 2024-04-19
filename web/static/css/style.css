@@ -46,13 +46,10 @@ header {
 
 }
 
-/* header > p {
-  font-size: 2rem;
-} */
-
 #logoimage{
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 60px;
+  padding-right: 15px;
 }
 
 /* Styling dynamic section for current weather */
