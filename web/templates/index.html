@@ -11,22 +11,31 @@
       type="text/css"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
-    
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/bicycle-24.ico') }}"> <!-- adds a favicon to browser tab-->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <title>On Your Bike</title>
   </head>
   <body>
     <header>
-      <p class="logo">On Your Bike</p>
+      <div class="header-container">
+        <img src="{{ url_for('static', filename='img/bicyc_road_bike.svg') }}" id="logoimage"> <!-- sets logo image to appear in header next to name "On Your Bike"  -->
+        <!-- <a href="http://www.onlinewebfonts.com">Web Fonts</a> -->
+        <p class="logo">On Your Bike</p>
+      </div>
       <div class="weather-info"></div>
+      <!-- weather information in header-->
     </header>
     <main>
       <div id="map"></div>
       <aside>
         <div class="btn-aside-div">
-          <button class="btn-aside btn-journey-planner btn-aside-active">Journey Planner</button>
+          <button class="btn-aside btn-journey-planner btn-aside-active">
+            Journey Planner
+          </button>
           <button class="btn-aside btn-stations">Nearest Stations</button>
-          <button class="btn-aside btn-station-info">Station Information</button>
+          <button class="btn-aside btn-station-info">
+            Station Information
+          </button>
         </div>
         <div class="aside-main"></div>
       </aside>

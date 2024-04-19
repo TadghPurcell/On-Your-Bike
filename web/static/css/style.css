@@ -39,8 +39,19 @@ header {
   box-shadow: var(--box-shadow);
 }
 
-header > p {
+/* Styles both the logo and page name to the correct size */
+.header-container {
+  display: flex;
+  align-items: center;
   font-size: 2rem;
+
+}
+
+/* Sets the logo image dimensions only */
+#logoimage{
+  width: 70px;
+  height: 60px;
+  padding-right: 10px;
 }
 
 /* Styling dynamic section for current weather */
@@ -447,4 +458,46 @@ input:focus {
 h4.journey-instruction {
   margin: 0px;
   padding-bottom: 0;
+}
+
+.starting-div {
+  display: flex;
+  gap: 8px;
+}
+
+.current-location-btn {
+  border: none;
+  background-color: fff;
+  background-image: url("/img/current_location_inactive.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: 24px;
+  height: 24px;
+  transition: all 0.3s, ease-in-out;
+}
+
+.current-location-btn:hover {
+  position: relative;
+  background-image: url("/img/current_location_active.svg");
+  transform: scale(1.1);
+}
+
+.current-location-btn:hover::after {
+  content: "Add Current Location";
+  display: inline-block;
+  position: absolute;
+  text-wrap: nowrap;
+  white-space: no-wrap;
+  font-size: 0.75rem;
+  background-color: var(--light-green);
+  color: #fff;
+  padding: 10px;
+  top: -40px;
+  border: none;
+  border-radius: 10px;
+}
+
+.location-active {
+  background-image: url("/img/current_location_active.svg");
 }

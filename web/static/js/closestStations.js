@@ -5,34 +5,12 @@ export async function ClosestStations(
   map,
   data,
   directionsRenderer,
-  directionsService
+  directionsService,
+  currentPos
 ) {
   // Import google library
   const { DistanceMatrixService } = await google.maps.importLibrary("routes");
   const distanceService = new DistanceMatrixService();
-  navigator.geolocation.getCurrentPosition = (fn) => {
-    setTimeout(() => {
-      fn({
-        coords: {
-          accuracy: 40,
-          altitude: null,
-          altitudeAccuracy: null,
-          heading: null,
-          latitude: 53.303921,
-          longitude: -6.25104,
-          speed: null,
-        },
-        timestamp: Date.now(),
-      });
-    }, 2912);
-  };
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
 
         const stationDistances = await Promise.all(
           data.map(
@@ -50,7 +28,7 @@ export async function ClosestStations(
               return new Promise((resolve, reject) => {
                 distanceService.getDistanceMatrix(
                   {
-                    origins: [pos],
+                    origins: [currentPos],
                     destinations: [{ lat, lng }],
                     travelMode: "WALKING",
                   },
@@ -153,18 +131,11 @@ export async function ClosestStations(
               station.latestTimeUpdate,
               directionsRenderer,
               directionsService,
+              currentPos,
               data,
               map
             );
           });
           asideMain.appendChild(stationDiv);
         });
-      },
-      (error) => {
-        console.error("Geolocation error:", error);
       }
-    );
-  } else {
-    handleLocationError(false, infoWindow, map.getCenter());
-  }
-}

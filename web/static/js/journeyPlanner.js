@@ -1,12 +1,22 @@
 import { getClosestStations } from "./getClosestStations.js";
 
-export async function initJourneyPlanner(map, data, directionsRenderer, directionsService, selectedStation, lat, lng) {
+export async function initJourneyPlanner(map, 
+  data, 
+  directionsRenderer,
+  directionsService,
+  pos, 
+  selectedStation, 
+  lat, 
+  lng
+  ) {
     const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary("places");
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
       "marker"
     );
-    const geocoder = new google.maps.Geocoder();
 
+    let currentPos;
+
+    const geocoder = new google.maps.Geocoder();
     function geocodeAddress(address) {
       return new Promise((resolve, reject) => {
         geocoder.geocode({ address }, (result, status) => {
@@ -57,17 +67,53 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
 
         const startingPoint = document.createElement('div')
         startingPoint.classList.add('searchbar-div')
+        const startingPointLabelDiv = document.createElement('div')
+        startingPointLabelDiv.classList.add('starting-div')
         const startingPointLabel = document.createElement('label')
         startingPointLabel.textContent = 'Starting Point'
         startingPointLabel.setAttribute('for', 'start')
+        const currentLocationBtn = document.createElement('button')
+        currentLocationBtn.classList.add('current-location-btn')
+
+        
+        startingPointLabelDiv.appendChild(startingPointLabel)
+        startingPointLabelDiv.appendChild(currentLocationBtn)
+        
         const startingPointInput = document.createElement('input')
         startingPointInput.setAttribute('type', 'text')
         startingPointInput.setAttribute('id', 'start')
         startingPointInput.setAttribute('name', 'start')
         startingPointInput.required = true
+        if (currentPos) {
+          startingPointInput.setAttribute('value', 'Current Location')
+        }
         startingPointInput.setAttribute('placeholder', 'Choose a starting point..')
-        
-        startingPoint.appendChild(startingPointLabel)
+  
+        if (selectedStation || lat || lng) {
+          currentLocationBtn.classList.add('location-active')
+          startingPointInput.value = 'Current Location'
+          currentPos = pos
+        }
+
+        currentLocationBtn.addEventListener('click', (e) => {
+          e.preventDefault()
+          currentLocationBtn.classList.toggle('location-active')
+          if (currentLocationBtn.classList.contains('location-active')) {
+            startingPointInput.classList.remove("error");
+            startingPointInput.value = 'Current Location'
+            currentPos = pos
+          }
+          if (!currentLocationBtn.classList.contains('location-active')) {
+            startingPointInput.value = ''
+            currentPos = ''
+          }
+        })
+
+        startingPointInput.addEventListener('input', () => {
+          startingPointInput.classList.remove('error')
+        })
+
+        startingPoint.appendChild(startingPointLabelDiv)
         startingPoint.appendChild(startingPointInput)
         
         const destination = document.createElement('div')
@@ -85,6 +131,10 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
             destinationInput.setAttribute('value', selectedStation)
         }
         
+        destinationInput.addEventListener('input', () => {
+          destinationInput.classList.remove('error')
+        })
+
         destination.appendChild(destinationLabel)
         destination.appendChild(destinationInput)
         
@@ -204,7 +254,7 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
 
     start.name = formData.get("start");
     destination.name = formData.get("destination");
-    start.pos = await geocodeAddress(formData.get("start"))
+    start.pos = currentPos ? currentPos : await geocodeAddress(formData.get("start"))
     destination.pos = selectedStation ? { lat, lng } : await geocodeAddress(formData.get("destination"))
     let closestStartStation;
     let closestDestStation;
@@ -428,8 +478,9 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
     resultDiv.innerHTML = "";
     startingPointInput.value = "";
     startingPointInput.classList.remove("error");
-    destinationInput.value = "";
     destinationInput.classList.remove("error");
+    currentLocationBtn.classList.remove("location-active")
+    destinationInput.value = "";
     console.log(directionsRenderer)
     directionsRenderer.forEach(renderer => {
       renderer.setDirections(null);
@@ -440,7 +491,4 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
     map.setCenter({ lat: 53.346, lng: -6.25 });
     map.setZoom(14);
   });
-  if (selectedStation) {
-    startingPointInput.focus();
-  }
 }
