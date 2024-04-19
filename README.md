@@ -17,6 +17,7 @@ A sidebar for journey planning is displayed on the right of the page, containing
 - **Page Header:** A section at the top of the page, conveniently placed above the map provides structure to the page, highlighting the page name, logo and weather details.
 
 - **Weather Details:** Real time weather information is displayed on the page, providing users with insights into the current climate for their planned journey. This feature is visual, concise and informative.
+
   
 ![Journey Planner Tab](https://github.com/TadghPurcell/se-group27-project/blob/main/github_imgs/figure_2.png?raw=true "Journey Planner Tab")
 #### Figure 2 - (a) journey planner sidebar with (b) autofill destination HTML form and (c) popup calendar.
@@ -29,8 +30,21 @@ This feature facilitates seamless journey planning, and access to predicted stat
 
 ![Station Information Tab](https://github.com/TadghPurcell/se-group27-project/blob/main/github_imgs/figure_4.png?raw=true "Station Information Tab")
 #### Figure 4 - Station information tab.
-- **Station Information Tab:** Upon clicking on a station, either on the map or in the closest stations tab, the user is greeted with a station information tab. This provides users with extra station details, such as predicted (green) and historic (blue) availability, distance from the user, and walk time. This allows the user to make more informed decisions for their planned journey. Should the user wish to go to this station, they can click the directions  button on the top right, bringing them into the journey planner tab.
+- **Station Information Tab:** Upon clicking a station, either on the map or in the 'closest stations' tab, the user is displayed the station information tab. This provides users with extra station details, such as predicted (green) and historic (blue) availability, distance from the user, and walk time. This allows the user to make more informed decisions for their planned journey. Should the user wish to go to this station, they can click the directions  button on the top right, bringing them into the journey planner tab.
 
 ![Route Renderer](https://github.com/TadghPurcell/se-group27-project/blob/main/github_imgs/figure_5.png?raw=true "Route Renderer")
 #### Figure 5 - User friendly route map and directions sidebar with predicted (green) bike/station availability for that day. Historic data (blue) will also be shown if the trip is being planned for the current day.
 - **Journey Route:** Once the user inputs the details of their location and trip, the map adjusts to show a clear layout of the recommended route to take. This leads the user from their current input location, to the nearest bike station with availability. A route plan appears on the map to get the user from starting to end destination efficiently and safely.
+
+## Contributors
+
+<a href='https://github.com/danieloflynn'></a>
+- [Dan O'Flynn](https://github.com/danieloflynn)
+
+<a href='https://github.com/DAVIDWOOD5'></a>
+- [David Woods](https://github.com/DAVIDWOOD5)
+
+<a href='https://github.com/TadghPurcell'></a>
+- [Tadgh Purcell](https://github.com/TadghPurcell)
+
+<img src="https://www.onlygfx.com/wp-content/uploads/2015/12/bicycle.png">
