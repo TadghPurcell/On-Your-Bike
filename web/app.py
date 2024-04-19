@@ -35,10 +35,15 @@ engine = create_engine(
 # engine = create_engine(
 #     'mysql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, URI, PORT, DB), echo=True)
 
+# engine = create_engine(
+#     'mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DB), echo=True)
+
 Base.metadata.create_all(bind=engine)
 print("connected")
 
 # Gives all of the data needed for the home page
+
+
 @app.route("/home/")
 def get_all_stations():
     try:
@@ -222,7 +227,7 @@ def route_planning():
                 station_information = session.query(Availability.station_id, Availability.time_updated, Availability.available_bikes, Availability.available_bike_stands).filter(
                     Availability.time_updated > midnight, Availability.station_id.in_(req['station_ids'] + req['available_ids'])).all()
                 station_data_df = pd.DataFrame(station_information, columns=[
-                                            'station_id', 'time_updated', 'available_bikes', 'bike_stands'])
+                    'station_id', 'time_updated', 'available_bikes', 'bike_stands'])
 
                 # Group by hour and station id and get mean avail bikes and bike stands
                 station_data_df = station_data_df.groupby([station_data_df['time_updated'].dt.floor('H'), station_data_df['station_id']]).agg({
@@ -232,7 +237,7 @@ def route_planning():
 
                 station_data_df['hour'] = station_data_df['time_updated'].dt.hour
                 station_data_df = station_data_df[['station_id',
-                                                'hour', 'available_bikes', 'bike_stands']]
+                                                   'hour', 'available_bikes', 'bike_stands']]
 
             # Get the predicted weather for that day
             weather_predictive = session.query(WeatherPredictive).all()
@@ -370,7 +375,6 @@ def route_planning():
         session.close()
 
 
-
 @app.route('/')
 def root():
     try:
@@ -387,6 +391,7 @@ def root():
         return jsonify({"error": f"error: failed to get station - {str(e)}"}), 500
     finally:
         session.close()
+
 
 if __name__ == "__main__":
     app.run(debug=True)
