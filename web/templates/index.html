@@ -11,14 +11,14 @@
       type="text/css"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/bicycle-24.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/bicycle-24.ico') }}"> <!-- adds a favicon to browser tab-->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <title>On Your Bike</title>
   </head>
   <body>
     <header>
       <div class="header-container">
-        <img src="{{ url_for('static', filename='img/bicyc_road_bike.svg') }}" id="logoimage"> <!-- logo to appear in header next to name "On Your Bike"  -->
+        <img src="{{ url_for('static', filename='img/bicyc_road_bike.svg') }}" id="logoimage"> <!-- sets logo image to appear in header next to name "On Your Bike"  -->
         <!-- <a href="http://www.onlinewebfonts.com">Web Fonts</a> -->
         <p class="logo">On Your Bike</p>
       </div>
