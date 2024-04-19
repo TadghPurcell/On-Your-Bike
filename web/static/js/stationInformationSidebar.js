@@ -124,10 +124,10 @@ export async function stationInformationSidebar(
       data,
       directionsRenderer,
       directionsService,
+      pos,
       modifiedName,
       lat,
-      lng,
-      pos
+      lng
     );
   });
 

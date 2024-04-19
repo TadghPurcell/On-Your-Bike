@@ -459,3 +459,29 @@ h4.journey-instruction {
   margin: 0px;
   padding-bottom: 0;
 }
+
+.starting-div {
+  display: flex;
+  gap: 8px;
+}
+
+.current-location-btn {
+  border: none;
+  background-color: fff;
+  background-image: url("/img/current_location_inactive.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: 24px;
+  height: 24px;
+  transition: all 0.3s, ease-in-out;
+}
+
+.current-location-btn:hover {
+  background-image: url("/img/current_location_active.svg");
+  transform: scale(1.1);
+}
+
+.location-active {
+  background-image: url("/img/current_location_active.svg");
+}

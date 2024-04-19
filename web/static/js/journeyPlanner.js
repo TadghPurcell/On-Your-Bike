@@ -3,17 +3,20 @@ import { getClosestStations } from "./getClosestStations.js";
 export async function initJourneyPlanner(map, 
   data, 
   directionsRenderer,
-  directionsService, 
+  directionsService,
+  pos, 
   selectedStation, 
   lat, 
-  lng, 
-  currentPos) {
+  lng
+  ) {
     const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary("places");
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
       "marker"
     );
-    const geocoder = new google.maps.Geocoder();
 
+    let currentPos;
+
+    const geocoder = new google.maps.Geocoder();
     function geocodeAddress(address) {
       return new Promise((resolve, reject) => {
         geocoder.geocode({ address }, (result, status) => {
@@ -64,9 +67,18 @@ export async function initJourneyPlanner(map,
 
         const startingPoint = document.createElement('div')
         startingPoint.classList.add('searchbar-div')
+        const startingPointLabelDiv = document.createElement('div')
+        startingPointLabelDiv.classList.add('starting-div')
         const startingPointLabel = document.createElement('label')
         startingPointLabel.textContent = 'Starting Point'
         startingPointLabel.setAttribute('for', 'start')
+        const currentLocationBtn = document.createElement('button')
+        currentLocationBtn.classList.add('current-location-btn')
+
+        
+        startingPointLabelDiv.appendChild(startingPointLabel)
+        startingPointLabelDiv.appendChild(currentLocationBtn)
+        
         const startingPointInput = document.createElement('input')
         startingPointInput.setAttribute('type', 'text')
         startingPointInput.setAttribute('id', 'start')
@@ -76,8 +88,28 @@ export async function initJourneyPlanner(map,
           startingPointInput.setAttribute('value', 'Current Location')
         }
         startingPointInput.setAttribute('placeholder', 'Choose a starting point..')
-        
-        startingPoint.appendChild(startingPointLabel)
+  
+        if (selectedStation || lat || lng) {
+          currentLocationBtn.classList.add('location-active')
+          startingPointInput.value = 'Current Location'
+          currentPos = pos
+        }
+
+        currentLocationBtn.addEventListener('click', (e) => {
+          e.preventDefault()
+          currentLocationBtn.classList.toggle('location-active')
+
+          if (currentLocationBtn.classList.contains('location-active')) {
+            startingPointInput.value = 'Current Location'
+            currentPos = pos
+          }
+          if (!currentLocationBtn.classList.contains('location-active')) {
+            startingPointInput.value = ''
+            currentPos = ''
+          }
+        })
+
+        startingPoint.appendChild(startingPointLabelDiv)
         startingPoint.appendChild(startingPointInput)
         
         const destination = document.createElement('div')
@@ -438,6 +470,7 @@ export async function initJourneyPlanner(map,
     resultDiv.innerHTML = "";
     startingPointInput.value = "";
     startingPointInput.classList.remove("error");
+    currentLocationBtn.classList.remove("location-active")
     destinationInput.value = "";
     destinationInput.classList.remove("error");
     console.log(directionsRenderer)

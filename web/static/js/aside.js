@@ -12,11 +12,11 @@ export async function initAside(map, data, directionsRenderer, directionsService
   const btnJourneyPlanner = document.querySelector('.btn-journey-planner')
   const btnNearestStations = document.querySelector('.btn-stations')
   
-  initJourneyPlanner(map, data, directionsRenderer, directionsService)
-  
+  initJourneyPlanner(map, data, directionsRenderer, directionsService, currentPos)
+
   btnJourneyPlanner.addEventListener('click', () => {
     activateSideBar('journey')
-    initJourneyPlanner(map, data, directionsRenderer, directionsService)
+    initJourneyPlanner(map, data, directionsRenderer, directionsService, currentPos)
   })
   btnNearestStations.addEventListener('click', () => {
     activateSideBar('nearest')
@@ -26,4 +26,3 @@ export async function initAside(map, data, directionsRenderer, directionsService
   aside.appendChild(stationDataPiece);
 }
 
-  
