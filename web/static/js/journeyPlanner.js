@@ -110,7 +110,7 @@ export async function initJourneyPlanner(map,
         })
 
         startingPointInput.addEventListener('input', () => {
-          if (!startingPointInput.value == 'Current Location') {
+          if (startingPointInput.value != 'Current Location') {
             currentLocationBtn.classList.remove('location-active')
           }
           startingPointInput.classList.remove('error')

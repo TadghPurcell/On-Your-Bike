@@ -26,8 +26,6 @@ async function initMap() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
                 resolve({ lat: position.coords.latitude, lng: position.coords.longitude });
-            }, err => {
-                reject(err);
             });
         } else {
           resolve(position)
