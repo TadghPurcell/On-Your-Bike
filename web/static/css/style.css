@@ -39,6 +39,7 @@ header {
   box-shadow: var(--box-shadow);
 }
 
+/* Styles both the logo and page name to the correct size */
 .header-container {
   display: flex;
   align-items: center;
@@ -46,13 +47,11 @@ header {
 
 }
 
-/* header > p {
-  font-size: 2rem;
-} */
-
+/* Sets the logo image dimensions only */
 #logoimage{
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 60px;
+  padding-right: 10px;
 }
 
 /* Styling dynamic section for current weather */
