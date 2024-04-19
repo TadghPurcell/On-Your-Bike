@@ -47,4 +47,4 @@ This feature facilitates seamless journey planning, and access to predicted stat
 <a href='https://github.com/TadghPurcell'></a>
 - [Tadgh Purcell](https://github.com/TadghPurcell)
 
-<img src="https://www.onlygfx.com/wp-content/uploads/2015/12/bicycle.png">
+<img src="https://www.svgrepo.com/show/19878/bike.svg">
