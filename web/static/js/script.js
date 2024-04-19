@@ -4,9 +4,9 @@ import { stationInformationSidebar } from "./stationInformationSidebar.js";
 import { getDirectionsRenderer, getDirectionsService } from "./getDirections.js";
 async function initMap() {
   let mapStyleId;
-
+  
   google.charts.load("current", { packages: ["corechart"] });
-
+  
   try {
     const res = await fetch("/dbinfo.json");
     if (!res.ok) {
@@ -18,6 +18,9 @@ async function initMap() {
     console.error("Error loading dbinfo.json:", e);
   }
 
+  // The location of Dublin
+  const position = { lat: 53.346, lng: -6.25 };
+
   async function getCurrentPos() {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
@@ -26,7 +29,9 @@ async function initMap() {
             }, err => {
                 reject(err);
             });
-        } 
+        } else {
+          resolve(position)
+        }
     });
 }
 
@@ -34,8 +39,6 @@ async function initMap() {
 const currentPos = await getCurrentPos()
 console.log(currentPos)
       
-  // The location of Dublin
-  const position = { lat: 53.346, lng: -6.25 };
   // 53.34611327830516, -6.264972599005677
 
   // Request needed libraries.
