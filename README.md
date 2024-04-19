@@ -6,7 +6,7 @@ Our project aimed to develop a standalone web application that provides Dublin B
 
 The website features a simplistic and straightforward design, with an interactive map of Dublin city filling the page. The application name “On Your Bike’ and accompanying logo are displayed clearly at the top of the page, with the details of the weather residing on the top right-hand corner as an informative feature. A sidebar on the right of the page contains a search panel and essential information, providing users with the ability to plan their journey.
 
-
+![App Features](https://github.com/TadghPurcell/se-group27-project/github_imgs/figure_1.png?raw=true "App Features")
 #### Figure 1 - On your bike app features.
 - **Interactive Map:** The focal point of the website is an interactive, functional map of Dublin, allowing users to explore bike stations and plan their route efficiently, in a visual manner. Markers for bike stations, and the surrounding landmarks are highlighted across the map, allowing users to zoom in and out of points of interest with ease.
 
