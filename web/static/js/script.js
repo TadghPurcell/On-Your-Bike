@@ -161,7 +161,7 @@ async function initMap() {
           latestTimeUpdate,
           directionsRenderer,
           directionsService,
-          pos,
+          currentPos,
           data,
           map
         );
