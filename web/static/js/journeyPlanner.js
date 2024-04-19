@@ -255,7 +255,7 @@ export async function initJourneyPlanner(map,
     start.name = formData.get("start");
     destination.name = formData.get("destination");
     start.pos = startingPointInput. value == 'Current Location' ? currentPos : await geocodeAddress(formData.get("start"))
-    destination.pos = selectedStation ? { lat, lng } : await geocodeAddress(formData.get("destination"))
+    destination.pos = destinationInput == selectedStation ? { lat, lng } : await geocodeAddress(formData.get("destination"))
 
     let closestStartStation;
     let closestDestStation;
