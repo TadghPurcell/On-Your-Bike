@@ -2,9 +2,13 @@
 You can access our web application here: https://onyourbike.info/
 
 ## Description
-Our project aimed to develop a standalone web application that provides Dublin Bikes users with real-time occupancy and weather information. With a primary focus on user experience, the goal was to create a highly functional and simple to use web page, tailored to the needs of cyclists and commuters in Dublin’s city centre.
+This project developed a standalone web application that provides Dublin Bikes users with real-time occupancy and weather information.
 
-The website features a simplistic and straightforward design, with an interactive map of Dublin city filling the page. The application name “On Your Bike’ and accompanying logo are displayed clearly at the top of the page, with the details of the weather residing on the top right-hand corner as an informative feature. A sidebar on the right of the page contains a search panel and essential information, providing users with the ability to plan their journey.
+The primary focus was placed on the user experience, with a central goal of creating a highly functional and intuitive web page, tailored to the needs of cyclists and commuters in Dublin’s city centre.
+
+The website features a simplistic and aesthetic design, with an interactive map, an application logo and name “On Your Bike", and real-time weather details appearing at the top of the screen as an informative feature. 
+
+A sidebar for journey planning is displayed on the right of the page, containing a search panel tab and additon station information tabs. This features allows the user to plan their journey.
 
 ![App Features](https://github.com/TadghPurcell/se-group27-project/blob/main/github_imgs/figure_1.png?raw=true "App Features")
 #### Figure 1 - On your bike app features.
