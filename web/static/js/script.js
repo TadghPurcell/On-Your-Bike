@@ -17,28 +17,24 @@ async function initMap() {
   } catch (e) {
     console.error("Error loading dbinfo.json:", e);
   }
-
+  
+  // Get current location
   // The location of Dublin
   const position = { lat: 53.346, lng: -6.25 };
-
+  let currentPos = position;
   async function getCurrentPos() {
     return new Promise((resolve, reject) => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
-                resolve({ lat: position.coords.latitude, lng: position.coords.longitude });
-            });
-        } else {
-          resolve(position)
-        }
+      navigator.geolocation.getCurrentPosition(position => {
+        resolve({ lat: position.coords.latitude, lng: position.coords.longitude });
+      });
     });
-}
-
-// Get current location
-const currentPos = await getCurrentPos()
+  }
+  
+  if (navigator.geolocation) {
+    currentPos = await getCurrentPos()
+  }
 console.log(currentPos)
       
-  // 53.34611327830516, -6.264972599005677
-
   // Request needed libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
   const { Place } = await google.maps.importLibrary("places");
