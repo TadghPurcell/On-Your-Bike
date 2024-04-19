@@ -1,6 +1,13 @@
 import { getClosestStations } from "./getClosestStations.js";
 
-export async function initJourneyPlanner(map, data, directionsRenderer, directionsService, selectedStation, lat, lng) {
+export async function initJourneyPlanner(map, 
+  data, 
+  directionsRenderer,
+  directionsService, 
+  selectedStation, 
+  lat, 
+  lng, 
+  currentPos) {
     const { Autocomplete, Place, SearchBox } = await google.maps.importLibrary("places");
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
       "marker"
@@ -65,6 +72,9 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
         startingPointInput.setAttribute('id', 'start')
         startingPointInput.setAttribute('name', 'start')
         startingPointInput.required = true
+        if (currentPos) {
+          startingPointInput.setAttribute('value', 'Current Location')
+        }
         startingPointInput.setAttribute('placeholder', 'Choose a starting point..')
         
         startingPoint.appendChild(startingPointLabel)
@@ -204,7 +214,7 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
 
     start.name = formData.get("start");
     destination.name = formData.get("destination");
-    start.pos = await geocodeAddress(formData.get("start"))
+    start.pos = currentPos ? currentPos : await geocodeAddress(formData.get("start"))
     destination.pos = selectedStation ? { lat, lng } : await geocodeAddress(formData.get("destination"))
     let closestStartStation;
     let closestDestStation;
@@ -440,7 +450,4 @@ export async function initJourneyPlanner(map, data, directionsRenderer, directio
     map.setCenter({ lat: 53.346, lng: -6.25 });
     map.setZoom(14);
   });
-  if (selectedStation) {
-    startingPointInput.focus();
-  }
 }

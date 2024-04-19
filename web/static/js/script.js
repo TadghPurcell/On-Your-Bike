@@ -18,6 +18,15 @@ async function initMap() {
     console.error("Error loading dbinfo.json:", e);
   }
 
+  // Get current location
+  let currentPos = {}
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        currentPos.lat = position.coords.latitude
+        currentPos.lng = position.coords.longitude
+      })};
+      
   // The location of Dublin
   const position = { lat: 53.346, lng: -6.25 };
   // 53.34611327830516, -6.264972599005677
@@ -152,6 +161,7 @@ async function initMap() {
           latestTimeUpdate,
           directionsRenderer,
           directionsService,
+          pos,
           data,
           map
         );
@@ -160,8 +170,7 @@ async function initMap() {
       return marker;
     }
   );
-
-initAside(map, data, directionsRenderer, directionsService)
+initAside(map, data, directionsRenderer, directionsService, currentPos)
 
 const markerCluster = new markerClusterer.MarkerClusterer({ markers, map})
 }

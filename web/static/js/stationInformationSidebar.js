@@ -14,6 +14,7 @@ export async function stationInformationSidebar(
   latestTimeUpdate,
   directionsRenderer,
   directionsService,
+  pos,
   data,
   map
 ) {
@@ -79,29 +80,6 @@ export async function stationInformationSidebar(
   stationWalkTime.classList.add("station_information_data");
   stationWalkTime.classList.add("station_information_walk_time");
   stationWalkTime.textContent = "..."; // Leave as 3 dots while walk time loads
-  navigator.geolocation.getCurrentPosition = (fn) => {
-    setTimeout(() => {
-      fn({
-        coords: {
-          accuracy: 40,
-          altitude: null,
-          altitudeAccuracy: null,
-          heading: null,
-          latitude: 53.303921,
-          longitude: -6.25104,
-          speed: null,
-        },
-        timestamp: Date.now(),
-      });
-    }, 2912);
-  };
-  // Get the current location if available and add distance and walk times to sidebar
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const pos = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      };
 
       const stationDistInfo = await new Promise((resolve, reject) => {
         distanceService.getDistanceMatrix(
@@ -127,8 +105,6 @@ export async function stationInformationSidebar(
       });
       stationDistance.innerText = stationDistInfo.distanceText;
       stationWalkTime.innerText = stationDistInfo.walkTime;
-    });
-  }
 
   quickInfo.appendChild(stationDistance);
   quickInfo.appendChild(stationWalkTime);
@@ -151,6 +127,7 @@ export async function stationInformationSidebar(
       modifiedName,
       lat,
       lng,
+      pos
     );
   });
 
