@@ -478,8 +478,24 @@ h4.journey-instruction {
 }
 
 .current-location-btn:hover {
+  position: relative;
   background-image: url("/img/current_location_active.svg");
   transform: scale(1.1);
+}
+
+.current-location-btn:hover::after {
+  content: "Add Current Location";
+  display: inline-block;
+  position: absolute;
+  text-wrap: nowrap;
+  white-space: no-wrap;
+  font-size: 0.75rem;
+  background-color: var(--light-green);
+  color: #fff;
+  padding: 10px;
+  top: -40px;
+  border: none;
+  border-radius: 10px;
 }
 
 .location-active {

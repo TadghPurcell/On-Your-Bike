@@ -98,8 +98,8 @@ export async function initJourneyPlanner(map,
         currentLocationBtn.addEventListener('click', (e) => {
           e.preventDefault()
           currentLocationBtn.classList.toggle('location-active')
-
           if (currentLocationBtn.classList.contains('location-active')) {
+            startingPointInput.classList.remove("error");
             startingPointInput.value = 'Current Location'
             currentPos = pos
           }
@@ -107,6 +107,10 @@ export async function initJourneyPlanner(map,
             startingPointInput.value = ''
             currentPos = ''
           }
+        })
+
+        startingPointInput.addEventListener('input', () => {
+          startingPointInput.classList.remove('error')
         })
 
         startingPoint.appendChild(startingPointLabelDiv)
@@ -127,6 +131,10 @@ export async function initJourneyPlanner(map,
             destinationInput.setAttribute('value', selectedStation)
         }
         
+        destinationInput.addEventListener('input', () => {
+          destinationInput.classList.remove('error')
+        })
+
         destination.appendChild(destinationLabel)
         destination.appendChild(destinationInput)
         
@@ -470,9 +478,9 @@ export async function initJourneyPlanner(map,
     resultDiv.innerHTML = "";
     startingPointInput.value = "";
     startingPointInput.classList.remove("error");
+    destinationInput.classList.remove("error");
     currentLocationBtn.classList.remove("location-active")
     destinationInput.value = "";
-    destinationInput.classList.remove("error");
     console.log(directionsRenderer)
     directionsRenderer.forEach(renderer => {
       renderer.setDirections(null);
