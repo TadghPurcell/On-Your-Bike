@@ -10,22 +10,6 @@ export async function ClosestStations(
   // Import google library
   const { DistanceMatrixService } = await google.maps.importLibrary("routes");
   const distanceService = new DistanceMatrixService();
-  navigator.geolocation.getCurrentPosition = (fn) => {
-    setTimeout(() => {
-      fn({
-        coords: {
-          accuracy: 40,
-          altitude: null,
-          altitudeAccuracy: null,
-          heading: null,
-          latitude: 53.303921,
-          longitude: -6.25104,
-          speed: null,
-        },
-        timestamp: Date.now(),
-      });
-    }, 2912);
-  };
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
