@@ -254,15 +254,15 @@ export async function initJourneyPlanner(map,
 
     start.name = formData.get("start");
     destination.name = formData.get("destination");
-    start.pos = currentPos ? currentPos : await geocodeAddress(formData.get("start"))
+    start.pos = startingPointInput. value == 'Current Location' ? currentPos : await geocodeAddress(formData.get("start"))
     destination.pos = selectedStation ? { lat, lng } : await geocodeAddress(formData.get("destination"))
+
     let closestStartStation;
     let closestDestStation;
     const startClosestStations = await getClosestStations(data, start, 30);
     const destinationClosestStations = await getClosestStations(
       data,
       destination,
-      
     );
     res["available_ids"] = startClosestStations.map((station) => station.sId);
     res["station_ids"] = destinationClosestStations.map(
