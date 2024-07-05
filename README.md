@@ -2,7 +2,7 @@
 You can access our web application here: https://onyourbike.info/
 
 ## Description
-This project developed a standalone web application that provides Dublin Bikes users with real-time occupancy and weather information.
+This project was developed as a standalone web application that provides Dublin Bikes users with real-time occupancy and weather information.
 
 The primary focus was placed on the user experience, with a central goal of creating a highly functional and intuitive web page, tailored to the needs of cyclists and commuters in Dublin’s city centre.
 
